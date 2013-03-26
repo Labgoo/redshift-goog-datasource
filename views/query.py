@@ -18,9 +18,9 @@ def query_db(query, args):
 	return description, data, columns_order
 
 def get_mongo():	
-	from pymongo import MongoClient
+	from pymongo import MongoClient, uri_parser
 
-	mongolab_uri = os.environ.get('MONGODB_URI')
+	mongolab_uri = os.environ['MONGOLAB_URI']
 	url = uri_parser.parse_uri(mongolab_uri)
 	MONGODB_USERNAME = url['username']
 	MONGODB_PASSWORD = url['password']
