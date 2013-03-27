@@ -716,7 +716,9 @@
                     forms.push(form);
                     prevForm = form;
                 } else {
-                    prevForm.data('nextForm', false);
+                    if (prevForm) {
+                       prevForm.data('nextForm', false);
+                    }
                     break;
                 }
 

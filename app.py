@@ -8,15 +8,18 @@ import logging
 app = Flask(__name__)
 
 app.config.update(
-    DEBUG = True,
-    SQLALCHEMY_DATABASE_URI = os.environ['SQLALCHEMY_DATABASE_URI']
+	DEBUG = True,
+	SQLALCHEMY_DATABASE_URI = os.environ['SQLALCHEMY_DATABASE_URI']
 )
 
 db = SQLAlchemy(app)
 
+from sqlalchemy.dialects import registry
+registry.register('postgresql.redshift', 'redshift' '', 'PGDialect_RedShift')
+
 @app.before_request
 def before_request():
-    g.db = db.engine
+	g.db = db.engine
 
 from views import query
 app.register_blueprint(query.mod)

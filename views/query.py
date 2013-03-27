@@ -72,18 +72,14 @@ def query_execute_sql(sql, meta_vars, vars):
 
 	vars = vars_with_default_value(meta_vars, vars)
 
-	try:
-		description, data, columns_order = query_db(sql, vars)
-	except Exception, ex:
-		logging.exception("Failed to execute query %s", ex)
-		json = {}
+	description, data, columns_order = query_db(sql, vars)
 
 	import gviz_api
-	
+
 	data_table = gviz_api.DataTable(description)
 	data_table.LoadData(data)
 
-	return data_table, columns_order
+	return data_table, columns_order	
 
 def load_sql(query_name):
 	data_explorer = get_mongo()
@@ -119,8 +115,6 @@ def new_query():
 @mod.route('/new', methods=['POST'])
 @mod.route('/<query_name>', methods=['POST'])
 def create_query(query_name=None):
-	logging.info('executing query')
-
 	def extract_meta_var_fields():
 		index = 0
 
@@ -157,6 +151,9 @@ def create_query(query_name=None):
 
 	query_name = request.form.get('query-name')
 
+	if query_name == 'new':
+		query_name = None
+
 	if query_name:
 		save_query(query_name, sql, meta_vars)
 		vars = vars_from_request(meta_vars, False)
@@ -168,7 +165,7 @@ def create_query(query_name=None):
 		data_table, columns_order = query_execute_sql(sql, meta_vars, vars)
 		json = data_table.ToJSon(columns_order=columns_order)
 	except Exception, ex:
-		logging.exception("Failed to execute query", ex)
+		logging.exception("Failed to execute query %s", ex)
 		json = {}
 
 	return render_template('query/new.html', 
@@ -193,7 +190,12 @@ def query_home(query_name=None):
 
 	sql, meta_vars = load_sql(query_name)
 
-	data_table, columns_order = query_execute_sql(sql, meta_vars, vars)
+	try:
+		data_table, columns_order = query_execute_sql(sql, meta_vars, vars)
+		json = data_table.ToJSon(columns_order=columns_order)
+	except Exception, ex:
+		logging.exception("Failed to execute query %s", ex)
+		return
 
 	if not request.args.get('json', None) is None:
 		return Response(data_table.ToJSonResponse(columns_order=columns_order),  mimetype='application/json')
