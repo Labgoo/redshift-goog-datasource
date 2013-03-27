@@ -697,6 +697,35 @@
             }
         }
 
+        function inital_forms() 
+        {
+            var forms = [];
+
+            var i = 0;
+            var prevForm;
+            for (;;) {
+                var form = $(options.formTemplateSelector + i);
+
+                if (form.length > 0) {
+                    form = $(form[0]);
+
+                    if (prevForm) {
+                        prevForm.data('nextForm', form);
+                    }
+
+                    forms.push(form);
+                    prevForm = form;
+                } else {
+                    prevForm.data('nextForm', false);
+                    break;
+                }
+
+                i += 1;
+            }
+
+            return forms;
+        }
+
         /**
          * Count the current elements
          */
@@ -1451,7 +1480,6 @@
             templateForm,
             noFormsTemplate,
             formFields = "input, checkbox, select, textarea",
-            forms = [],
             ip =  false, // Internal ip
             // Default options
             defaults = {
@@ -1516,6 +1544,9 @@
 
 
         setOptions(options);
+
+        forms = inital_forms();
+
         initialize();
 
         return source;
