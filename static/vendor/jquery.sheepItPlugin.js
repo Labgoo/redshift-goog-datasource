@@ -88,17 +88,19 @@
                 options.beforeRemoveCurrent(source);
             }
             
+            var removedFormed = $(this).data('removableClone');
+
             if (options.removeCurrentConfirmation) {
                 if ( confirm(options.removeCurrentConfirmationMsg) ) {
-                    removeCurrentForm($(this).data('removableClone'));
+                    removeCurrentForm(removedFormed);
                 }
             } else {
-                removeCurrentForm($(this).data('removableClone'));
+                removeCurrentForm(removedFormed);
             }
             
             // After remove current callBack function
             if (typeof options.afterRemoveCurrent === "function") {
-                options.afterRemoveCurrent(source);
+                options.afterRemoveCurrent(source, removedFormed);
             }
         }
 
@@ -333,15 +335,10 @@
          * 
          * @parameter normalize: avoid normalize all forms if not necessary
          */
-        function addForm(normalizeAllafterAdd, form)
+        function addForm(normalizeAllAfterAdd, form)
         {
-            if (typeof normalizeAllafterAdd == 'undefined') {
-                normalizeAllafterAdd = true;
-            }
-            
-            if (typeof form == 'undefined') {
-                form = false;
-            }
+            normalizeAllAfterAdd = normalizeAllAfterAdd || true;
+            form = form || false;          
 
             // Before add callBack function
             if (typeof options.beforeAdd === "function") {
@@ -362,7 +359,6 @@
                 }
                 
                 newForm.remove();
-               
             }
             // Cloned Form
             else {
@@ -376,7 +372,7 @@
                 
 
                 // Remove current control
-                var removeCurrentBtn = newForm.find(options.removeCurrentSelector).first();
+                var removeCurrentBtn = newForm.find(options.removeCurrentSelector, newForm);
 
                 removeCurrentBtn.click(clickOnRemoveCurrent);
                 removeCurrentBtn.data('removableClone', newForm);
@@ -441,7 +437,7 @@
                  * all items are reindexed/renumbered using 
                  * normalizeAll() after add a new form clone
                  */
-                if (normalizeAllafterAdd || options.continuousIndex) {
+                if (normalizeAllAfterAdd || options.continuousIndex) {
                     normalizeAll();
                 }
 
@@ -697,35 +693,21 @@
             }
         }
 
-        function inital_forms() 
+        function initalForms() 
         {
-            var forms = [];
-
             var i = 0;
             var prevForm;
             for (;;) {
                 var form = $(options.formTemplateSelector + i);
 
                 if (form.length > 0) {
-                    form = $(form[0]);
-
-                    if (prevForm) {
-                        prevForm.data('nextForm', form);
-                    }
-
-                    forms.push(form);
-                    prevForm = form;
+                    addForm(false, $(form[0]));
                 } else {
-                    if (prevForm) {
-                       prevForm.data('nextForm', false);
-                    }
                     break;
                 }
 
                 i += 1;
             }
-
-            return forms;
         }
 
         /**
@@ -733,7 +715,7 @@
          */
         function count()
         {
-            if (forms.length > 0) {
+            if (forms && forms.length > 0) {
                 var count = 0;
                 var x = [];
                 for (x in forms) {
@@ -1492,7 +1474,7 @@
                 addNInputSelector: '#' + $(this).attr("id") + '_add_n_input',
                 addNButtonSelector: '#' + $(this).attr("id") + '_add_n_button',
                 removeLastSelector: '#' + $(this).attr("id") + '_remove_last',
-                removeCurrentSelector: '#' + $(this).attr("id") + '_remove_current',
+                removeCurrentSelector: '.' + $(this).attr("id") + '_remove_current',
                 removeAllSelector: '#' + $(this).attr("id") + '_remove_all',
                 controlsSelector: '#' + $(this).attr("id") + '_controls',
                 labelSelector: '#' + $(this).attr("id") + '_label',
@@ -1547,9 +1529,11 @@
 
         setOptions(options);
 
-        forms = inital_forms();
+        forms = [];
 
         initialize();
+
+        initalForms();
 
         return source;
     };

@@ -19,10 +19,14 @@ registry.register('postgresql.redshift', 'redshift' '', 'PGDialect_RedShift')
 
 @app.before_request
 def before_request():
+	logging.getLogger().setLevel(logging.INFO)
 	g.db = db.engine
 
 from views import query
+from views import transformer
+
 app.register_blueprint(query.mod)
+app.register_blueprint(transformer.mod)
 
 if __name__ == '__main__':
 	# Bind to PORT if defined, otherwise default to 5000.

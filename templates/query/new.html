@@ -12,9 +12,6 @@
 
 {% block body %}
 <div class="span9 offset2">
-
-		<link rel=stylesheet type=text/css href="{{ url_for('static', filename='css/bootstrap.css') }}" media="screen">
-		<link rel=stylesheet type=text/css href="{{ url_for('static', filename='css/bootstrap-responsive.css') }}" media="screen">
 	<form id="sheepItForm" method="post" action="{% if query_name %}{{url_for('.query_home', query_name=query_name) }}{%else%}{{ url_for('.create_query') }}{%endif%}">
 		<fieldset>
 			<div class="controls controls-row">
@@ -22,9 +19,15 @@
 			</div>
 			<div class="controls">
 				<textarea id="sql" name="sql" class="span9" rows="5">{{sql|safe}}</textarea>
+				{%if error %}
+				<div class="alert alert-error">
+					<button type="button" class="close" data-dismiss="alert">&times;</button>
+	  				{{error}}
+				</div>
+				{%endif%}				
 			</div>
 			<div class="controls controls-row">
-					<input id="sql-execute" type="submit" class="btn btn-primary btn-xxlarge pull-right" value="Execute"/>
+				<input id="sql-execute" type="submit" class="btn btn-primary btn-xxlarge pull-right" value="Execute"/>
 			</div>
 			<div id="vars">
 				{%for name,value in vars%}
@@ -45,8 +48,8 @@
 								<option {% if options.type == "float" %}selected="selected"{% endif %}>float</option>
 						</select>
 						<input id="sheepItForm_{{prefix}}_default" class="span2" type="text" name="var-default{{prefix}}" placeholder="Default value" value="{{options.default}}" {%if not index is none%}idtemplate="sheepItForm_%23index%23_default" nametemplate="var-default%23index%23"{%endif%} />
-						<div id="sheepItForm_remove_current" class="span2" style="display: block;">
-							<a href="#" class="delete-variable btn btn-danger btn-small"><i class="icon-white icon-trash"></i> 	Delete</a>
+						<div class="span2">
+							<a href="#" style="float:left" class="sheepItForm_remove_current delete-variable btn btn-danger btn-small"><i class="icon-white icon-trash"></i> 	Delete</a>
 						</div>
 				</div>
 			{%- endmacro %}

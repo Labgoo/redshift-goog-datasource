@@ -2,9 +2,27 @@
 
 from flask import render_template, request, Blueprint, g, Response, redirect, url_for
 import logging, json
-import pymongo, os
+import mongo, os
 
 mod = Blueprint('query', __name__, url_prefix='/query')
+
+def execute_transform(transformer_name, data):
+	logging.info('executing transformer %s', transformer_name)
+	data_explorer = mongo.get_mongo()
+	if data_explorer:
+		transformer = data_explorer.transformers.find_one({"name": transformer_name})
+
+	if not transformer:
+		return data
+
+	code = transformer.get('code')
+
+	code_globals = {}
+	code_locals = {'data': data}
+ 	code_object = compile(code, '<string>', 'exec')
+	exec code_object in code_globals, code_locals
+
+	return code_locals['result']
 
 def query_db(query, args):
 	sql = query.format(**args)
@@ -14,30 +32,13 @@ def query_db(query, args):
 	columns_order = [column for column, value in rows[0].items()]
 	data = [dict((column, value) for column, value in row.items()) for row in rows]
 
-	type_convert = {"unicode": "string", "string": "string", "long": "number"}
+	type_convert = {"unicode": "string", "string": "string", "long": "number", "int": "number"}
 	description = dict([(name, (type_convert[type(value).__name__], name)) for name, value in data[0].iteritems()])	
 
 	return description, data, columns_order
 
-def get_mongo():	
-	from pymongo import MongoClient, uri_parser
-
-	mongolab_uri = os.environ['MONGOLAB_URI']
-	url = uri_parser.parse_uri(mongolab_uri)
-	MONGODB_USERNAME = url['username']
-	MONGODB_PASSWORD = url['password']
-	MONGODB_HOST, MONGODB_PORT = url['nodelist'][0]
-	MONGODB_DB = url['database']
-
-	connection = MongoClient(MONGODB_HOST, MONGODB_PORT)
-	db = connection[MONGODB_DB]
-	if MONGODB_USERNAME:
-		db.authenticate(MONGODB_USERNAME, MONGODB_PASSWORD)
-
-	return db
-
 def save_query(query_name, sql, meta_vars):
-	data_explorer = get_mongo()
+	data_explorer = mongo.get_mongo()
 	data_explorer.queries.update(
 		{'name': query_name}, 
 		{"$set": {'sql': sql, 'meta_vars': meta_vars}},
@@ -66,25 +67,33 @@ def vars_with_default_value(meta_vars, vars):
 
 	return result
 
+def data_to_datatable(description, data, columns_order):
+	import gviz_api
+
+	data_table = gviz_api.DataTable(description)
+	data_table.LoadData(data)
+
+	return data_table, columns_order
+
 def query_execute_sql(sql, meta_vars, vars):
 	meta_vars = dict(meta_vars)
 	vars = dict(vars)
 
 	vars = vars_with_default_value(meta_vars, vars)
 
+	logging.info('execute query %s %s %s', sql, vars, meta_vars)
+
 	description, data, columns_order = query_db(sql, vars)
 
-	import gviz_api
-
-	data_table = gviz_api.DataTable(description)
-	data_table.LoadData(data)
-
-	return data_table, columns_order	
+	return description, data, columns_order
 
 def load_sql(query_name):
-	data_explorer = get_mongo()
+	data_explorer = mongo.get_mongo()
 	if data_explorer:
 		query = data_explorer.queries.find_one({"name": query_name})
+
+	if not query:
+		return None, None
 
 	meta_vars = query.get('meta_vars')
 
@@ -162,15 +171,17 @@ def create_query(query_name=None):
 	vars = vars_from_request(meta_vars, True)
 
 	try:
-		data_table, columns_order = query_execute_sql(sql, meta_vars, vars)
-		json = data_table.ToJSon(columns_order=columns_order)
+		description, data, columns_order = query_execute_sql(sql, meta_vars, vars)
+
+		data_table, columns_order = data_to_datatable(description, data, columns_order)
+		json_data = data_table.ToJSon(columns_order=columns_order)
 	except Exception, ex:
 		logging.exception("Failed to execute query %s", ex)
 		json = {}
 
 	return render_template('query/new.html', 
 		query_name = query_name, 
-		json = json, 
+		json = json_data, 
 		sql = sql, 
 		meta_vars = meta_vars, 
 		vars = vars)
@@ -190,21 +201,44 @@ def query_home(query_name=None):
 
 	sql, meta_vars = load_sql(query_name)
 
+	if not sql:
+		return redirect(url_for('.new_query'))
+
+	transform = request.args.get('transform', None)
+
+	raw_data = not request.args.get('json', None) is None
+
 	try:
-		data_table, columns_order = query_execute_sql(sql, meta_vars, vars)
-		json = data_table.ToJSon(columns_order=columns_order)
+		description, data, columns_order = query_execute_sql(sql, meta_vars, vars)
+
+		if transform:
+			data = execute_transform(transform, data)
+
+		if raw_data:
+			json_data = json.dumps(data)
+		else:
+			data_table, columns_order = data_to_datatable(description, data, columns_order)
+			json_data = data_table.ToJSon(columns_order=columns_order)
+		
+		error = ''
 	except Exception, ex:
 		logging.exception("Failed to execute query %s", ex)
-		return
+		error = ex.message
+		data_table = None
 
-	if not request.args.get('json', None) is None:
+	if not request.args.get('gwiz', None) is None:
 		return Response(data_table.ToJSonResponse(columns_order=columns_order),  mimetype='application/json')
+	if not request.args.get('json', None) is None:
+		if error:
+			return Response(error)
+
+		return Response(json_data,  mimetype='application/json')
 	elif not request.args.get('html', None) is None:
 		return Response(data_table.ToHtml(columns_order=columns_order))
 	elif not request.args.get('csv', None) is None:
 		return Response(data_table.ToCsv(columns_order=columns_order), mimetype='text/csv')
 	else:
-		json = data_table.ToJSon(columns_order=columns_order)
+		json_data = data_table.ToJSon(columns_order=columns_order) if data_table else None
 		
 		full_vars = []
 		vars = dict(vars)
@@ -217,8 +251,8 @@ def query_home(query_name=None):
 
 		return render_template('query/new.html', 
 			query_name = query_name, 
-			sql = sql, 
-			json = json,
+			sql = sql,
+			error = error,
+			json = json_data,
 			meta_vars = meta_vars, 
 			vars = full_vars)
-		

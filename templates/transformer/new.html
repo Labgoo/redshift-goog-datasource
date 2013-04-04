@@ -1,0 +1,31 @@
+{% extends "layout.html" %}
+
+{% block head %}
+	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+	<script src="{{ url_for('static', filename='vendor/codemirror/codemirror.js') }}"></script>
+	<link rel="stylesheet" href="{{ url_for('static', filename='vendor/codemirror/codemirror.css') }}" media="screen"/>
+	<script src="{{ url_for('static', filename='vendor/codemirror/sql.js') }}"></script>
+	<link rel=stylesheet type=text/css href="{{ url_for('static', filename='css/codemirror-custom.css') }}" media="screen">
+	<script src="{{ url_for('static', filename='vendor/jquery.sheepItPlugin.js') }}"></script>
+	<script src="{{ url_for('static', filename='js/transformer-editor.js') }}"></script>
+{% endblock%}
+
+{% block body %}
+<div class="span9 offset2">
+	<form method="post" action="{% if transformer_name %}{{url_for('.transformer_home', transformer_name=transformer_name) }}{%else%}{{ url_for('.create_transformer') }}{%endif%}">
+		<fieldset>
+			<div class="controls controls-row">
+				<input class="span9 input-xxlarge" type="text" id="title" name="transformer-name" value="{{transformer_name}}" placeholder="Enter a title for your transformer" maxlength="100" />
+			</div>
+			<div class="controls">
+				<textarea id="code" name="code" class="span9" rows="5">{{code|safe}}</textarea>
+			</div>
+			<div class="controls controls-row">
+				<input type="submit" class="btn btn-primary btn-xxlarge pull-right" value="Save"/>
+			</div>
+		</fieldset>
+	</form>
+	<div id="table_div_json"></div>
+
+</div>
+{% endblock %}

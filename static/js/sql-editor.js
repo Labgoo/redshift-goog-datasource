@@ -31,7 +31,9 @@ $(document).ready(function () {
 		afterAdd: function(source, newForm) {
             recreateVars = true;
         },
-        afterRemoveCurrent: function(source, clone) {
+        afterRemoveCurrent: function(source, removedForm) {
+			var fieldName = $('.var-name', removedForm).val();
+        	$('input[name=' + fieldName + ']').parents('.control-group').remove();
             recreateVars = true;
         }
     });
@@ -54,7 +56,7 @@ $(document).ready(function () {
 			var defaultValue = $("#sheepItForm_" +  i + "_default").val();
 			
 			var fieldId = "dynfield" + i;
-			var currentValue = $("#" + fieldId + i).val();
+			var currentValue = $('input[name='+ name +']').val();
 
 			var value = currentValue || defaultValue;
 
