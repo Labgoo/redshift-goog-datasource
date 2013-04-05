@@ -32,7 +32,7 @@ def query_db(query, args):
 	columns_order = [column for column, value in rows[0].items()]
 	data = [dict((column, value) for column, value in row.items()) for row in rows]
 
-	type_convert = {"unicode": "string", "string": "string", "long": "number", "int": "number"}
+	type_convert = {"unicode": "string", "string": "string", "long": "number", "int": "number", "datetime": "timetime"}
 	description = dict([(name, (type_convert[type(value).__name__], name)) for name, value in data[0].iteritems()])	
 
 	return description, data, columns_order
@@ -177,12 +177,14 @@ def create_query(query_name=None):
 		json_data = data_table.ToJSon(columns_order=columns_order)
 	except Exception, ex:
 		logging.exception("Failed to execute query %s", ex)
-		json = {}
+		error = ex.message
+		json_data = {}
 
 	return render_template('query/new.html', 
 		query_name = query_name, 
 		json = json_data, 
 		sql = sql, 
+		error = error,
 		meta_vars = meta_vars, 
 		vars = vars)
 
@@ -223,7 +225,7 @@ def query_home(query_name=None):
 		error = ''
 	except Exception, ex:
 		logging.exception("Failed to execute query %s", ex)
-		error = ex.message
+		error = str(ex)
 		data_table = None
 
 	if not request.args.get('gwiz', None) is None:
