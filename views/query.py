@@ -3,6 +3,7 @@
 from flask import render_template, request, Blueprint, g, Response, redirect, url_for
 import logging, json
 import mongo, os
+from datetime import datetime
 
 mod = Blueprint('query', __name__, url_prefix='/query')
 
@@ -29,11 +30,18 @@ def query_db(query, args):
 	cur = g.db.execute(sql)
 	rows = cur.fetchall()
 
-	columns_order = [column for column, value in rows[0].items()]
+	if len(rows) > 0:
+		columns_order = [column for column, value in rows[0].items()]
+	else:
+		columns_order = []
+
 	data = [dict((column, value) for column, value in row.items()) for row in rows]
 
 	type_convert = {"unicode": "string", "string": "string", "long": "number", "int": "number", "datetime": "datetime", "float": "number"}
-	description = dict([(name, (type_convert[type(value).__name__], name)) for name, value in data[0].iteritems()])	
+	if len(data) > 0:
+		description = dict([(name, (type_convert[type(value).__name__], name)) for name, value in data[0].iteritems()])	
+	else:
+		description = {}
 
 	return description, data, columns_order
 
@@ -173,8 +181,13 @@ def create_query(query_name=None):
 	try:
 		description, data, columns_order = query_execute_sql(sql, meta_vars, vars)
 
-		data_table, columns_order = data_to_datatable(description, data, columns_order)
-		json_data = data_table.ToJSon(columns_order=columns_order)
+		if len(data) > 0:
+			data_table, columns_order = data_to_datatable(description, data, columns_order)
+			json_data = data_table.ToJSon(columns_order=columns_order)
+		else:
+			json_data = json.dumps([])
+
+		error = ''
 	except Exception, ex:
 		logging.exception("Failed to execute query %s", ex)
 		error = ex.message
@@ -187,6 +200,9 @@ def create_query(query_name=None):
 		error = error,
 		meta_vars = meta_vars, 
 		vars = vars)
+
+def handle_datetime(obj):
+	return obj.isoformat() if isinstance(obj, datetime) else None
 
 @mod.route('/', methods=['GET'])
 @mod.route('/<query_name>', methods=['GET'])
@@ -217,14 +233,14 @@ def query_home(query_name=None):
 			data = execute_transform(transform, data)
 
 		if raw_data:
-			json_data = json.dumps(data)
+			json_data = json.dumps(data, default=handle_datetime)
 		else:
 			data_table, columns_order = data_to_datatable(description, data, columns_order)
 			json_data = data_table.ToJSon(columns_order=columns_order)
 		
 		error = ''
 	except Exception, ex:
-		logging.exception("Failed to execute query %s", ex)
+		logging.error("Failed to execute query %s", ex)
 		error = str(ex)
 		data_table = None
 
