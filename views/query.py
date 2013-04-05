@@ -32,7 +32,7 @@ def query_db(query, args):
 	columns_order = [column for column, value in rows[0].items()]
 	data = [dict((column, value) for column, value in row.items()) for row in rows]
 
-	type_convert = {"unicode": "string", "string": "string", "long": "number", "int": "number", "datetime": "datetime"}
+	type_convert = {"unicode": "string", "string": "string", "long": "number", "int": "number", "datetime": "datetime", "float": "float"}
 	description = dict([(name, (type_convert[type(value).__name__], name)) for name, value in data[0].iteritems()])	
 
 	return description, data, columns_order
