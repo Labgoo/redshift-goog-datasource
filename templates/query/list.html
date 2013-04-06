@@ -1,0 +1,28 @@
+{% extends "layout.html" %}
+
+{% block head %}
+	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+{% endblock%}
+
+{% block body %}
+<div class="span9 offset2">
+	<div id="content">        
+		<h1>Queries</h1>
+
+		<ul class="admin">
+		    {%for query in queries%}
+		    <li>
+				<a class="name" href="/query/{{query.name}}">{{query.name}}</a>
+				<a href="/query/{{query.name}}/delete"class="delete-variable btn btn-danger btn-small">
+					<i class="icon-white icon-trash"></i>Delete
+				</a>
+		    </li>
+			{%endfor%}    
+		</ul>
+
+		<a id="create" href="/query/news" class="button pill big primary">
+		  Create a Query
+		</a>
+      </div>
+</div>
+{% endblock %}

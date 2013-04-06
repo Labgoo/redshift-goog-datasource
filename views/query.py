@@ -129,6 +129,16 @@ def new_query():
 		vars = vars,
 		meta_vars = meta_vars)
 
+@mod.route('/list', methods=['GET'])
+def queries():
+	data_explorer = mongo.get_mongo()
+	if data_explorer:
+		queries = data_explorer.queries.find()
+	else:
+		queries = []
+
+	return render_template('query/list.html', queries=queries)
+
 @mod.route('/new', methods=['POST'])
 @mod.route('/<query_name>', methods=['POST'])
 def create_query(query_name=None):
