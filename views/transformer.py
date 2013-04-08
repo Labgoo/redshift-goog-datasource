@@ -29,6 +29,17 @@ def save_transformer(transformer_name, code):
 		{"$set": {'code': code}},
 		upsert = True);
 
+@mod.route('/list', methods=['GET'])
+def queries():
+	data_explorer = mongo.get_mongo()
+	if data_explorer:
+		transformers = data_explorer.transformers.find()
+	else:
+		transformers = []
+
+	return render_template('transformer/list.html', transformers=transformers)
+
+
 @mod.route('/new', methods=['GET'])
 def new_transformer():
 	code = "def process(data):\n  return data"

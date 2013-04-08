@@ -1,0 +1,24 @@
+{% extends "layout.html" %}
+
+{% block body %}
+<div class="span9 offset2">
+	<div id="content">        
+		<h1>Transformers</h1>
+
+		<ul class="admin">
+		    {%for transformer in transformers%}
+		    <li>
+				<a class="name" href="/transformer/{{transformer.name}}">{{transformer.name}}</a>
+				<a href="/transformer/{{transformer.name}}/delete"class="delete-variable btn btn-danger btn-small">
+					<i class="icon-white icon-trash"></i>Delete
+				</a>
+		    </li>
+			{%endfor%}    
+		</ul>
+
+		<a id="create" href="/transformer/new" class="button pill big primary">
+		  Create a Transformer
+		</a>
+      </div>
+</div>
+{% endblock %}
