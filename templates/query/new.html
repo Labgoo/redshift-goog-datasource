@@ -4,13 +4,14 @@
 	<script src="{{ url_for('static', filename='vendor/codemirror/codemirror.js') }}"></script>
 	<link rel="stylesheet" href="{{ url_for('static', filename='vendor/codemirror/codemirror.css') }}" media="screen"/>
 	<script src="{{ url_for('static', filename='vendor/codemirror/sql.js') }}"></script>
+	<script src="{{ url_for('static', filename='vendor/codemirror/code.js') }}"></script>
 	<link rel=stylesheet type=text/css href="{{ url_for('static', filename='css/codemirror-custom.css') }}" media="screen">
 	<script src="{{ url_for('static', filename='vendor/jquery.sheepItPlugin.js') }}"></script>
 	<script src="{{ url_for('static', filename='js/sql-editor.js') }}"></script>
 {% endblock%}
 
 {% block body %}
-<div class="span9 offset2">
+	<h1>Create a Query</h1>
 	<form id="sheepItForm" method="post" action="{% if query_name %}{{url_for('.query_home', query_name=query_name) }}{%else%}{{ url_for('.create_query') }}{%endif%}">
 		<fieldset>
 			<div class="controls controls-row">
@@ -25,9 +26,15 @@
 				</div>
 				{%endif%}				
 			</div>
-			<div class="controls controls-row">
-				<input id="sql-execute" type="submit" class="btn btn-primary btn-xxlarge pull-right" value="Execute"/>
-			</div>
+			<div class="controls-row controls" style="float:right">
+				<div class="btn-group">
+					<button id="sql-save-execute" type="submit" class="btn btn-primary btn-xxlarge pull-right">Save + Execute</button>
+				</div>
+				<div class="btn-group">
+					<button id="sql-execute" type="submit" class="btn btn-xxlarge pull-right">Execute</button>
+				</div>
+			</div> 
+			<br class="clearfix" />
 			<div id="vars">
 				{%for name,value in vars%}
 					<div class="control-group">
@@ -83,5 +90,4 @@
 			}
 	</script>
 	{% endif %}
-</div>
 {% endblock %}

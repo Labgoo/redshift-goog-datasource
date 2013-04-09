@@ -30,7 +30,7 @@ def save_transformer(transformer_name, code):
 		upsert = True);
 
 @mod.route('/list', methods=['GET'])
-def queries():
+def list():
 	data_explorer = mongo.get_mongo()
 	if data_explorer:
 		transformers = data_explorer.transformers.find()
@@ -41,40 +41,34 @@ def queries():
 
 
 @mod.route('/new', methods=['GET'])
-def new_transformer():
+def new():
 	code = "def process(data):\n  return data"
 
 	return render_template('transformer/new.html', 
 		code = code)
 
-@mod.route('/', methods=['GET'])
-@mod.route('/<transformer_name>', methods=['GET'])
-def transformer_home(transformer_name=None):
-	logging.info('loading transformer %s', transformer_name)
-	if not transformer_name:
-		return redirect(url_for('.new_transformer'))
+@mod.route('/', methods=['GET', 'POST'])
+@mod.route('/<name>', methods=['GET', 'POST'])
+def edit(name=None):
+	if request.method == 'GET':
+		logging.info('loading transformer %s', name)
+		if not name:
+			return redirect(url_for('.new'))
 
-	code = load_transformer(transformer_name)
+		code = load_transformer(name)
+	else:
+		code = request.form['code']
 
-	return render_template('transformer/new.html', 
-		transformer_name = transformer_name, 
-		code = code)
+		name = request.form.get('name')
 
-@mod.route('/new', methods=['POST'])
-@mod.route('/<transformer_name>', methods=['POST'])
-def create_transformer(transformer_name=None):
-	code = request.form['code']
+		if name == 'new':
+			name = None
 
-	transformer_name = request.form.get('transformer-name')
-
-	if transformer_name == 'new':
-		transformer_name = None
-
-	if transformer_name:
-		save_transformer(transformer_name, code)
-		return redirect(url_for('.transformer_home', transformer_name = transformer_name))
+		if name:
+			save_transformer(name, code)
+			return redirect(url_for('.edit', name = name))
 
 	return render_template('transformer/new.html', 
-		transformer_name = transformer_name, 
+		name = name, 
 		code = code)
 

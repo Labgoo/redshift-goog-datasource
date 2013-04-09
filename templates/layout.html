@@ -9,6 +9,28 @@
     {% block head %}{% endblock %}
   </head>
   <body>
+<div class="navbar">
+  <div class="navbar-inner">
+    <a class="brand" href="#">Data Explorer</a>
+     <div class="container"> 
+      <ul class="nav">
+        <li class="active"><a href="#">Home</a></li>
+        <li><a href="{{url_for('query.list')}}">Queries</a></li>
+        <li><a href="{{url_for('transformer.list')}}">Transformers</a></li>      
+      </ul>
+      <ul class="nav pull-right">
+        {% if not g.user %}
+          <li><a href="{{url_for('user.login')}}">Login</a></li>
+        {%else%}
+          <li><a>Hello {{g.user.username}}</a></li>
+          <li><a href="{{url_for('user.logout')}}">Logout</a></li>
+        {%endif%}
+      </ul>
+    </div>
+  </div>
+</div>    
+      <div class="span9 offset2">
       {% block body %}{% endblock %}
+      </div>
   </body>
 </html>

@@ -1,0 +1,16 @@
+{% extends "layout.html" %}
+{% block title %}Sign in{% endblock %}
+{% block body %}
+  <h1>Sign in</h1>
+  <form action="" method=post>
+    {% if error %}<p class=error><strong>Error:</strong> {{ error }}</p>{% endif %}
+		<div class="control-group">
+			<label class="control-label" for="openid">Open Id</label>
+			<div class="controls form-horizontal">
+				<input type="text" name="openid" id="openid">
+      			<input type="submit" value="Sign in" class="btn">
+			</div>
+			<input type=hidden name=next value="{{ next }}">
+		</div>      	
+  </form>
+{% endblock %}

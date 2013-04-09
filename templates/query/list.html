@@ -1,24 +1,29 @@
 {% extends "layout.html" %}
 
+{% block head %}
+<link rel=stylesheet type=text/css href="{{ url_for('static', filename='css/admin.css') }}" media="screen">
+{% endblock %}
+
 {% block body %}
-<div class="span9 offset2">
-	<div id="content">        
-		<h1>Queries</h1>
+<div id="content">        
+	<h1>Queries</h1>
 
-		<ul class="admin">
-		    {%for query in queries%}
-		    <li>
-				<a class="name" href="/query/{{query.name}}">{{query.name}}</a>
-				<a href="/query/{{query.name}}/delete"class="delete-variable btn btn-danger btn-small">
-					<i class="icon-white icon-trash"></i>Delete
-				</a>
-		    </li>
-			{%endfor%}    
-		</ul>
+	<ul class="admin">
+	    {%for query in queries%}
+	    <li>
+			<a class="name" href="/query/{{query.name}}">{{query.name}}</a>
+			<a href="/query/{{query.name}}/delete" class="btn btn-danger btn-small">
+				<i class="icon-white icon-trash"></i>Delete
+			</a>
+			<a href="/query/{{query.name}}" class="btn btn-small">
+				<i class="icon-edit"></i>Edit
+			</a>
+	    </li>
+		{%endfor%}
+	</ul>
 
-		<a id="create" href="/query/new" class="button pill big primary">
-		  Create a Query
-		</a>
-      </div>
-</div>
+	<a id="create" href="/query/new" class="button pill big primary">
+	  Create a Query
+	</a>
+  </div>
 {% endblock %}

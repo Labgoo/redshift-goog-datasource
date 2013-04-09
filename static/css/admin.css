@@ -1,0 +1,19 @@
+ul.admin .btn {
+  float: right;
+  margin-left: 5px;
+}
+
+ul.admin li {
+  list-style: none;	
+  padding: 5px;
+  border-bottom: 1px solid #CCC;
+}
+
+ul.admin .name {
+  font-size: 20px;
+}
+
+ul.admin a  .name:hover {
+  font-size: 20px;
+  text-decoration: underline;
+}

@@ -130,7 +130,7 @@ def new_query():
 		meta_vars = meta_vars)
 
 @mod.route('/list', methods=['GET'])
-def queries():
+def list():
 	data_explorer = mongo.get_mongo()
 	if data_explorer:
 		queries = data_explorer.queries.find()

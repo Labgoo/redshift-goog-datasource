@@ -1,0 +1,27 @@
+{% extends "layout.html" %}
+{% block title %}Create Profile{% endblock %}
+{% block body %}
+  <h1>Create Profile</h1>
+  <p>
+    Hey!  This is the first time you signed in on this website.  In
+    order to proceed we need a couple of more information from you:
+  </p>
+  <form action="" method=post>
+
+      <div class="controls">
+        <label class="control-label" for="name">Name</label>
+        <input type="text" id="name" name="name" size="30" value="{{ request.values.name }}">
+      </div>
+
+      <div class="controls">
+        <label class="control-label" for="email">Email</label>
+        <input type="email" name="email" size="30" value="{{ request.values.email }}">
+      </div>
+
+      <input type="submit" value="Create profile" class="btn">
+      <input type="hidden" name=next value="{{ next }}">
+  </form>
+  <p>
+    If you don't want to proceed, you can <a href="{{ url_for('.logout')}}">sign out</a> again.
+  </p>
+{% endblock %}

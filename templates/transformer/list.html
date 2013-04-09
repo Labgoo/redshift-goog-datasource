@@ -1,7 +1,10 @@
 {% extends "layout.html" %}
 
+{% block head %}
+<link rel=stylesheet type=text/css href="{{ url_for('static', filename='css/admin.css') }}" media="screen">
+{% endblock %}
+
 {% block body %}
-<div class="span9 offset2">
 	<div id="content">        
 		<h1>Transformers</h1>
 
@@ -12,6 +15,9 @@
 				<a href="/transformer/{{transformer.name}}/delete"class="delete-variable btn btn-danger btn-small">
 					<i class="icon-white icon-trash"></i>Delete
 				</a>
+				<a href="{{url_for('.edit', name=transformer.name)}}" class="btn btn-small">
+					<i class="icon-edit"></i>Edit
+				</a>				
 		    </li>
 			{%endfor%}    
 		</ul>
@@ -20,5 +26,4 @@
 		  Create a Transformer
 		</a>
       </div>
-</div>
 {% endblock %}

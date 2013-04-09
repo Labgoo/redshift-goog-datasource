@@ -1,0 +1,21 @@
+{% extends "layout.html" %}
+
+{% block head %}
+{% endblock%}
+
+{% block body %}
+<form method="post" action="{% if name %}{{url_for('.user_home', name=name) }}{%else%}{{ url_for('.create_user') }}{%endif%}">
+	<fieldset>
+		<div class="controls controls-row">
+			<input class="span9 input-xxlarge" type="text" id="name" name="name" value="{{name}}" placeholder="User Name" maxlength="100" />
+		</div>
+		<div class="controls">
+			<textarea id="code" name="code" class="span9" rows="5">{{code|safe}}</textarea>
+		</div>
+		<div class="controls controls-row">
+			<input type="submit" class="btn btn-primary btn-xxlarge pull-right" value="Save"/>
+		</div>
+	</fieldset>
+</form>
+<div id="table_div_json"></div>
+{% endblock %}
