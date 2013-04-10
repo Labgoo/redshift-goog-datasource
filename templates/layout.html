@@ -14,9 +14,9 @@
     <a class="brand" href="#">Data Explorer</a>
      <div class="container"> 
       <ul class="nav">
-        <li class="active"><a href="#">Home</a></li>
-        <li><a href="{{url_for('query.list')}}">Queries</a></li>
-        <li><a href="{{url_for('transformer.list')}}">Transformers</a></li>      
+        <li {% if request.blueprint=='home_page'%}class="active"{%endif%}><a href="#">Home</a></li>
+        <li {% if request.blueprint=='query'%}class="active"{%endif%}><a href="{{url_for('query.list')}}">Queries</a></li>
+        <li {% if request.blueprint=='transformer'%}class="active"{%endif%}><a href="{{url_for('transformer.list')}}">Transformers</a></li>
       </ul>
       <ul class="nav pull-right">
         {% if not g.user %}
