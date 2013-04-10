@@ -4,7 +4,6 @@
 	<script src="{{ url_for('static', filename='vendor/codemirror/codemirror.js') }}"></script>
 	<link rel="stylesheet" href="{{ url_for('static', filename='vendor/codemirror/codemirror.css') }}" media="screen"/>
 	<script src="{{ url_for('static', filename='vendor/codemirror/sql.js') }}"></script>
-	<script src="{{ url_for('static', filename='vendor/codemirror/code.js') }}"></script>
 	<link rel=stylesheet type=text/css href="{{ url_for('static', filename='css/codemirror-custom.css') }}" media="screen">
 	<script src="{{ url_for('static', filename='vendor/jquery.sheepItPlugin.js') }}"></script>
 	<script src="{{ url_for('static', filename='js/sql-editor.js') }}"></script>
@@ -12,10 +11,10 @@
 
 {% block body %}
 	<h1>Create a Query</h1>
-	<form id="sheepItForm" method="post" action="{% if query_name %}{{url_for('.query_home', query_name=query_name) }}{%else%}{{ url_for('.create_query') }}{%endif%}">
+	<form id="sheepItForm" method="post" action="{% if name %}{{url_for('.edit', name=name) }}{%else%}{{ url_for('.new') }}{%endif%}">
 		<fieldset>
 			<div class="controls controls-row">
-				<input class="span9 input-xxlarge" type="text" id="title" name="query-name" value="{{query_name}}" placeholder="Enter a title for your query" maxlength="100" />
+				<input class="span9 input-xxlarge" type="text" id="query-name" name="query-name" value="{{name}}" placeholder="Enter a title for your query" maxlength="100" />
 			</div>
 			<div class="controls">
 				<textarea id="sql" name="sql" class="span9" rows="5">{{sql|safe}}</textarea>
@@ -28,7 +27,7 @@
 			</div>
 			<div class="controls-row controls" style="float:right">
 				<div class="btn-group">
-					<button id="sql-save-execute" type="submit" class="btn btn-primary btn-xxlarge pull-right">Save + Execute</button>
+					<button id="sql-save-execute" type="submit" class="btn btn-primary btn-xxlarge pull-right {%if not name %}disabled{%endif%}">Save + Execute</button>
 				</div>
 				<div class="btn-group">
 					<button id="sql-execute" type="submit" class="btn btn-xxlarge pull-right">Execute</button>

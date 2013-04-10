@@ -38,6 +38,11 @@ $(document).ready(function () {
         }
     });
 
+	$('#query-name').change(function() {
+		var hasName = $.trim($(this).val()).length > 0;
+		$('#sql-save-execute').prop('disabled', !hasName).toggleClass('disabled', !hasName);
+	});
+
 	$(document).on('change', '.var-name', function() {
 		var varIndex = $(this).data('var-index');
 

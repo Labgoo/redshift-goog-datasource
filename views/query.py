@@ -3,27 +3,10 @@
 from flask import render_template, request, Blueprint, g, Response, redirect, url_for
 import logging, json
 import mongo, os
-from datetime import datetime
+from datetime import datetime, timedelta
+from models import Transformer
 
 mod = Blueprint('query', __name__, url_prefix='/query')
-
-def execute_transform(transformer_name, data):
-	logging.info('executing transformer %s', transformer_name)
-	data_explorer = mongo.get_mongo()
-	if data_explorer:
-		transformer = data_explorer.transformers.find_one({"name": transformer_name})
-
-	if not transformer:
-		return data
-
-	code = transformer.get('code')
-
-	code_globals = {}
-	code_locals = {'data': data}
- 	code_object = compile(code, '<string>', 'exec')
-	exec code_object in code_globals, code_locals
-
-	return code_locals['result']
 
 def query_db(query, args):
 	sql = query.format(**args)
@@ -45,10 +28,10 @@ def query_db(query, args):
 
 	return description, data, columns_order
 
-def save_query(query_name, sql, meta_vars):
+def save_query(name, sql, meta_vars):
 	data_explorer = mongo.get_mongo()
 	data_explorer.queries.update(
-		{'name': query_name}, 
+		{'name': name}, 
 		{"$set": {'sql': sql, 'meta_vars': meta_vars}},
 		upsert = True);
 
@@ -95,10 +78,10 @@ def query_execute_sql(sql, meta_vars, vars):
 
 	return description, data, columns_order
 
-def load_sql(query_name):
+def load_sql(name):
 	data_explorer = mongo.get_mongo()
 	if data_explorer:
-		query = data_explorer.queries.find_one({"name": query_name})
+		query = data_explorer.queries.find_one({"name": name})
 
 	if not query:
 		return None, None
@@ -108,26 +91,6 @@ def load_sql(query_name):
 	sql = query.get('sql')
 
 	return sql, meta_vars
-
-@mod.route('/new', methods=['GET'])
-def new_query():
-	sql = "select str_targetcountry as country,count(*) as calls,sum(int_duration) as total_duration, sum(int_billsec) as total_billsec " + \
-	"from socialism_online.cdrs_raw " + \
-	"where int_year={Year} and int_month={Month} and int_day={Day} " + \
-	"group by str_targetcountry " + \
-	"order by str_targetcountry asc;"
-
-	meta_vars=[
-		("Year", {"type": "integer", "default": 2013}), 
-		("Month", {"type": "integer", "default": 3}), 
-		("Day", {"type": "integer", "default": 18})]
-
-	vars = [('Year', None), ('Month', None), ('Day', None)]
-
-	return render_template('query/new.html', 
-		sql = sql,
-		vars = vars,
-		meta_vars = meta_vars)
 
 @mod.route('/list', methods=['GET'])
 def list():
@@ -139,148 +102,162 @@ def list():
 
 	return render_template('query/list.html', queries=queries)
 
-@mod.route('/new', methods=['POST'])
-@mod.route('/<query_name>', methods=['POST'])
-def create_query(query_name=None):
-	def extract_meta_var_fields():
-		index = 0
-
-		meta = []
-		while True:
-			name = request.form.get('var-name%d' % index)
-			if not name:
-				return meta
-
-			type = request.form.get('var-type%d' % index, 'string')
-			default = request.form.get('var-default%d' % index, 'string')
-
-			meta.append((name, {'default': default, 'type': type}))
-
-			index += 1
-
-	def vars_from_request(meta_vars, empty_vars):
-		vars = []
-		for name, options in meta_vars:
-			value = request.form.get(name)
-
-			if value:
-				value = convert_value(value, options.get('type'))
-			elif not empty_vars:
-				continue
-
-			vars.append((name, value))
-		
-		return vars
-
-	meta_vars = extract_meta_var_fields()
-
-	sql = request.form['sql']
-
-	query_name = request.form.get('query-name')
-
-	if query_name == 'new':
-		query_name = None
-
-	if query_name:
-		save_query(query_name, sql, meta_vars)
-		vars = vars_from_request(meta_vars, False)
-		return redirect(url_for('.query_home', query_name = query_name, **dict(vars)))
-
-	vars = vars_from_request(meta_vars, True)
-
-	try:
-		description, data, columns_order = query_execute_sql(sql, meta_vars, vars)
-
-		if len(data) > 0:
-			data_table, columns_order = data_to_datatable(description, data, columns_order)
-			json_data = data_table.ToJSon(columns_order=columns_order)
-		else:
-			json_data = json.dumps([])
-
-		error = ''
-	except Exception, ex:
-		logging.exception("Failed to execute query %s", ex)
-		error = ex.message
-		json_data = {}
-
-	return render_template('query/new.html', 
-		query_name = query_name, 
-		json = json_data, 
-		sql = sql, 
-		error = error,
-		meta_vars = meta_vars, 
-		vars = vars)
-
 def handle_datetime(obj):
 	return obj.isoformat() if isinstance(obj, datetime) else None
 
-@mod.route('/', methods=['GET'])
-@mod.route('/<query_name>', methods=['GET'])
-def query_home(query_name=None):
-	if not query_name:
-		return redirect(url_for('.new_query'))
+@mod.route('/new', methods=['GET'])
+def new():
+	sql = "select * from socialism_online.cdrs_raw \n" + \
+		  "where\n\textract(year from dt_timestamp)={Year} and \n" + \
+      	  "\textract(month from dt_timestamp)={Month} and \n" + \
+	  	  "\textract(day from dt_timestamp)={Day}" 
 
-	vars = []
-	for key, value in request.args.iteritems():
-		if not value:
-			continue
+	yesterday = datetime.today() - timedelta(days=1)
+	meta_vars=[
+		("Year", {"type": "integer", "default": yesterday.year}), 
+		("Month", {"type": "integer", "default": yesterday.month}), 
+		("Day", {"type": "integer", "default": yesterday.day})]
 
-		vars.append((key, value))
+	vars = [('Year', None), ('Month', None), ('Day', None)]
 
-	sql, meta_vars = load_sql(query_name)
+	return render_template('query/new.html', 
+		sql = sql,
+		vars = vars,
+		meta_vars = meta_vars)
 
-	if not sql:
-		return redirect(url_for('.new_query'))
+@mod.route('/', methods=['POST', 'GET'])
+@mod.route('/<name>', methods=['POST', 'GET'])
+def edit(name=None):
+	if request.method == 'POST':
+		def extract_meta_var_fields():
+			index = 0
 
-	transform = request.args.get('transform', None)
+			meta = []
+			while True:
+				name = request.form.get('var-name%d' % index)
+				if not name:
+					return meta
 
-	raw_data = not request.args.get('json', None) is None
+				type = request.form.get('var-type%d' % index, 'string')
+				default = request.form.get('var-default%d' % index, 'string')
 
-	try:
-		description, data, columns_order = query_execute_sql(sql, meta_vars, vars)
+				meta.append((name, {'default': default, 'type': type}))
 
-		if transform:
-			data = execute_transform(transform, data)
+				index += 1
 
-		if raw_data:
-			json_data = json.dumps(data, default=handle_datetime)
-		else:
-			data_table, columns_order = data_to_datatable(description, data, columns_order)
-			json_data = data_table.ToJSon(columns_order=columns_order)
-		
-		error = ''
-	except Exception, ex:
-		logging.error("Failed to execute query %s", ex)
-		error = str(ex)
-		data_table = None
+		def vars_from_request(meta_vars, empty_vars):
+			vars = []
+			for name, options in meta_vars:
+				value = request.form.get(name)
 
-	if not request.args.get('gwiz', None) is None:
-		return Response(data_table.ToJSonResponse(columns_order=columns_order),  mimetype='application/json')
-	if not request.args.get('json', None) is None:
-		if error:
-			return Response(error)
+				if value:
+					value = convert_value(value, options.get('type'))
+				elif not empty_vars:
+					continue
 
-		return Response(json_data,  mimetype='application/json')
-	elif not request.args.get('html', None) is None:
-		return Response(data_table.ToHtml(columns_order=columns_order))
-	elif not request.args.get('csv', None) is None:
-		return Response(data_table.ToCsv(columns_order=columns_order), mimetype='text/csv')
-	else:
-		json_data = data_table.ToJSon(columns_order=columns_order) if data_table else None
-		
-		full_vars = []
-		vars = dict(vars)
-		for key, options in meta_vars:
-			val = vars.get(key)
-			if val:
-				full_vars.append((key, val))
+				vars.append((name, value))
+			
+			return vars
+
+		meta_vars = extract_meta_var_fields()
+
+		sql = request.form['sql']
+
+		name = request.form.get('query-name')
+
+		if name == 'new':
+			name = None
+
+		if name:
+			save_query(name, sql, meta_vars)
+			full_vars = vars_from_request(meta_vars, False)
+			return redirect(url_for('.edit', name = name, **dict(full_vars)))
+
+		full_vars = vars_from_request(meta_vars, True)
+
+		try:
+			description, data, columns_order = query_execute_sql(sql, meta_vars, full_vars)
+
+			if len(data) > 0:
+				data_table, columns_order = data_to_datatable(description, data, columns_order)
+				json_data = data_table.ToJSon(columns_order=columns_order)
 			else:
-				full_vars.append((key, None))
+				json_data = json.dumps([])
 
-		return render_template('query/new.html', 
-			query_name = query_name, 
-			sql = sql,
-			error = error,
-			json = json_data,
-			meta_vars = meta_vars, 
-			vars = full_vars)
+			error = ''
+		except Exception, ex:
+			logging.exception("Failed to execute query %s", ex)
+			error = ex.message
+			json_data = {}
+	else:
+		if not name:
+			return redirect(url_for('.new'))
+
+		vars = []
+		for key, value in request.args.iteritems():
+			if not value:
+				continue
+
+			vars.append((key, value))
+
+		sql, meta_vars = load_sql(name)
+
+		if not sql:
+			return redirect(url_for('.new'))
+
+		transform = request.args.get('transform', None)
+
+		raw_data = not request.args.get('json', None) is None
+
+		try:
+			description, data, columns_order = query_execute_sql(sql, meta_vars, vars)
+
+			if transform:
+				data = Transformer.execute(transform, data)
+
+			if raw_data:
+				json_data = json.dumps(data, default=handle_datetime)
+			elif len(data) > 0:
+				data_table, columns_order = data_to_datatable(description, data, columns_order)
+				json_data = data_table.ToJSon(columns_order=columns_order)
+			else:
+				json_data = json.dumps([])
+				data_table = None
+
+			
+			error = ''
+		except Exception, ex:
+			logging.error("Failed to execute query %s", ex)
+			error = str(ex)
+			data_table = None
+
+		if not request.args.get('gwiz', None) is None:
+			return Response(data_table.ToJSonResponse(columns_order=columns_order),  mimetype='application/json')
+		if not request.args.get('json', None) is None:
+			if error:
+				return Response(error)
+
+			return Response(json_data,  mimetype='application/json')
+		elif not request.args.get('html', None) is None:
+			return Response(data_table.ToHtml(columns_order=columns_order))
+		elif not request.args.get('csv', None) is None:
+			return Response(data_table.ToCsv(columns_order=columns_order), mimetype='text/csv')
+		else:
+			json_data = data_table.ToJSon(columns_order=columns_order) if data_table else None
+			
+			full_vars = []
+			vars = dict(vars)
+			for key, options in meta_vars:
+				val = vars.get(key)
+				if val:
+					full_vars.append((key, val))
+				else:
+					full_vars.append((key, None))
+
+	return render_template('query/new.html', 
+		name = name, 
+		sql = sql,
+		error = error,
+		json = json_data,
+		meta_vars = meta_vars, 
+		vars = full_vars)
