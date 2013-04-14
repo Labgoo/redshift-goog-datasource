@@ -1,4 +1,4 @@
-import mongo
+import mongo, logging
 
 class Transformer():
 	@classmethod
