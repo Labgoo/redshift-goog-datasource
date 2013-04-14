@@ -6,7 +6,7 @@ class Transformer():
 		logging.info('executing transformer %s', name)
 		data_explorer = mongo.get_mongo()
 		if data_explorer:
-			transformer = data_explorer.transformers.find_one({"name": transformer_name})
+			transformer = data_explorer.transformers.find_one({"name": name})
 
 		if not transformer:
 			return data
