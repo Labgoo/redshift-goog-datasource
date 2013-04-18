@@ -9,28 +9,29 @@
     {% block head %}{% endblock %}
   </head>
   <body>
-<div class="navbar">
-  <div class="navbar-inner">
-    <a class="brand" href="#">Data Explorer</a>
-     <div class="container"> 
-      <ul class="nav">
-        <li {% if request.blueprint=='home_page'%}class="active"{%endif%}><a href="#">Home</a></li>
-        <li {% if request.blueprint=='query'%}class="active"{%endif%}><a href="{{url_for('query.list')}}">Queries</a></li>
-        <li {% if request.blueprint=='transformer'%}class="active"{%endif%}><a href="{{url_for('transformer.list')}}">Transformers</a></li>
-      </ul>
-      <ul class="nav pull-right">
-        {% if not g.user %}
-          <li><a href="{{url_for('user.login')}}">Login</a></li>
-        {%else%}
-          <li><a>Hello {{g.user.username}}</a></li>
-          <li><a href="{{url_for('user.logout')}}">Logout</a></li>
-        {%endif%}
-      </ul>
-    </div>
-  </div>
-</div>    
-      <div class="span9 offset2">
-      {% block body %}{% endblock %}
+    <div class="navbar">
+      <div class="navbar-inner">
+        <a class="brand" href="#">Data Explorer</a>
+         <div class="container">
+          <ul class="nav">
+            <li {% if request.blueprint=='home_page'%}class="active"{%endif%}><a href="#">Home</a></li>
+            <li {% if request.blueprint=='query'%}class="active"{%endif%}><a href="{{url_for('query.list')}}">Queries</a></li>
+            <li {% if request.blueprint=='transformer'%}class="active"{%endif%}><a href="{{url_for('transformer.list')}}">Transformers</a></li>
+            <li {% if request.blueprint=='connection_string'%}class="active"{%endif%}><a href="{{url_for('connection_string.list')}}">Connection String</a></li>
+          </ul>
+          <ul class="nav pull-right">
+            {% if not g.user %}
+              <li><a href="{{url_for('user.login')}}">Login</a></li>
+            {%else%}
+              <li><a>Hello {{g.user.username}}</a></li>
+              <li><a href="{{url_for('user.logout')}}">Logout</a></li>
+            {%endif%}
+          </ul>
+        </div>
       </div>
+    </div>
+    <div class="span9 offset2">
+        {% block body %}{% endblock %}
+    </div>
   </body>
 </html>

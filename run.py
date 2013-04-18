@@ -1,6 +1,7 @@
 from flask import g
 import logging
 from app import app, db
+import os
 
 from sqlalchemy.dialects import registry
 registry.register('postgresql.redshift', 'redshift' '', 'PGDialect_RedShift')
@@ -13,10 +14,12 @@ def before_request():
 from views import query
 from views import transformer
 from views import user
+from views import connection_string
 
 app.register_blueprint(query.mod)
 app.register_blueprint(transformer.mod)
 app.register_blueprint(user.mod)
+app.register_blueprint(connection_string.mod)
 
 if __name__ == '__main__':
 	# Bind to PORT if defined, otherwise default to 5000.

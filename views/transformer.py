@@ -3,6 +3,7 @@
 from flask import render_template, request, Blueprint, g, Response, redirect, url_for
 import logging, json
 import mongo, os
+from user import require_login
 
 mod = Blueprint('transformer', __name__, url_prefix='/transformer')
 
@@ -30,6 +31,7 @@ def save_transformer(transformer_name, code):
 		upsert = True);
 
 @mod.route('/list', methods=['GET'])
+@require_login
 def list():
 	data_explorer = mongo.get_mongo()
 	if data_explorer:
@@ -41,6 +43,7 @@ def list():
 
 
 @mod.route('/new', methods=['GET'])
+@require_login
 def new():
 	code = "def process(data):\n  return data"
 
@@ -49,6 +52,7 @@ def new():
 
 @mod.route('/', methods=['GET', 'POST'])
 @mod.route('/<name>', methods=['GET', 'POST'])
+@require_login
 def edit(name=None):
 	if request.method == 'GET':
 		logging.info('loading transformer %s', name)

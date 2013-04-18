@@ -1,0 +1,61 @@
+{% extends "layout.html" %}
+
+{% block head %}
+{% endblock%}
+
+{% block body %}
+    <form method="post" action="{% if name %}{{url_for('.edit', name=name) }}{%else%}{{ url_for('.new') }}{%endif%}">
+        <fieldset>
+            <div class="controls controls-row">
+                <input class="span9 input-xxlarge" type="text" id="name" name="name" value="{{name}}" placeholder="Name" maxlength="100" />
+            </div>
+            <div class="controls controls-row">
+                <input class="span9 input-xxlarge" type="text" id="url" name="url" value="{{url|safe}}" />
+            </div>
+            <div class="controls controls-row">
+                <input class="span9 input-xxlarge" type="text" id="users" name="users" value="{{users|safe}}" />
+            </div>
+            <div class="controls controls-row">
+                <textarea class="span9 input-xxlarge" id="headers" name="headers">{{ headers }}</textarea>
+            </div>
+            <div class="controls controls-row">
+                <input type="submit" class="btn btn-primary btn-xxlarge pull-right" value="Save"/>
+            </div>
+        </fieldset>
+    </form>
+    <div class="alert alert-info">
+        <span class="label label-info">Postgresql</span>
+        <br>
+        <br>
+        # default<br>
+        postgresql://scott:tiger@localhost/mydatabase<br>
+        <br>
+        # psycopg2<br>
+        postgresql+psycopg2://scott:tiger@localhost/mydatabase<br>
+        <br>
+        # pg8000<br>
+        postgresql+pg8000://scott:tiger@localhost/mydatabase<br>
+        <br>
+        # Jython<br>
+        postgresql+zxjdbc://scott:tiger@localhost/mydatabase<br>
+        <br>
+        <span class="label label-info">Mysql</span><br>
+        <br>
+        # default<br>
+        mysql://scott:tiger@localhost/foo<br>
+        <br>
+        # mysql-python<br>
+        mysql+mysqldb://scott:tiger@localhost/foo<br>
+        <br>
+        # OurSQL<br>
+        mysql+oursql://scott:tiger@localhost/fo<br>
+        <br>
+        <span class="label label-info">Oracle</span><br>
+        <br>
+        oracle://scott:tiger@127.0.0.1:1521/sidname<br>
+        oracle+cx_oracle://scott:tiger@tnsname<br>
+        <br>
+        <span class="label label-info">Microsoft SQL Server</span><br><br>
+        mssql+pyodbc://mydsn<br>
+    </div>
+{% endblock %}

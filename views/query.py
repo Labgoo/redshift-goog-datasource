@@ -5,6 +5,7 @@ import logging, json
 import mongo, os
 from datetime import datetime, timedelta
 from models import Transformer
+from user import require_login
 
 mod = Blueprint('query', __name__, url_prefix='/query')
 
@@ -93,6 +94,7 @@ def load_sql(name):
 	return sql, meta_vars
 
 @mod.route('/list', methods=['GET'])
+@require_login
 def list():
 	data_explorer = mongo.get_mongo()
 	if data_explorer:
@@ -106,6 +108,7 @@ def handle_datetime(obj):
 	return obj.isoformat() if isinstance(obj, datetime) else None
 
 @mod.route('/new', methods=['GET'])
+@require_login
 def new():
 	sql = "select * from socialism_online.cdrs_raw \n" + \
 		  "where\n\textract(year from dt_timestamp)={Year} and \n" + \
@@ -127,6 +130,7 @@ def new():
 
 @mod.route('/', methods=['POST', 'GET'])
 @mod.route('/<name>', methods=['POST', 'GET'])
+@require_login
 def edit(name=None):
 	if request.method == 'POST':
 		def extract_meta_var_fields():

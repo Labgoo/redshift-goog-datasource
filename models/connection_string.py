@@ -1,7 +1,6 @@
 import mongo, logging
 
-
-class Transformer():
+class ConnectionString():
     @classmethod
     def execute(cls, name, data):
         logging.info('executing transformer %s', name)
