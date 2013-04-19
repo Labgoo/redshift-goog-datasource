@@ -1,0 +1,36 @@
+{% extends "layout.html" %}
+
+{% block head %}
+<link rel=stylesheet type=text/css href="{{ url_for('static', filename='css/admin.css') }}" media="screen">
+{% endblock %}
+
+
+{% block body %}
+<div class="dialog">
+    <div class="app-container">
+        <div class="fl app-info">
+            <p class="app-description">
+                <img class="fl app-image" src="{{ application.icon }}" width="50" height="50" />
+                {{ application.description }}
+            </p>
+
+            <div class="app-perms">
+                This app needs these permissions
+                <ul>
+                    {% for premission in premissions %}
+                    <li>{{ premission }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+
+        <form method="post" action="/oauth/submit">
+            <input type="hidden" name="client_id" value="{{ client_id }}" />
+            <input type="hidden" name="scope" value="{{ scope }}" />
+            <input type="submit" name="user_action" value="Approve" class="btn btn-primary btn-xxlarge"/>
+            <input type="submit" name="user_action" value="Reject"  class="btn btn-xxlarge"/>
+        </form>
+    </div>
+</div>
+
+{% endblock %}

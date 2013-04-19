@@ -1,0 +1,38 @@
+{% extends "layout.html" %}
+
+{% block head %}
+{% endblock%}
+
+{% block body %}
+    <form method="post" action="{% if application.name %}{{url_for('.edit', name=name) }}{%else%}{{ url_for('.new') }}{%endif%}">
+        <fieldset>
+            {% if application.pk %}
+                <label class="control-label" for="client-id">Client Id</label>
+                <input class="span9 input-xxlarge" type="text" id="client-id" name="client-id" value="{{application.pk}}" readonly="readonly" maxlength="100" />
+            {% endif %}
+            <div class="controls controls-row">
+                <label class="control-label" for="name">Name</label>
+                <input class="span9 input-xxlarge" type="text" id="name" name="name" value="{{application.name}}" placeholder="Name" maxlength="100" />
+            </div>
+            <div class="controls controls-row">
+                <label class="control-label" for="description">Description</label>
+                <textarea class="span9 input-xxlarge" rows="5" id="description" name="description">{{ application.description }}</textarea>
+            </div>
+            <div class="controls controls-row">
+                <label class="control-label" for="domain">OAuth Domain</label>
+                <input class="span9 input-xxlarge" type="text" id="domain" name="domain" value="{{application.domain}}" />
+            </div>
+            <div class="controls controls-row">
+                <label class="control-label"for="website">Application Website</label>
+                <input class="span9 input-xxlarge" type="text" id="website" name="website" value="{{application.website}}" />
+            </div>
+            <div class="controls controls-row">
+                <label class="control-label" for="icon">Application Icon</label>
+                <input class="span9 input-xxlarge" type="text" id="icon" name="icon" value="{{application.icon}}" />
+            </div>
+            <div class="controls controls-row">
+                <input type="submit" class="btn btn-primary btn-xxlarge pull-right" value="Register Your Application"/>
+            </div>
+        </fieldset>
+    </form>
+{% endblock %}

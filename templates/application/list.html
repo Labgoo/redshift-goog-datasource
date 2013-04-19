@@ -1,0 +1,29 @@
+{% extends "layout.html" %}
+
+{% block head %}
+    <link rel=stylesheet type=text/css href="{{ url_for('static', filename='css/admin.css') }}" media="screen">
+{% endblock %}
+
+{% block body %}
+    <div id="content">
+        <h1>Applications</h1>
+
+        <ul class="admin">
+            {%for application in applications%}
+                <li>
+                    <a class="name" href="/application/{{application.name}}">{{application.name}}</a>
+                    <a href="/application/{{application.name}}/delete" class="btn btn-danger btn-small">
+                        <i class="icon-white icon-trash"></i>Delete
+                    </a>
+                    <a href="/application/{{application.name}}" class="btn btn-small">
+                        <i class="icon-edit"></i>Edit
+                    </a>
+                </li>
+            {%endfor%}
+        </ul>
+
+        <a id="create" href="/application/new" class="button big primary">
+            Create an Application
+        </a>
+    </div>
+{% endblock %}

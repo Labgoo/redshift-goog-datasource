@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from flask import render_template, request, Blueprint, g, Response, redirect, url_for, flash, session
+from flask import render_template, request, Blueprint, g, redirect, url_for, flash, session
 import logging, json
 import os
 from flask_openid import OpenID
@@ -41,7 +41,7 @@ def create_profile():
 @oid.loginhandler
 def login():
     if g.user is not None:
-        return redirect(url_for('query.query_home'))
+        return redirect(url_for('query.new'))
 
     if request.method == 'POST':
         openid = request.form.get('openid')
@@ -73,6 +73,7 @@ def lookup_current_user():
     g.user = None
     if 'openid' in session:
         g.user = User.get_by_openid(session['openid'])
+        session.user = g.user
 
 
 from functools import wraps

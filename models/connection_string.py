@@ -1,21 +1,17 @@
-import mongo, logging
+import logging
+from app import app
+from models import Transformer
 
-class ConnectionString():
-    @classmethod
-    def execute(cls, name, data):
-        logging.info('executing transformer %s', name)
-        data_explorer = mongo.get_mongo()
-        if data_explorer:
-            transformer = data_explorer.transformers.find_one({"name": name})
+db = app.extensions['mongoengine']
 
-        if not transformer:
-            return data
+class ConnectionString(db.Document):
+    meta = {'collection': 'connection_strings',
+            'indexes': [
+                {'fields': ['name'], 'unique': True},
+                ]
+    }
 
-        code = transformer.get('code')
+    url = db.StringField(required=True)
+    name = db.StringField(required=True)
+    headers = db.StringField()
 
-        code_globals = {}
-        code_locals = {'data': data}
-        code_object = compile(code, '<string>', 'exec')
-        exec code_object in code_globals, code_locals
-
-        return code_locals['result']

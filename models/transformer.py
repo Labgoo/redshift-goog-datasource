@@ -1,18 +1,27 @@
-import mongo, logging
+import logging
+from app import app
 
+db = app.extensions['mongoengine']
 
-class Transformer():
+class Transformer(db.Document):
+    meta = {'collection': 'transformerers',
+            'indexes': [
+                {'fields': ['name'], 'unique': True},
+                ]
+    }
+
+    code = db.StringField(required=True)
+    name = db.StringField(required=True)
+
     @classmethod
     def execute(cls, name, data):
         logging.info('executing transformer %s', name)
-        data_explorer = mongo.get_mongo()
-        if data_explorer:
-            transformer = data_explorer.transformers.find_one({"name": name})
+        transformer = cls.objects.get({"name": name})
 
         if not transformer:
-            return data
+            return None
 
-        code = transformer.get('code')
+        code = transformer.code
 
         code_globals = {}
         code_locals = {'data': data}

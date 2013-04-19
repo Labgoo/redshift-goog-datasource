@@ -9,3 +9,11 @@ pymongo==2.5
 wsgiref==0.1.2
 gunicorn
 Flask-OpenID
+Flask-DebugToolbar==0.6.3.1
+Flask-WTF==0.6
+mongoengine>=0.6.9
+Flask-MongoEngine
+redis
+requests
+PyCrypto
+six>=1.0

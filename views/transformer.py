@@ -2,17 +2,15 @@
 
 from flask import render_template, request, Blueprint, g, Response, redirect, url_for
 import logging, json
-import mongo, os
 from user import require_login
+from models import Transformer
 
 mod = Blueprint('transformer', __name__, url_prefix='/transformer')
 
-def load_transformer(transformer_name):
-	logging.info('load transformer %s', transformer_name)
+def load(name):
+	logging.info('load transformer %s', name)
 
-	data_explorer = mongo.get_mongo()
-	if data_explorer:
-		transformer = data_explorer.transformers.find_one({"name": transformer_name})
+	transformer = Transformer.objects.get({"name": name})
 
 	if not transformer:
 		return None
@@ -21,25 +19,18 @@ def load_transformer(transformer_name):
 
 	return code
 
-def save_transformer(transformer_name, code):
-	logging.info('save transformer %s: %s', transformer_name, code)
+def save(name, code):
+    logging.info('save transformer %s: %s', name, code)
 
-	data_explorer = mongo.get_mongo()
-	data_explorer.transformers.update(
-		{'name': transformer_name}, 
+    Transformer.update(
+		{'name': name},
 		{"$set": {'code': code}},
 		upsert = True);
 
 @mod.route('/list', methods=['GET'])
 @require_login
 def list():
-	data_explorer = mongo.get_mongo()
-	if data_explorer:
-		transformers = data_explorer.transformers.find()
-	else:
-		transformers = []
-
-	return render_template('transformer/list.html', transformers=transformers)
+	return render_template('transformer/list.html', transformeres=Transformer.objects())
 
 
 @mod.route('/new', methods=['GET'])
@@ -59,7 +50,7 @@ def edit(name=None):
 		if not name:
 			return redirect(url_for('.new'))
 
-		code = load_transformer(name)
+		code = load(name)
 	else:
 		code = request.form['code']
 
@@ -69,7 +60,7 @@ def edit(name=None):
 			name = None
 
 		if name:
-			save_transformer(name, code)
+			save(name, code)
 			return redirect(url_for('.edit', name = name))
 
 	return render_template('transformer/new.html', 

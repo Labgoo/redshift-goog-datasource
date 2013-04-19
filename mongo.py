@@ -1,7 +1,7 @@
 import os
 
-def get_mongo():
-    from pymongo import MongoClient, uri_parser
+def get_mongo_params():
+    from pymongo import uri_parser
 
     mongolab_uri = os.environ['MONGOLAB_URI']
 
@@ -11,9 +11,9 @@ def get_mongo():
     MONGODB_HOST, MONGODB_PORT = url['nodelist'][0]
     MONGODB_DB = url['database']
 
-    connection = MongoClient(MONGODB_HOST, MONGODB_PORT)
-    db = connection[MONGODB_DB]
-    if MONGODB_USERNAME:
-        db.authenticate(MONGODB_USERNAME, MONGODB_PASSWORD)
-
-    return db
+    return {'username': MONGODB_USERNAME,
+            'password': MONGODB_PASSWORD,
+            'host': MONGODB_HOST,
+            'port': MONGODB_PORT,
+            'db': MONGODB_DB
+    }

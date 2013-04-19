@@ -4,17 +4,15 @@ from flask import render_template, request, Blueprint, g, Response, redirect, ur
 import logging, json
 import mongo, os
 from user import require_login
+from models import ConnectionString
 
 mod = Blueprint('connection_string', __name__, url_prefix='/connection')
 
-def get_collection():
-    data_explorer = mongo.get_mongo()
-    return data_explorer.connection_strings
 
 def load(name):
     logging.info('load connection string %s', name)
 
-    connection_string = get_collection().find_one({"name": name})
+    connection_string = ConnectionString.objects.get({"name": name})
 
     if not connection_string:
         return None
@@ -24,14 +22,14 @@ def load(name):
 def save(name, url):
     logging.info('save connection_string %s: %s', name, url)
 
-    get_collection().update(
+    ConnectionString.update(
         {'name': name},
         {"$set": {'url': url}},
         upsert = True);
 
 @mod.route('/list', methods=['GET'])
 def list():
-    return render_template('connection_string/list.html', connection_strings=get_collection().find())
+    return render_template('connection_string/list.html', connection_strings=ConnectionString.objects())
 
 
 @mod.route('/new', methods=['GET'])

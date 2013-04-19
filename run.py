@@ -15,11 +15,15 @@ from views import query
 from views import transformer
 from views import user
 from views import connection_string
+from views import oauth2
+from views import application
 
 app.register_blueprint(query.mod)
 app.register_blueprint(transformer.mod)
 app.register_blueprint(user.mod)
 app.register_blueprint(connection_string.mod)
+app.register_blueprint(oauth2.mod)
+app.register_blueprint(application.mod)
 
 if __name__ == '__main__':
 	# Bind to PORT if defined, otherwise default to 5000.
