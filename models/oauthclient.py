@@ -3,8 +3,8 @@ from models import User
 from bson import ObjectId
 db = app.extensions['mongoengine']
 
-class Application(db.Document):
-    meta = {'collection': 'applications',
+class OAuthClient(db.Document):
+    meta = {'collection': 'oauthclients',
             'indexes': [
                 {'fields': ['name'], 'unique': True},
             ]
@@ -28,8 +28,8 @@ class Application(db.Document):
             return None
 
         if ObjectId.is_valid(client_id):
-            app = cls.objects.get(db.Q(pk = client_id) | db.Q(name = client_id))
+            client = cls.objects.get(db.Q(pk = client_id) | db.Q(name = client_id))
         else:
-            app = cls.objects.get(db.Q(name = client_id))
+            client = cls.objects.get(db.Q(name = client_id))
 
-        return app
+        return client

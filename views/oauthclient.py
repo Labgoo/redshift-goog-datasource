@@ -30,12 +30,12 @@ def save(name, description, domain, website, icon):
 @mod.route('/list', methods=['GET'])
 @require_login
 def list():
-    return render_template('application/list.html', application=Application.objects())
+    return render_template('oauthclient/application/list.html', application=Application.objects())
 
 @mod.route('/new', methods=['GET'])
 @require_login
 def new():
-    return render_template('application/new.html', application = None)
+    return render_template('oauthclient/application/new.html', application = None)
 
 @mod.route('/', methods=['GET', 'POST'])
 @mod.route('/<name>', methods=['GET', 'POST'])
@@ -61,6 +61,6 @@ def edit(name=None):
             save(name, description, domain, website, icon)
             return redirect(url_for('.edit', name = name))
 
-    return render_template('application/new.html',
+    return render_template('oauthclient/application/new.html',
                            application = application)
 
