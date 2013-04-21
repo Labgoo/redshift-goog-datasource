@@ -1,0 +1,12 @@
+{% extends "layout.html" %}
+
+{% block head %}
+    <link rel=stylesheet type=text/css href="{{ url_for('static', filename='css/admin.css') }}" media="screen">
+{% endblock %}
+
+{% block body %}
+    <div class="controls controls-row">
+        <label for="code" class="control-label">Code</label>
+        <input class="span9 input-xxlarge" type="text" id="code" value="{{code}}"  />
+    </div>
+{% endblock %}

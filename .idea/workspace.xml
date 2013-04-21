@@ -2,57 +2,44 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="879ead0d-c927-4a60-a617-412f0ea01429" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/oauth/__init__.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/models/application.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/views/application.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/dictionaries/erlichmen.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/templates/application/list.html" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/templates/application/new.html" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/views/oauth2.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/oauth/provider.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/models/query.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/models/refresh_token.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/templates/oauth/request.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/models/__init__.py" afterPath="$PROJECT_DIR$/models/__init__.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app.py" afterPath="$PROJECT_DIR$/app.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/models/connection_string.py" afterPath="$PROJECT_DIR$/models/connection_string.py" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/templates/oauth/display_code.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/models/application.py" afterPath="$PROJECT_DIR$/models/application.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/views/application.py" afterPath="$PROJECT_DIR$/views/application.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/views/connection_string.py" afterPath="$PROJECT_DIR$/views/connection_string.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/templates/layout.html" afterPath="$PROJECT_DIR$/templates/layout.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/mongo.py" afterPath="$PROJECT_DIR$/mongo.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/views/query.py" afterPath="$PROJECT_DIR$/views/query.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/requirements.txt" afterPath="$PROJECT_DIR$/requirements.txt" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/run.py" afterPath="$PROJECT_DIR$/run.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/models/transformer.py" afterPath="$PROJECT_DIR$/models/transformer.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/views/transformer.py" afterPath="$PROJECT_DIR$/views/transformer.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/models/user.py" afterPath="$PROJECT_DIR$/models/user.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/views/user.py" afterPath="$PROJECT_DIR$/views/user.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/templates/application/new.html" afterPath="$PROJECT_DIR$/templates/application/new.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/templates/connection_string/new.html" afterPath="$PROJECT_DIR$/templates/connection_string/new.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/views/oauth2.py" afterPath="$PROJECT_DIR$/views/oauth2.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/oauth/provider.py" afterPath="$PROJECT_DIR$/oauth/provider.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/pyoauth2/provider.py" afterPath="$PROJECT_DIR$/pyoauth2/provider.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/templates/oauth/request.html" afterPath="$PROJECT_DIR$/templates/oauth/request.html" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <ignored path="redshift-goog-datasource.iws" />
     <ignored path=".idea/workspace.xml" />
     <file path="/Dummy.txt" changelist="879ead0d-c927-4a60-a617-412f0ea01429" time="1366402007754" ignored="false" />
-    <file path="/connection_string.py" changelist="879ead0d-c927-4a60-a617-412f0ea01429" time="1366290975602" ignored="false" />
+    <file path="/connection_string.py" changelist="879ead0d-c927-4a60-a617-412f0ea01429" time="1366491601586" ignored="false" />
     <file path="/list.html" changelist="879ead0d-c927-4a60-a617-412f0ea01429" time="1366312367832" ignored="false" />
-    <file path="/new.html" changelist="879ead0d-c927-4a60-a617-412f0ea01429" time="1366317374184" ignored="false" />
+    <file path="/new.html" changelist="879ead0d-c927-4a60-a617-412f0ea01429" time="1366491502913" ignored="false" />
     <file path="/run.py" changelist="879ead0d-c927-4a60-a617-412f0ea01429" time="1366312462793" ignored="false" />
     <file path="/layout.html" changelist="879ead0d-c927-4a60-a617-412f0ea01429" time="1366312831373" ignored="false" />
     <file path="/.env" changelist="879ead0d-c927-4a60-a617-412f0ea01429" time="1366268298116" ignored="false" />
-    <file path="/a.dummy" changelist="879ead0d-c927-4a60-a617-412f0ea01429" time="1366407824329" ignored="false" />
+    <file path="/a.dummy" changelist="879ead0d-c927-4a60-a617-412f0ea01429" time="1366490640650" ignored="false" />
     <file path="/user.py" changelist="879ead0d-c927-4a60-a617-412f0ea01429" time="1366318730352" ignored="false" />
     <file path="/login.html" changelist="879ead0d-c927-4a60-a617-412f0ea01429" time="1366271295794" ignored="false" />
-    <file path="/fragment.py" changelist="879ead0d-c927-4a60-a617-412f0ea01429" time="1366318578490" ignored="false" />
+    <file path="/fragment.py" changelist="879ead0d-c927-4a60-a617-412f0ea01429" time="1366486902568" ignored="false" />
     <file path="/query.py" changelist="879ead0d-c927-4a60-a617-412f0ea01429" time="1366289842929" ignored="false" />
     <file path="/transformer.py" changelist="879ead0d-c927-4a60-a617-412f0ea01429" time="1366290925104" ignored="false" />
     <file path="/oauth.py" changelist="879ead0d-c927-4a60-a617-412f0ea01429" time="1366309172152" ignored="false" />
-    <file path="/provider.py" changelist="879ead0d-c927-4a60-a617-412f0ea01429" time="1366406279806" ignored="false" />
+    <file path="/provider.py" changelist="879ead0d-c927-4a60-a617-412f0ea01429" time="1366489533176" ignored="false" />
     <file path="/__init__.py" changelist="879ead0d-c927-4a60-a617-412f0ea01429" time="1366405918408" ignored="false" />
-    <file path="/application.py" changelist="879ead0d-c927-4a60-a617-412f0ea01429" time="1366403252274" ignored="false" />
+    <file path="/application.py" changelist="879ead0d-c927-4a60-a617-412f0ea01429" time="1366489273160" ignored="false" />
     <file path="/mongo.py" changelist="879ead0d-c927-4a60-a617-412f0ea01429" time="1366279994186" ignored="false" />
     <file path="/app.py" changelist="879ead0d-c927-4a60-a617-412f0ea01429" time="1366287836122" ignored="false" />
     <file path="/a.py" changelist="879ead0d-c927-4a60-a617-412f0ea01429" time="1366289398516" ignored="false" />
-    <file path="/request.html" changelist="879ead0d-c927-4a60-a617-412f0ea01429" time="1366408784479" ignored="false" />
-    <file path="/oauth2.py" changelist="879ead0d-c927-4a60-a617-412f0ea01429" time="1366408077606" ignored="false" />
+    <file path="/request.html" changelist="879ead0d-c927-4a60-a617-412f0ea01429" time="1366487053657" ignored="false" />
+    <file path="/oauth2.py" changelist="879ead0d-c927-4a60-a617-412f0ea01429" time="1366490979849" ignored="false" />
     <file path="/refresh_token.py" changelist="879ead0d-c927-4a60-a617-412f0ea01429" time="1366408280355" ignored="false" />
+    <file path="/display_code.html" changelist="879ead0d-c927-4a60-a617-412f0ea01429" time="1366491055074" ignored="false" />
     <option name="TRACKING_ENABLED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -75,16 +62,18 @@
       <file leaf-file-name="application.py" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/views/application.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="12" column="0" selection-start="367" selection-end="657" vertical-scroll-proportion="0.0">
-              <folding />
+            <state line="18" column="33" selection-start="602" selection-end="615" vertical-scroll-proportion="0.0">
+              <folding>
+                <element signature="e#25#100#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="request.html" pinned="false" current="true" current-in-tab="true">
+      <file leaf-file-name="request.html" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/templates/oauth/request.html">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="28" column="68" selection-start="971" selection-end="971" vertical-scroll-proportion="0.5971074">
+            <state line="31" column="17" selection-start="0" selection-end="1569" vertical-scroll-proportion="-5.5833335">
               <folding />
             </state>
           </provider>
@@ -93,7 +82,7 @@
       <file leaf-file-name="oauth2.py" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/views/oauth2.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="17" column="29" selection-start="498" selection-end="498" vertical-scroll-proportion="-4.6153846">
+            <state line="31" column="6" selection-start="888" selection-end="888" vertical-scroll-proportion="0.0">
               <folding>
                 <element signature="e#0#12#0" expanded="true" />
               </folding>
@@ -101,43 +90,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="refresh_token.py" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/models/refresh_token.py">
+      <file leaf-file-name="new.html" pinned="false" current="true" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/templates/connection_string/new.html">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="46" column="15" selection-start="1577" selection-end="1577" vertical-scroll-proportion="0.0">
-              <folding>
-                <element signature="e#0#19#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="__init__.py" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/models/__init__.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="5" column="30" selection-start="195" selection-end="195" vertical-scroll-proportion="0.0">
+            <state line="19" column="0" selection-start="780" selection-end="964" vertical-scroll-proportion="0.6038136">
               <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="run.py" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/run.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="17" column="24" selection-start="432" selection-end="432" vertical-scroll-proportion="0.0">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="__init__.py" pinned="false" current="false" current-in-tab="false">
-        <entry file="file:///System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/json/__init__.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="230" column="0" selection-start="8581" selection-end="8581" vertical-scroll-proportion="0.0">
-              <folding>
-                <marker date="1366194624000" expanded="true" signature="1898:2015" placeholder="..." />
-                <marker date="1366194624000" expanded="true" signature="2337:2489" placeholder="..." />
-              </folding>
             </state>
           </provider>
         </entry>
@@ -145,7 +102,7 @@
       <file leaf-file-name="connection_string.py" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/views/connection_string.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="31" column="104" selection-start="769" selection-end="869" vertical-scroll-proportion="-4.6923075">
+            <state line="37" column="90" selection-start="1069" selection-end="1069" vertical-scroll-proportion="0.0">
               <folding>
                 <element signature="e#25#110#0" expanded="true" />
               </folding>
@@ -153,13 +110,29 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="application.py" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/models/application.py">
+      <file leaf-file-name="display_code.html" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/templates/oauth/display_code.html">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="12" column="50" selection-start="292" selection-end="330" vertical-scroll-proportion="0.0">
-              <folding>
-                <element signature="e#0#19#0" expanded="true" />
-              </folding>
+            <state line="9" column="72" selection-start="364" selection-end="364" vertical-scroll-proportion="-5.625">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="user.py" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/views/user.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="86" column="0" selection-start="2482" selection-end="2482" vertical-scroll-proportion="0.0">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="fields.py" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/venv/lib/python2.7/site-packages/mongoengine/fields.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="749" column="0" selection-start="25612" selection-end="25667" vertical-scroll-proportion="0.0">
+              <folding />
             </state>
           </provider>
         </entry>
@@ -182,22 +155,22 @@
   <component name="IdeDocumentHistory">
     <option name="changedFiles">
       <list>
-        <option value="$PROJECT_DIR$/views/oauth.py" />
-        <option value="$PROJECT_DIR$/requirements.txt" />
-        <option value="$PROJECT_DIR$/templates/application/list.html" />
-        <option value="$PROJECT_DIR$/run.py" />
         <option value="$PROJECT_DIR$/templates/layout.html" />
         <option value="$PROJECT_DIR$/models/transformer.py" />
-        <option value="$PROJECT_DIR$/templates/application/new.html" />
         <option value="$PROJECT_DIR$/views/user.py" />
-        <option value="$PROJECT_DIR$/models/application.py" />
-        <option value="$PROJECT_DIR$/views/application.py" />
-        <option value="$PROJECT_DIR$/pyoauth2/provider.py" />
         <option value="$PROJECT_DIR$/models/__init__.py" />
-        <option value="$PROJECT_DIR$/oauth/provider.py" />
-        <option value="$PROJECT_DIR$/views/oauth2.py" />
         <option value="$PROJECT_DIR$/models/refresh_token.py" />
+        <option value="$PROJECT_DIR$/views/application.py" />
+        <option value="$PROJECT_DIR$/templates/application/new.html" />
         <option value="$PROJECT_DIR$/templates/oauth/request.html" />
+        <option value="$PROJECT_DIR$/models/application.py" />
+        <option value="$PROJECT_DIR$/oauth/provider.py" />
+        <option value="$PROJECT_DIR$/pyoauth2/provider.py" />
+        <option value="$PROJECT_DIR$/run.py" />
+        <option value="$PROJECT_DIR$/views/oauth2.py" />
+        <option value="$PROJECT_DIR$/templates/oauth/display_code.html" />
+        <option value="$PROJECT_DIR$/views/connection_string.py" />
+        <option value="$PROJECT_DIR$/templates/connection_string/new.html" />
       </list>
     </option>
   </component>
@@ -356,6 +329,20 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
+              <option name="myItemId" value="pyoauth2" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="redshift-goog-datasource" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="redshift-goog-datasource" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
               <option name="myItemId" value="oauth" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
@@ -387,6 +374,7 @@
     <property name="restartRequiresConfirmation" value="false" />
     <property name="FullScreen" value="false" />
     <property name="DefaultHtmlFileTemplate" value="Html5" />
+    <property name="GoToClass.includeJavaFiles" value="false" />
     <property name="options.splitter.details.proportions" value="0.2" />
     <property name="options.searchVisible" value="true" />
   </component>
@@ -552,8 +540,8 @@
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4431217" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.22668579" sideWeight="0.73941797" order="0" side_tool="false" content_ui="combo" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.260582" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.22668579" sideWeight="0.72354496" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.27645501" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32947975" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
@@ -631,133 +619,134 @@
           <line>215</line>
           <option name="timeStamp" value="28" />
         </line-breakpoint>
+        <line-breakpoint enabled="true" type="python-line">
+          <url>file://$PROJECT_DIR$/models/application.py</url>
+          <line>32</line>
+          <option name="timeStamp" value="44" />
+        </line-breakpoint>
       </breakpoints>
-      <option name="time" value="39" />
+      <option name="time" value="55" />
     </breakpoint-manager>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/venv/lib/python2.7/site-packages/werkzeug/local.py">
+    <entry file="file://$PROJECT_DIR$/venv/lib/python2.7/site-packages/mongoengine/fields.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="335" column="0" selection-start="10466" selection-end="10466" vertical-scroll-proportion="0.33142856">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/views/user.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="86" column="0" selection-start="2482" selection-end="2482" vertical-scroll-proportion="0.6183206">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/views/application.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="12" column="0" selection-start="367" selection-end="657" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/models/application.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="12" column="50" selection-start="292" selection-end="330" vertical-scroll-proportion="0.0">
-          <folding>
-            <element signature="e#0#19#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/pyoauth2/utils.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="13" column="4" selection-start="307" selection-end="307" vertical-scroll-proportion="0.33142856">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/run.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="17" column="24" selection-start="432" selection-end="432" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/venv/lib/python2.7/site-packages/mongoengine/base.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="796" column="0" selection-start="30238" selection-end="30238" vertical-scroll-proportion="0.31099194">
-          <folding>
-            <element signature="e#0#15#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/venv/lib/python2.7/site-packages/mongoengine/queryset.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="539" column="0" selection-start="18779" selection-end="18779" vertical-scroll-proportion="0.3324397">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/oauth/provider.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="72" column="8" selection-start="2253" selection-end="2253" vertical-scroll-proportion="0.027989822">
-          <folding>
-            <element signature="e#0#11#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/pyoauth2/provider.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="508" column="34" selection-start="18348" selection-end="18374" vertical-scroll-proportion="0.3133515">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/views/connection_string.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="31" column="104" selection-start="769" selection-end="869" vertical-scroll-proportion="-4.6923075">
-          <folding>
-            <element signature="e#25#110#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/views/query.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="194" column="34" selection-start="5558" selection-end="5566" vertical-scroll-proportion="0.3314121">
-          <folding>
-            <element signature="e#25#110#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/views/oauth2.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="17" column="29" selection-start="498" selection-end="498" vertical-scroll-proportion="-4.6153846">
-          <folding>
-            <element signature="e#0#12#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/models/__init__.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="5" column="30" selection-start="195" selection-end="195" vertical-scroll-proportion="0.0">
+        <state line="749" column="0" selection-start="25612" selection-end="25667" vertical-scroll-proportion="0.0">
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/models/refresh_token.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="46" column="15" selection-start="1577" selection-end="1577" vertical-scroll-proportion="0.0">
+        <state line="46" column="15" selection-start="1577" selection-end="1577" vertical-scroll-proportion="0.7111111">
           <folding>
             <element signature="e#0#19#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/models/application.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="20" column="13" selection-start="612" selection-end="612" vertical-scroll-proportion="0.1904762">
+          <folding>
+            <element signature="e#0#19#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/oauth/provider.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="4" column="0" selection-start="88" selection-end="88" vertical-scroll-proportion="0.1904762">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/pyoauth2/provider.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="270" column="30" selection-start="8603" selection-end="8603" vertical-scroll-proportion="0.2802768">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/venv/lib/python2.7/site-packages/werkzeug/local.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="335" column="0" selection-start="10466" selection-end="10466" vertical-scroll-proportion="0.33136094">
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/templates/oauth/request.html">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="28" column="68" selection-start="971" selection-end="971" vertical-scroll-proportion="0.5971074">
+        <state line="31" column="17" selection-start="0" selection-end="1569" vertical-scroll-proportion="-5.5833335">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/pyoauth2/utils.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="51" column="59" selection-start="1412" selection-end="1447" vertical-scroll-proportion="0.5192308">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/run.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="17" column="0" selection-start="408" selection-end="408" vertical-scroll-proportion="0.33136094">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/views/user.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="86" column="0" selection-start="2482" selection-end="2482" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file:///System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/urlparse.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="358" column="4" selection-start="12925" selection-end="12925" vertical-scroll-proportion="0.33136094">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/views/oauth2.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="31" column="6" selection-start="888" selection-end="888" vertical-scroll-proportion="0.0">
+          <folding>
+            <element signature="e#0#12#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/templates/oauth/display_code.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="9" column="72" selection-start="364" selection-end="364" vertical-scroll-proportion="-5.625">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/models/user.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="9" column="12" selection-start="181" selection-end="189" vertical-scroll-proportion="0.27217743">
+          <folding>
+            <element signature="e#0#14#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/views/connection_string.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="37" column="90" selection-start="1069" selection-end="1069" vertical-scroll-proportion="0.0">
+          <folding>
+            <element signature="e#25#110#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/templates/connection_string/new.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="19" column="0" selection-start="780" selection-end="964" vertical-scroll-proportion="0.6038136">
           <folding />
         </state>
       </provider>

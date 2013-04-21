@@ -17,16 +17,24 @@
             <div class="app-perms">
                 This app needs these permissions
                 <ul>
-                    {% for premission in premissions %}
-                    <li>{{ premission }}</li>
+                    {% for permission in premissions %}
+                    <li>{{ permission }}</li>
                     {% endfor %}
                 </ul>
             </div>
         </div>
 
         <form method="post" action="/oauth/submit">
-            <input type="hidden" name="client_id" value="{{ client_id }}" />
+            <input type="hidden" name="client_id" value="{{ application.client_id }}" />
+            {% if scope %}
             <input type="hidden" name="scope" value="{{ scope }}" />
+            {% endif %}
+            {% if response_type %}
+            <input type="hidden" name="response_type" value="{{ response_type }}" />
+            {% endif %}
+            {% if redirect_uri %}
+            <input type="hidden" name="redirect_uri" value="{{ redirect_uri }}" />
+            {% endif %}
             <input type="submit" name="user_action" value="Approve" class="btn btn-primary btn-xxlarge"/>
             <input type="submit" name="user_action" value="Reject"  class="btn btn-xxlarge"/>
         </form>

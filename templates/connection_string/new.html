@@ -7,15 +7,19 @@
     <form method="post" action="{% if name %}{{url_for('.edit', name=name) }}{%else%}{{ url_for('.new') }}{%endif%}">
         <fieldset>
             <div class="controls controls-row">
+                <label for="name" class="control-label">Name</label>
                 <input class="span9 input-xxlarge" type="text" id="name" name="name" value="{{name}}" placeholder="Name" maxlength="100" />
             </div>
             <div class="controls controls-row">
+                <label for="url" class="control-label">Url</label>
                 <input class="span9 input-xxlarge" type="text" id="url" name="url" value="{{url|safe}}" />
             </div>
             <div class="controls controls-row">
+                <label for="users" class="control-label">Users</label>
                 <input class="span9 input-xxlarge" type="text" id="users" name="users" value="{{users|safe}}" />
             </div>
             <div class="controls controls-row">
+                <label for="headers" class="control-label">Headers</label>
                 <textarea class="span9 input-xxlarge" id="headers" name="headers">{{ headers }}</textarea>
             </div>
             <div class="controls controls-row">

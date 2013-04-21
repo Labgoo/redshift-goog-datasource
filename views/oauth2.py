@@ -7,49 +7,65 @@ from models import AccessKey, Application
 # This class will be defined later in this post
 from oauth.provider import DataExplorerAuthorizationProvider
 
-mod = Blueprint('oauth2', __name__, url_prefix='/oauth2')
+mod = Blueprint('oauth', __name__, url_prefix='/oauth')
+
+provider = DataExplorerAuthorizationProvider()
+
+def code_request(get_response):
+    response = get_response()
+
+    location = response.headers.get('Location')
+
+    if location.startswith('urn:ietf:wg:oauth:2.0:oob'):
+        import urlparse
+
+        query = location.split('?')[1]
+        params = dict(urlparse.parse_qsl(query))
+        code = params.get('code')
+        return render_template('oauth/display_code.html',
+                               code=code)
+    else:
+        return response
+
+@mod.route("/submit", methods=["POST"])
+@require_login
+def submit_auth():
+    if request.form.get('user_action', 'Reject') == 'Reject':
+        return render_template('oauth/request_result.html',
+                               title='Application Login Failure',
+                               error='invalid_request',
+                               description="user denied this authentication request")
+
+    params = {}
+    for key, val in request.form.iteritems():
+        params[key] = val
+
+    return code_request(lambda: provider.get_authorization_code_from_params(params))
 
 # Authorization Code
 # Returns a redirect header on success
-@mod.route("/auth", methods=["GET"])
+@mod.route("/", methods=["GET"])
 @require_login
 def authorization_code():
-
     client_id = request.args.get('client_id')
 
     if not AccessKey.has_access(client_id, g.user.id):
         application = Application.find(client_id)
-        return render_template('oauth/request.html', application=application)
+        scope = request.args.get('scope')
+        response_type = request.args.get('response_type')
+        redirect_uri = request.args.get('redirect_uri')
+        return render_template('oauth/request.html',
+                               application=application,
+                               redirect_uri=redirect_uri,
+                               scope=scope,
+                               response_type=response_type)
     else:
-        # You can cache this instance for efficiency
-        provider = DataExplorerAuthorizationProvider()
-
-        # This is the important line
-        response = provider.get_authorization_code_from_uri(request.url)
-
-        # For maximum compatibility, a standard Response object is provided
-        # Response has the following properties:
-        #
-        #     response.status_code        int
-        #     response.text               response body
-        #     response.headers            iterable dict-like object with keys and values
-        #
-        # This response must be converted to a type that your application
-        # framework can use and returned.
-        flask_res = flask.make_response(response.text, response.status_code)
-        for k, v in response.headers.iteritems():
-            flask_res.headers[k] = v
-
-        return flask_res
+        return code_request(lambda: provider.get_authorization_code_from_uri(request.url))
 
 # Token exchange
 # Returns JSON token information on success
-@mod.route("/token", methods=["POST"])
+@mod.route("/access_token", methods=["POST"])
 def token():
-
-    # You can cache this instance for efficiency
-    provider = DataExplorerAuthorizationProvider()
-
     # Get a dict of POSTed form data
     data = {k: request.form[k] for k in request.form.iterkeys()}
 

@@ -178,6 +178,13 @@ class AuthorizationProvider(Provider):
         """
         return 3600
 
+    def generate_client_secret(self):
+        """Generate a random authorization code.
+
+        :rtype: str
+        """
+        return utils.random_ascii_string(self.token_length)
+
     def generate_authorization_code(self):
         """Generate a random authorization code.
 
@@ -260,6 +267,7 @@ class AuthorizationProvider(Provider):
             'client_id': None,
             'redirect_uri': None
         })
+
         redirect = utils.build_url(redirect_uri, params)
         return self._make_response(headers={'Location': redirect},
                                    status_code=302)
@@ -406,7 +414,7 @@ class AuthorizationProvider(Provider):
             'refresh_token': refresh_token
         })
 
-    def get_authorization_code_from_uri(self, uri):
+    def get_authorization_code_from_params(self, params):
         """Get authorization code response from a URI. This method will
         ignore the domain and path of the request, instead
         automatically parsing the query string parameters.
@@ -415,7 +423,7 @@ class AuthorizationProvider(Provider):
         :type uri: str
         :rtype: requests.Response
         """
-        params = utils.url_query_params(uri)
+
         try:
             if 'response_type' not in params:
                 raise TypeError('Missing parameter response_type in URL query')
@@ -444,6 +452,10 @@ class AuthorizationProvider(Provider):
             err = 'server_error'
             u = params['redirect_uri']
             return self._make_redirect_error_response(u, err)
+
+    def get_authorization_code_from_uri(self, uri):
+        params = utils.url_query_params(uri)
+        self.get_authorization_code_from_params(params)
 
     def get_token_from_post_data(self, data):
         """Get a token response from POST data.

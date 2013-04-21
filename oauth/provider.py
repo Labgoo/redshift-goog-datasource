@@ -42,6 +42,10 @@ class DataExplorerAuthorizationProvider(AuthorizationProvider):
         :param redirect_uri: Redirect URI.
         :type redirect_uri: str
         """
+
+        if redirect_uri == 'urn:ietf:wg:oauth:2.0:oob':
+            return True
+
         app = Application.find(client_id)
 
         # When matching against a redirect_uri, it is very important to

@@ -8,7 +8,6 @@ from models import ConnectionString
 
 mod = Blueprint('connection_string', __name__, url_prefix='/connection')
 
-
 def load(name):
     logging.info('load connection string %s', name)
 
@@ -36,7 +35,7 @@ def list():
 @require_login
 def new():
     url = 'mysql://scott:tiger@localhost/foo'
-    return render_template('connection_string/new.html', url = url)
+    return render_template('connection_string/new.html', url = url, users=[g.user.username])
 
 @mod.route('/', methods=['GET', 'POST'])
 @mod.route('/<name>', methods=['GET', 'POST'])

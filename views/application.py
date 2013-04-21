@@ -1,16 +1,23 @@
 # -*- coding: utf-8 -*-
 
-from flask import render_template, request, Blueprint, g, Response, redirect, url_for
-import logging, json
+from flask import render_template, request, Blueprint, g, redirect, url_for
+import logging
+from oauth.provider import DataExplorerAuthorizationProvider
 from user import require_login
 from models import Application
 
 mod = Blueprint('application', __name__, url_prefix='/application')
 
+provider = DataExplorerAuthorizationProvider()
+
 def save(name, description, domain, website, icon):
     logging.info('save application %s: %s', name)
 
     application, created = Application.objects.get_or_create(name=name)
+
+    if created or not application.client_secret:
+        application.client_secret = provider.generate_client_secret()
+
     application.owner = g.user
     application.name = name
     application.description = description

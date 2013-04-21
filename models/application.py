@@ -10,12 +10,17 @@ class Application(db.Document):
             ]
     }
 
-    owner = db.ReferenceField(User, required=True)
+    owner = db.ReferenceField(User, required=True, dbref=True)
     name = db.StringField(required=True)
     website = db.StringField(required=True)
     icon = db.StringField(required=False)
     domain = db.StringField(required=True)
     description = db.StringField(required=True)
+    client_secret = db.StringField()
+
+    @property
+    def client_id(self):
+        return str(self.pk)
 
     @classmethod
     def find(cls, client_id):

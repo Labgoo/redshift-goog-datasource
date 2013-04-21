@@ -10,6 +10,10 @@
                 <label class="control-label" for="client-id">Client Id</label>
                 <input class="span9 input-xxlarge" type="text" id="client-id" name="client-id" value="{{application.pk}}" readonly="readonly" maxlength="100" />
             {% endif %}
+            {% if application.client_secret %}
+                <label class="control-label" for="client-secret">Client Secret</label>
+                <input class="span9 input-xxlarge" type="text" id="client-secret" name="client-secret" value="{{application.client_secret}}" readonly="readonly" maxlength="100" />
+            {% endif %}
             <div class="controls controls-row">
                 <label class="control-label" for="name">Name</label>
                 <input class="span9 input-xxlarge" type="text" id="name" name="name" value="{{application.name}}" placeholder="Name" maxlength="100" />
@@ -31,7 +35,7 @@
                 <input class="span9 input-xxlarge" type="text" id="icon" name="icon" value="{{application.icon}}" />
             </div>
             <div class="controls controls-row">
-                <input type="submit" class="btn btn-primary btn-xxlarge pull-right" value="Register Your Application"/>
+                <input type="submit" class="btn btn-primary btn-xxlarge pull-right" value="{% if application.name %}Update Your Application{% else %}Register Your Application{% endif %}"/>
             </div>
         </fieldset>
     </form>
