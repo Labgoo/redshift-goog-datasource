@@ -15,7 +15,7 @@ class RefreshToken(db.Document):
 
     @classmethod
     def delete(cls, client_id, refresh_token):
-        AccessKey.objects(db.Q(client_id = client_id) & db.Q(refresh_token = refresh_token)).remove()
+        cls.objects(db.Q(client_id = client_id) & db.Q(refresh_token = refresh_token)).remove()
 
     @classmethod
     def find(cls, client_id, refresh_token):
@@ -43,13 +43,13 @@ class AccessKey(db.Document):
     @classmethod
     def has_access(cls, client_id, user_id):
         try:
-            return AccessKey.objects.get(db.Q(client_id = client_id) & db.Q(user_id = user_id)) != None
+            return cls.objects.get(db.Q(client_id = client_id) & db.Q(user_id = user_id)) != None
         except DoesNotExist:
             return None
 
     @classmethod
     def delete(cls, client_id, user_id):
-        AccessKey.objects(db.Q(client_id = client_id) & db.Q(user_id = user_id)).remove()
+        cls.objects(db.Q(client_id = client_id) & db.Q(user_id = user_id)).remove()
 
     @classmethod
     def save(cls, client_id, user_id, access_key, token):

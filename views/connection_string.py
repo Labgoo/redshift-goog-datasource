@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from flask import render_template, request, Blueprint, g, Response, redirect, url_for
+from flask import render_template, request, Blueprint, g, session, redirect, url_for
 import logging, json
 import mongo, os
 from user import require_login
@@ -8,28 +8,9 @@ from models import ConnectionString
 
 mod = Blueprint('connection_string', __name__, url_prefix='/connection')
 
-def load(name):
-    logging.info('load connection string %s', name)
-
-    connection_string = ConnectionString.objects.get({"name": name})
-
-    if not connection_string:
-        return None
-
-    return connection_string.get('url')
-
-def save(name, url):
-    logging.info('save connection_string %s: %s', name, url)
-
-    ConnectionString.update(
-        {'name': name},
-        {"$set": {'url': url}},
-        upsert = True);
-
 @mod.route('/list', methods=['GET'])
 def list():
-    return render_template('connection_string/list.html', connection_strings=ConnectionString.objects())
-
+    return render_template('connection_string/list.html', connection_strings=ConnectionString.all())
 
 @mod.route('/new', methods=['GET'])
 @require_login
@@ -46,20 +27,25 @@ def edit(name=None):
         if not name:
             return redirect(url_for('.new'))
 
-        url = load(name)
+        connection_string = ConnectionString.find(name)
+
+        url = connection_string.url
+        name = connection_string.name
+        headers = connection_string.headers
     else:
         url = request.form['url']
-
         name = request.form.get('name')
+        headers = request.form.get('headers')
 
         if name == 'new':
             name = None
 
         if name:
-            save(name, url)
+            ConnectionString.create_or_update(name=name, url=url, headers=headers)
             return redirect(url_for('.edit', name = name))
 
     return render_template('connection_string/new.html',
                            name = name,
+                           headers = headers,
                            url = url)
 

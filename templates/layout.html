@@ -18,7 +18,7 @@
             <li {% if request.blueprint=='query'%}class="active"{%endif%}><a href="{{url_for('query.list')}}">Queries</a></li>
             <li {% if request.blueprint=='transformer'%}class="active"{%endif%}><a href="{{url_for('transformer.list')}}">Transformers</a></li>
             <li {% if request.blueprint=='connection_string'%}class="active"{%endif%}><a href="{{url_for('connection_string.list')}}">Connection Strings</a></li>
-            <li {% if request.blueprint=='application'%}class="active"{%endif%}><a href="{{url_for('application.list')}}">Applications</a></li>
+            <li {% if request.blueprint=='oauthclient'%}class="active"{%endif%}><a href="{{url_for('oauthclient.list')}}">OAuth Clients</a></li>
           </ul>
           <ul class="nav pull-right">
             {% if not g.user %}

@@ -1,6 +1,5 @@
-from flask import g
 import logging
-from app import app, db
+from app import app
 import os
 
 from sqlalchemy.dialects import registry
@@ -9,21 +8,20 @@ registry.register('postgresql.redshift', 'redshift' '', 'PGDialect_RedShift')
 @app.before_request
 def before_request():
 	logging.getLogger().setLevel(logging.INFO)
-	g.db = db.engine
 
 from views import query
 from views import transformer
 from views import user
 from views import connection_string
 from views import oauth2
-from views import application
+from views import oauthclient
 
 app.register_blueprint(query.mod)
 app.register_blueprint(transformer.mod)
 app.register_blueprint(user.mod)
 app.register_blueprint(connection_string.mod)
 app.register_blueprint(oauth2.mod)
-app.register_blueprint(application.mod)
+app.register_blueprint(oauthclient.mod)
 
 if __name__ == '__main__':
 	# Bind to PORT if defined, otherwise default to 5000.

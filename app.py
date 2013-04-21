@@ -1,15 +1,8 @@
-import os
 from flask import Flask
-from flask.ext.sqlalchemy import SQLAlchemy
-from flask_debugtoolbar import DebugToolbarExtension
+#from flask_debugtoolbar import DebugToolbarExtension
 import mongo
 
 app = Flask(__name__)
-
-app.config.update(
-	DEBUG = True,
-	SQLALCHEMY_DATABASE_URI = os.environ['SQLALCHEMY_DATABASE_URI']
-)
 
 app.config['DEBUG_TB_PANELS'] = (
     'flask.ext.debugtoolbar.panels.versions.VersionDebugPanel',
@@ -28,8 +21,6 @@ app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = False
 app.secret_key = 'A0Zr98j/3yX R~XHH!jmN]LWX/,?RT'
 
 app.config['MONGODB_SETTINGS'] = mongo.get_mongo_params()
-
-db = SQLAlchemy(app)
 
 from flask.ext.mongoengine import MongoEngine
 

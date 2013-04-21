@@ -10,12 +10,30 @@
 {% endblock%}
 
 {% block body %}
-	<h1>Create a Query</h1>
+	<h1>{% if name %}Edit{% else %}Create{%endif  %} a Query</h1>
 	<form id="sheepItForm" method="post" action="{% if name %}{{url_for('.edit', name=name) }}{%else%}{{ url_for('.new') }}{%endif%}">
 		<fieldset>
 			<div class="controls controls-row">
 				<input class="span9 input-xxlarge" type="text" id="query-name" name="query-name" value="{{name}}" placeholder="Enter a title for your query" maxlength="100" />
 			</div>
+
+            {% for connection in connections %}
+                {% if loop.first %}
+                    <div class="controls controls-row">
+					    <select id="connection_strings" class="span9 input-xxlarge" type="select" name="connection-string">
+                            <option></option>
+                {% endif %}
+                            <option>{{ connection.name }}</option>
+                {% if loop.last %}
+				        </select>
+                    </div>
+                {% endif %}
+            {% else %}
+                <div class="alert">
+                    You need to define a connection to the database.
+                </div>
+            {% endfor %}
+
 			<div class="controls">
 				<textarea id="sql" name="sql" class="span9" rows="5">{{sql|safe}}</textarea>
 				{%if error %}

@@ -1,7 +1,7 @@
 import json
 import re
 from flask import request, session
-from models import Application
+from models import OAuthClient
 from pyoauth2.provider import AuthorizationProvider
 import redis, os
 from models import RefreshToken, AccessKey
@@ -20,7 +20,7 @@ class DataExplorerAuthorizationProvider(AuthorizationProvider):
         :param client_id: Client id.
         :type client_id: str
         """
-        return Application.find(client_id) is not None
+        return OAuthClient.find(client_id) is not None
 
     def validate_client_secret(self, client_id, client_secret):
         """Check that the client secret matches the application secret.
@@ -30,7 +30,7 @@ class DataExplorerAuthorizationProvider(AuthorizationProvider):
         :param client_secret: Client secret.
         :type client_secret: str
         """
-        app = Application.find(client_id)
+        app = OAuthClient.find(client_id)
         if app is not None and app.secret == client_secret:
             return True
 
@@ -46,7 +46,7 @@ class DataExplorerAuthorizationProvider(AuthorizationProvider):
         if redirect_uri == 'urn:ietf:wg:oauth:2.0:oob':
             return True
 
-        app = Application.find(client_id)
+        app = OAuthClient.find(client_id)
 
         # When matching against a redirect_uri, it is very important to
         # ignore the query parameters, or else this step will fail as the

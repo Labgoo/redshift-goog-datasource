@@ -2,7 +2,7 @@ import flask
 from flask import request, g, render_template
 from user import require_login
 from flask import Blueprint
-from models import AccessKey, Application
+from models import AccessKey, OAuthClient
 
 # This class will be defined later in this post
 from oauth.provider import DataExplorerAuthorizationProvider
@@ -50,12 +50,12 @@ def authorization_code():
     client_id = request.args.get('client_id')
 
     if not AccessKey.has_access(client_id, g.user.id):
-        application = Application.find(client_id)
+        client = OAuthClient.find(client_id)
         scope = request.args.get('scope')
         response_type = request.args.get('response_type')
         redirect_uri = request.args.get('redirect_uri')
         return render_template('oauth/request.html',
-                               application=application,
+                               client=client,
                                redirect_uri=redirect_uri,
                                scope=scope,
                                response_type=response_type)
