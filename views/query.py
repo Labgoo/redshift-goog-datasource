@@ -10,6 +10,22 @@ from user import require_login
 
 mod = Blueprint('query', __name__, url_prefix='/query')
 
+def query_google_data_source(connection, sql, meta_vars, vars):
+    import requests
+
+    url = connection.url[len('google://'):]
+
+    query = build_sql_query(sql, meta_vars, vars)
+
+    url = url.replace('{query}', query)
+
+    headers = json.loads(connection.headers)
+
+    r = requests.get(url, headers=headers)
+    r.raise_for_status()
+
+    return datatable_to_data(r.json())
+
 def build_sql_query(query, meta_vars, vars):
     meta_vars = dict(meta_vars)
     vars = dict(vars)
@@ -82,6 +98,27 @@ def data_to_datatable(description, data, columns_order):
     data_table.LoadData(data)
 
     return data_table, columns_order
+
+def datatable_to_data(data_table):
+    description = data_table["cols"]
+
+    def enum_rows():
+        for row in data_table["rows"]:
+            r = []
+            for i,v in enumerate(row["c"]):
+                r.append((description[i]["id"], v["v"]))
+
+            yield dict(r)
+
+    data = [item for item in enum_rows()]
+
+    def convert_description():
+        for col in description:
+            yield col["id"], (col["type"], col["label"])
+
+    description = [item for item in convert_description()]
+
+    return dict(description), data, None
 
 def query_execute_sql(connection, sql, meta_vars, vars):
     description, data, columns_order = query_db(connection, sql, meta_vars, vars)
@@ -201,34 +238,19 @@ def edit(name=None):
         json_data = None
 
         if connection:
-
             if connection.url.startswith('google://'):
-                import requests
-
-                url = connection.url[len('google://'):]
-
-                query = build_sql_query(sql, meta_vars, vars)
-
-                url = url.replace('{query}', query)
-
-                headers = json.loads(connection.headers)
-
-                r = requests.get(url, headers=headers)
-                r.raise_for_status()
-
-                json_data = r.text
-
+                description, data, columns_order = query_google_data_source(connection, sql, meta_vars, vars)
             else:
                 description, data, columns_order = query_execute_sql(connection, sql, meta_vars, vars)
 
-                if transform:
-                    data = Transformer.execute(transform, data)
+            if transform:
+                data = Transformer.execute(transform, data)
 
-                if raw_data:
-                    json_data = json.dumps(data, default=handle_datetime)
-                elif len(data) > 0:
-                    data_table, columns_order = data_to_datatable(description, data, columns_order)
-                    json_data = data_table.ToJSon(columns_order=columns_order)
+            if raw_data:
+                json_data = json.dumps(data, default=handle_datetime)
+            elif len(data) > 0:
+                data_table, columns_order = data_to_datatable(description, data, columns_order)
+                json_data = data_table.ToJSon(columns_order=columns_order)
 
         if not json_data:
             json_data = json.dumps([])
