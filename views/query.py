@@ -10,15 +10,24 @@ from user import require_login
 
 mod = Blueprint('query', __name__, url_prefix='/query')
 
-def query_db(connection, query, args):
+def build_sql_query(query, meta_vars, vars):
+    meta_vars = dict(meta_vars)
+    vars = dict(vars)
+
+    vars = vars_with_default_value(meta_vars, vars)
+
+    logging.info('execute query %s %s %s', query, vars, meta_vars)
+
+    return query.format(**vars)
+
+def query_db(connection, query,  meta_vars, vars):
     if not connection:
         raise ValueError('Missing Connection String')
 
     from sqlalchemy import create_engine
 
     db = create_engine(connection.url)
-
-    sql = query.format(**args)
+    sql = build_sql_query(query, meta_vars, vars)
     cur = db.execute(sql)
     rows = cur.fetchall()
 
@@ -41,7 +50,7 @@ def save(name, sql, meta_vars, connection):
     Query.create_or_update(name = name,
                            sql = sql,
                            meta_vars = meta_vars,
-                           connection = ConnectionString.find(connection))
+                           connection = connection)
 
 def convert_value(val, type):
     if not val:
@@ -75,14 +84,7 @@ def data_to_datatable(description, data, columns_order):
     return data_table, columns_order
 
 def query_execute_sql(connection, sql, meta_vars, vars):
-    meta_vars = dict(meta_vars)
-    vars = dict(vars)
-
-    vars = vars_with_default_value(meta_vars, vars)
-
-    logging.info('execute query %s %s %s', sql, vars, meta_vars)
-
-    description, data, columns_order = query_db(connection, sql, vars)
+    description, data, columns_order = query_db(connection, sql, meta_vars, vars)
 
     return description, data, columns_order
 
@@ -115,6 +117,8 @@ def new():
     return render_template('query/create_or_edit.html',
         sql = sql,
         vars = vars,
+        connection = None,
+        connections = ConnectionString.all(),
         meta_vars = meta_vars)
 
 @mod.route('/', methods=['POST', 'GET'])
@@ -161,9 +165,9 @@ def edit(name=None):
         if name == 'new':
             name = None
 
-        connection = ConnectionString.find(request.form.get('connection_string'))
+        connection = ConnectionString.find(request.form.get('connection-string'))
 
-        if name:
+        if name and request.form.get('user-action') == 'Save + Execute':
             save(name, sql, meta_vars, connection)
             full_vars = vars_from_request(meta_vars, False)
             return redirect(url_for('.edit', name = name, **dict(full_vars)))
@@ -197,16 +201,34 @@ def edit(name=None):
         json_data = None
 
         if connection:
-            description, data, columns_order = query_execute_sql(connection, sql, meta_vars, vars)
 
-            if transform:
-                data = Transformer.execute(transform, data)
+            if connection.url.startswith('google://'):
+                import requests
 
-            if raw_data:
-                json_data = json.dumps(data, default=handle_datetime)
-            elif len(data) > 0:
-                data_table, columns_order = data_to_datatable(description, data, columns_order)
-                json_data = data_table.ToJSon(columns_order=columns_order)
+                url = connection.url[len('google://'):]
+
+                query = build_sql_query(sql, meta_vars, vars)
+
+                url = url.replace('{query}', query)
+
+                headers = json.loads(connection.headers)
+
+                r = requests.get(url, headers=headers)
+                r.raise_for_status()
+
+                json_data = r.text
+
+            else:
+                description, data, columns_order = query_execute_sql(connection, sql, meta_vars, vars)
+
+                if transform:
+                    data = Transformer.execute(transform, data)
+
+                if raw_data:
+                    json_data = json.dumps(data, default=handle_datetime)
+                elif len(data) > 0:
+                    data_table, columns_order = data_to_datatable(description, data, columns_order)
+                    json_data = data_table.ToJSon(columns_order=columns_order)
 
         if not json_data:
             json_data = json.dumps([])
@@ -230,8 +252,6 @@ def edit(name=None):
     elif not request.args.get('csv', None) is None:
         return Response(data_table.ToCsv(columns_order=columns_order), mimetype='text/csv')
     else:
-        json_data = data_table.ToJSon(columns_order=columns_order) if data_table else None
-
         full_vars = []
         vars = dict(vars)
         for key, options in meta_vars:

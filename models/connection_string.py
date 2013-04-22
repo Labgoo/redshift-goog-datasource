@@ -21,7 +21,7 @@ class ConnectionString(db.Document):
         if not session.user:
             return None
 
-        return cls.objects.filter(owner=session.user)
+        return cls.objects(owner=session.user)
 
     @classmethod
     def create_or_update(cls, name, url, headers):

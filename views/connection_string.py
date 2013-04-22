@@ -10,7 +10,7 @@ mod = Blueprint('connection_string', __name__, url_prefix='/connection')
 
 @mod.route('/list', methods=['GET'])
 def list():
-    return render_template('connection_string/list.html', connection_strings=ConnectionString.all())
+    return render_template('connection_string/list.html', connections=ConnectionString.all())
 
 @mod.route('/new', methods=['GET'])
 @require_login
@@ -22,20 +22,23 @@ def new():
 @mod.route('/<name>', methods=['GET', 'POST'])
 @require_login
 def edit(name=None):
+    users = []
     if request.method == 'GET':
         logging.info('loading connection string %s', name)
         if not name:
             return redirect(url_for('.new'))
 
-        connection_string = ConnectionString.find(name)
+        connection = ConnectionString.find(name)
 
-        url = connection_string.url
-        name = connection_string.name
-        headers = connection_string.headers
+        url = connection.url
+        name = connection.name
+        headers = connection.headers
+        users.append(connection.owner)
     else:
         url = request.form['url']
         name = request.form.get('name')
         headers = request.form.get('headers')
+        users.append(session.user)
 
         if name == 'new':
             name = None
@@ -47,5 +50,6 @@ def edit(name=None):
     return render_template('connection_string/new.html',
                            name = name,
                            headers = headers,
+                           users = users,
                            url = url)
 

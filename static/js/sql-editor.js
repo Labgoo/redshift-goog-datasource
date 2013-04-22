@@ -85,7 +85,7 @@ $(document).ready(function () {
 		recreateVars = false;
 	};
 
-    $("#sql-execute").click(function() {
+    $("#sql-execute, #sql-save-execute").click(function() {
     	if (recreateVars) {
 			createVarsFills();
 			return false;

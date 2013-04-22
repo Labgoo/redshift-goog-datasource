@@ -10,20 +10,20 @@
 {% endblock%}
 
 {% block body %}
-	<h1>{% if name %}Edit{% else %}Create{%endif  %} a Query</h1>
+	<h1>{% if name %}Edit{% else %}Create{% endif  %} a Query</h1>
 	<form id="sheepItForm" method="post" action="{% if name %}{{url_for('.edit', name=name) }}{%else%}{{ url_for('.new') }}{%endif%}">
 		<fieldset>
 			<div class="controls controls-row">
-				<input class="span9 input-xxlarge" type="text" id="query-name" name="query-name" value="{{name}}" placeholder="Enter a title for your query" maxlength="100" />
+				<input class="span9 input-xxlarge" type="text" id="query-name" name="query-name" value="{{name}}" {% if name %}readonly="readonly"{% else %} placeholder="Enter a title for your query"{% endif %} maxlength="100" />
 			</div>
 
-            {% for connection in connections %}
+            {% for current_connection in connections %}
                 {% if loop.first %}
                     <div class="controls controls-row">
 					    <select id="connection_strings" class="span9 input-xxlarge" type="select" name="connection-string">
                             <option></option>
                 {% endif %}
-                            <option>{{ connection.name }}</option>
+                            <option {% if connection.pk == current_connection.pk %}selected="selected"{% endif %}>{{ current_connection.name }}</option>
                 {% if loop.last %}
 				        </select>
                     </div>
@@ -45,10 +45,10 @@
 			</div>
 			<div class="controls-row controls" style="float:right">
 				<div class="btn-group">
-					<button id="sql-save-execute" type="submit" class="btn btn-primary btn-xxlarge pull-right {%if not name %}disabled{%endif%}">Save + Execute</button>
+					<input id="sql-save-execute" type="submit" name="user-action" class="btn btn-xxlarge pull-right {%if not name %}disabled{%endif%}" value="Save + Execute" />
 				</div>
 				<div class="btn-group">
-					<button id="sql-execute" type="submit" class="btn btn-xxlarge pull-right">Execute</button>
+					<input id="sql-execute" type="submit" name="user-action" class="btn btn-primary btn-xxlarge pull-right" value="Execute" />
 				</div>
 			</div> 
 			<br class="clearfix" />
