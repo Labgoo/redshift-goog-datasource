@@ -94,6 +94,7 @@
 		</fieldset>
 	</form>
 
+	{% if json %}
     <ul id="vistabs" class="nav nav-tabs">
         <li><a href="#table" data-toggle="tab">Table</a></li>
         <li><a href="#piechart" data-toggle="tab">Piechart</a></li>
@@ -108,7 +109,6 @@
         <div class="tab-pane" id="barcharts"></div>
     </div>
 
-	{% if json %}
 	<script src="https://www.google.com/jsapi" type="text/javascript"></script>
 	<script>
             $(function () {
