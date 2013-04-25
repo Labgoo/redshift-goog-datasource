@@ -35,7 +35,10 @@ class Query(db.Document):
 
     @classmethod
     def all(cls):
-        return cls.objects()
+        if not session.user:
+            return None
+
+        return cls.objects(owner=session.user)
 
     @classmethod
     def find(cls, name_or_oid):
