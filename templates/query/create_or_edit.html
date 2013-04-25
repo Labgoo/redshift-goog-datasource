@@ -93,18 +93,64 @@
 			</div>
 		</fieldset>
 	</form>
-	<div id="table_div_json"></div>
+
+    <ul id="vistabs" class="nav nav-tabs">
+        <li><a href="#table" data-toggle="tab">Table</a></li>
+        <li><a href="#piechart" data-toggle="tab">Piechart</a></li>
+        <li><a href="#areachart" data-toggle="tab">Area Charts</a></li>
+        <li><a href="#barcharts" data-toggle="tab">Bar Charts</a></li>
+    </ul>
+
+    <div class="tab-content">
+        <div class="tab-pane active" id="table"></div>
+        <div class="tab-pane" id="piechart"></div>
+        <div class="tab-pane" id="areachart"></div>
+        <div class="tab-pane" id="barcharts"></div>
+    </div>
 
 	{% if json %}
 	<script src="https://www.google.com/jsapi" type="text/javascript"></script>
 	<script>
-			google.load('visualization', '1', {packages:['table']});
-			google.setOnLoadCallback(drawTable);
-			function drawTable() {
-				var json_table = new google.visualization.Table(document.getElementById('table_div_json'));
-				var json_data = new google.visualization.DataTable({{json|safe}}, 0.6);
-				json_table.draw(json_data, {showRowNumber: true});
+            $(function () {
+                $('#vistabs a:first').tab('show');
+
+                $('#vistabs a').click(function (e) {
+                    e.preventDefault();
+                    $(this).tab('show');
+                });
+            });
+
+			google.load('visualization', '1', {packages:['table', 'corechart']});
+			google.setOnLoadCallback(drawVis);
+
+			function drawTable(data) {
+                var table = new google.visualization.Table(document.getElementById('table'));
+				table.draw(data, {showRowNumber: true});
 			}
+
+            function drawPieChart(data) {
+                var chart = new google.visualization.PieChart(document.getElementById('piechart'));
+                chart.draw(data);
+            }
+
+            function drawAreaChart(data) {
+                var chart = new google.visualization.AreaChart(document.getElementById('areachart'));
+                chart.draw(data);
+            }
+
+            function drawBarCharts(data) {
+                var chart = new google.visualization.BarChart(document.getElementById('barcharts'));
+                chart.draw(data);
+            }
+
+            function drawVis() {
+                var json_data = new google.visualization.DataTable({{json|safe}}, 0.6);
+
+                drawTable(json_data);
+                drawPieChart(json_data);
+                drawAreaChart(json_data);
+                drawBarCharts(json_data);
+            }
 	</script>
 	{% endif %}
 {% endblock %}
