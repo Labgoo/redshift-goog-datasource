@@ -4,6 +4,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel=stylesheet type=text/css href="{{ url_for('static', filename='css/bootstrap.css') }}" media="screen">
     <link rel=stylesheet type=text/css href="{{ url_for('static', filename='css/bootstrap-responsive.css') }}" media="screen">
+    <link rel=stylesheet type=text/css href="{{ url_for('static', filename='css/bootstrap-custom.css') }}" media="screen">
+
+    {% if favico %}
+    <link rel="icon" type="image/png" href="{{ favico }}">
+    {% endif %}
 
 	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
     {% block head %}{% endblock %}
@@ -11,8 +16,13 @@
   <body>
     <div class="navbar">
       <div class="navbar-inner">
-        <a class="brand" href="#">Data Explorer</a>
          <div class="container">
+            {% if logo %}
+                    <img id="logo" src="{{ logo }}">
+            {% endif %}
+
+        <a class="brand" href="#">
+            Data Explorer</a>
           <ul class="nav">
             <li {% if request.blueprint=='home_page'%}class="active"{%endif%}><a href="#">Home</a></li>
             <li {% if request.blueprint=='query'%}class="active"{%endif%}><a href="{{url_for('query.list')}}">Queries</a></li>

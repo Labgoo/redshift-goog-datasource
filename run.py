@@ -23,6 +23,11 @@ app.register_blueprint(connection_string.mod)
 app.register_blueprint(oauth2.mod)
 app.register_blueprint(oauthclient.mod)
 
+
+@app.context_processor
+def inject_meta():
+    return dict(favico=os.environ.get('favico'), logo=os.environ.get('logo'))
+
 if __name__ == '__main__':
 	# Bind to PORT if defined, otherwise default to 5000.
 	port = int(os.environ.get('PORT', 5000))
