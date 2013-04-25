@@ -21,6 +21,6 @@ class User(db.Document):
     @classmethod
     def get_by_openid(cls, openid):
         try:
-            return cls.objects.get(openid == openid)
+            return cls.objects.get(openid = openid)
         except:
             return None
