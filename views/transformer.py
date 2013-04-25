@@ -8,62 +8,61 @@ from models import Transformer
 mod = Blueprint('transformer', __name__, url_prefix='/transformer')
 
 def load(name):
-	logging.info('load transformer %s', name)
+    logging.info('load transformer %s', name)
 
-	transformer = Transformer.objects.get({"name": name})
+    transformer = Transformer.find(name)
 
-	if not transformer:
-		return None
+    if not transformer:
+        return None
 
-	code = transformer.get('code')
+    code = transformer.get('code')
 
-	return code
+    return code
 
 def save(name, code):
     logging.info('save transformer %s: %s', name, code)
 
-    Transformer.update(
-		{'name': name},
-		{"$set": {'code': code}},
-		upsert = True);
+    Transformer.create_or_update(name, code)
+
 
 @mod.route('/list', methods=['GET'])
 @require_login
 def list():
-	return render_template('transformer/list.html', transformeres=Transformer.objects())
+    return render_template('transformer/list.html', transformeres=Transformer.all())
 
 
 @mod.route('/new', methods=['GET'])
 @require_login
 def new():
-	code = "def process(data):\n  return data"
+    code = "#simple passthru transformer\nresult = []\n\nfor row in data:\n  result.append(row)"
 
-	return render_template('transformer/new.html', 
-		code = code)
+    return render_template('transformer/create_or_edit.html',
+                           code=code)
+
 
 @mod.route('/', methods=['GET', 'POST'])
 @mod.route('/<name>', methods=['GET', 'POST'])
 @require_login
 def edit(name=None):
-	if request.method == 'GET':
-		logging.info('loading transformer %s', name)
-		if not name:
-			return redirect(url_for('.new'))
+    if request.method == 'GET':
+        logging.info('loading transformer %s', name)
+        if not name:
+            return redirect(url_for('.new'))
 
-		code = load(name)
-	else:
-		code = request.form['code']
+        code = load(name)
+    else:
+        code = request.form['code']
 
-		name = request.form.get('name')
+        name = request.form.get('name')
 
-		if name == 'new':
-			name = None
+        if name == 'new':
+            name = None
 
-		if name:
-			save(name, code)
-			return redirect(url_for('.edit', name = name))
+        if name:
+            save(name, code)
+            return redirect(url_for('.edit', name=name))
 
-	return render_template('transformer/new.html', 
-		name = name, 
-		code = code)
+    return render_template('transformer/create_or_edit.html',
+                           name=name,
+                           code=code)
 

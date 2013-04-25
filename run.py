@@ -1,5 +1,6 @@
 import logging
 from app import app
+from flask import redirect, url_for
 import os
 
 from sqlalchemy.dialects import registry
@@ -23,6 +24,9 @@ app.register_blueprint(connection_string.mod)
 app.register_blueprint(oauth2.mod)
 app.register_blueprint(oauthclient.mod)
 
+@app.route('/')
+def index():
+    return redirect('/query/list')
 
 @app.context_processor
 def inject_meta():
