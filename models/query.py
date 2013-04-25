@@ -20,13 +20,18 @@ class Query(db.Document):
     connection = db.ReferenceField(ConnectionString, required=False, dbref=True)
     last_modified_by = db.ReferenceField(User, required=True, dbref=True)
     updated = db.DateTimeField(required=True)
+    owner = db.ReferenceField(User, required=True, dbref=True)
 
     @classmethod
     def create_or_update(cls, name, sql, meta_vars, connection):
+        owner = session.user
         query, created = cls.objects.get_or_create(auto_save = False, name = name)
 
-        query.last_modified_by = session.user
+        if not created and query.owner.pk != owner.pk:
+            raise Exception('Query already exists')
 
+        query.last_modified_by = session.user
+        query.owner = owner
         query.sql = sql
         query.connection = connection
         query.meta_vars = meta_vars
@@ -38,7 +43,7 @@ class Query(db.Document):
         if not session.user:
             return None
 
-        return cls.objects(owner=session.user)
+        return cls.objects.filter(owner=session.user)
 
     @classmethod
     def find(cls, name_or_oid):

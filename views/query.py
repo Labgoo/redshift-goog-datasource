@@ -128,7 +128,7 @@ def query_execute_sql(connection, sql, meta_vars, vars):
 @mod.route('/list', methods=['GET'])
 @require_login
 def list():
-    queries = Query.objects()
+    queries = Query.all()
 
     return render_template('query/list.html', queries=queries)
 

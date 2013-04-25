@@ -29,7 +29,7 @@ class ConnectionString(db.Document):
         connection, created = cls.objects.get_or_create(auto_save = False, name = name)
 
         if not created and connection.owner.pk != owner.pk:
-            raise Exception('Connection point already exists')
+            raise Exception('Connection already exists')
 
         connection.owner = owner
         connection.url = url
