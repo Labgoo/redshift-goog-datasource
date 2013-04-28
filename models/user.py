@@ -19,8 +19,15 @@ class User(db.Document):
         user.save()
 
     @classmethod
+    def get_by_username(cls, users):
+        try:
+            return cls.objects.filter(email__in=users)
+        except: # TODO: better catch
+            return None
+
+    @classmethod
     def get_by_openid(cls, openid):
         try:
             return cls.objects.get(openid = openid)
-        except:
+        except:  # TODO: better catch
             return None

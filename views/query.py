@@ -4,8 +4,7 @@ from flask import render_template, request, Blueprint, Response, redirect, url_f
 import logging, json
 from models import Query
 from datetime import datetime, timedelta
-from models import Transformer
-from models import ConnectionString
+from models import Transformer, ConnectionString, User
 from user import require_login
 
 mod = Blueprint('query', __name__, url_prefix='/query')
@@ -62,11 +61,12 @@ def query_db(connection, query,  meta_vars, vars):
 
     return description, data, columns_order
 
-def save(name, sql, meta_vars, connection):
+def save(name, sql, meta_vars, connection, editors):
     Query.create_or_update(name = name,
                            sql = sql,
                            meta_vars = meta_vars,
-                           connection = connection)
+                           connection = connection,
+                           editors = editors)
 
 def convert_value(val, type):
     if not val:
@@ -156,6 +156,7 @@ def new():
         vars = vars,
         connection = None,
         connections = ConnectionString.all(),
+        editors = [],
         meta_vars = meta_vars)
 
 @mod.route('/', methods=['POST', 'GET'])
@@ -193,6 +194,10 @@ def edit(name=None):
 
             return vars
 
+        def get_editors():
+            editors = request.form.get('editors', '').split(',')
+            return User.get_by_username(editors)
+
         meta_vars = extract_meta_var_fields()
 
         sql = request.form['sql']
@@ -204,8 +209,10 @@ def edit(name=None):
 
         connection = ConnectionString.find(request.form.get('connection-string'))
 
+        editors = get_editors()
+
         if name and request.form.get('user-action') == 'Save + Execute':
-            save(name, sql, meta_vars, connection)
+            save(name, sql, meta_vars, connection, editors)
             full_vars = vars_from_request(meta_vars, False)
             return redirect(url_for('.edit', name = name, **dict(full_vars)))
 
@@ -229,6 +236,7 @@ def edit(name=None):
         sql = query.sql
         meta_vars = query.meta_vars
         connection = query.connection
+        editors = query.editors
 
     transform = request.args.get('transform', None)
 
@@ -291,4 +299,5 @@ def edit(name=None):
         connection = connection,
         connections = ConnectionString.all(),
         meta_vars = meta_vars,
+        editors = editors,
         vars = full_vars)

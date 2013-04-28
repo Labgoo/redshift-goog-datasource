@@ -15,35 +15,59 @@ class ConnectionString(db.Document):
     url = db.StringField(required=True)
     name = db.StringField(required=True)
     headers = db.StringField()
+    editors = db.ListField(db.ReferenceField('User', dbref=True))
 
     @classmethod
     def all(cls):
         if not session.user:
             return None
 
-        return cls.objects(owner=session.user)
+        return cls.objects.filter(db.Q(owner=session.user) | db.Q(editors = session.user))
 
     @classmethod
-    def create_or_update(cls, name, url, headers):
-        owner = session.user
+    def create_or_update(cls, name, url, headers, editors):
+        user = session.user
+
+        if not user:
+            raise Exception('Missing user')
+
         connection, created = cls.objects.get_or_create(auto_save = False, name = name)
 
         if not created and connection.owner.pk != owner.pk:
             raise Exception('Connection already exists')
 
-        connection.owner = owner
+        if created:
+            connection.owner = user
+
+        editors = list(editors)
+
+        for i,editor in enumerate(editors):
+            if editor.pk == user.pk:
+                editors[i] = None
+
+        editors = [editor for editor in editors if editor]
+
+        connection.editors = editors
         connection.url = url
         connection.headers = headers
         connection.save()
 
     @classmethod
     def find(cls, name_or_oid):
+        user = session.user
+
+        if not user:
+            raise Exception('Missing user')
+
         if not name_or_oid:
             return None
 
         if ObjectId.is_valid(name_or_oid):
-            connection_string = cls.objects.get(db.Q(pk = name_or_oid) | db.Q(name = name_or_oid))
+            filter = db.Q(pk = name_or_oid) | db.Q(name = name_or_oid)
         else:
-            connection_string = cls.objects.get(db.Q(name = name_or_oid))
+            filter = db.Q(name = name_or_oid)
 
-        return connection_string
+        query = cls.objects.get(filter & (db.Q(owner=user) | db.Q(editors = user)))
+
+        return query
+

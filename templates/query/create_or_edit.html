@@ -7,6 +7,11 @@
 	<link rel=stylesheet type=text/css href="{{ url_for('static', filename='css/codemirror-custom.css') }}" media="screen">
 	<script src="{{ url_for('static', filename='vendor/jquery.sheepItPlugin.js') }}"></script>
 	<script src="{{ url_for('static', filename='js/sql-editor.js') }}"></script>
+
+    <script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.2/jquery-ui.min.js" type="text/javascript" charset="utf-8"></script>
+    <script src="{{ url_for('static', filename='vendor/tag-it/js/tag-it.js') }}" type="text/javascript" charset="utf-8"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='vendor/tag-it/css/jquery.tagit.css') }}" type="text/css">
+    <link rel="stylesheet" type="text/css" href="//ajax.googleapis.com/ajax/libs/jqueryui/1/themes/flick/jquery-ui.css">
 {% endblock%}
 
 {% block body %}
@@ -33,6 +38,15 @@
                     You need to define a connection to the database.
                 </div>
             {% endfor %}
+
+            <div class="controls controls-row">
+                <label for="editors" class="control-label">Editors</label>
+                <ul id="editors">
+                    {% for editor in editors %}
+                        <li>{{ editor.email }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
 
 			<div class="controls">
 				<textarea id="sql" name="sql" class="span9" rows="5">{{sql|safe}}</textarea>
@@ -94,6 +108,14 @@
 		</fieldset>
 	</form>
 
+    <script type="text/javascript">
+        $(function () {
+            $("#editors").tagit({
+                    fieldName: "editors",
+                    allowSpaces: true
+            });
+        });
+    </script>
 	{% if json %}
     <ul id="vistabs" class="nav nav-tabs">
         <li><a href="#table" data-toggle="tab">Table</a></li>
@@ -110,7 +132,7 @@
     </div>
 
 	<script src="https://www.google.com/jsapi" type="text/javascript"></script>
-	<script>
+	<script type="text/javascript">
             $(function () {
                 $('#vistabs a:first').tab('show');
 

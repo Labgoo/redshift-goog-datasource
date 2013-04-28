@@ -1,6 +1,10 @@
 {% extends "layout.html" %}
 
 {% block head %}
+    <script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.2/jquery-ui.min.js" type="text/javascript" charset="utf-8"></script>
+    <script src="{{ url_for('static', filename='vendor/tag-it/js/tag-it.js') }}" type="text/javascript" charset="utf-8"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='vendor/tag-it/css/jquery.tagit.css') }}" type="text/css">
+    <link rel="stylesheet" type="text/css" href="//ajax.googleapis.com/ajax/libs/jqueryui/1/themes/flick/jquery-ui.css">
 {% endblock%}
 
 {% block body %}
@@ -15,8 +19,12 @@
                 <input class="span9 input-xxlarge" type="text" id="url" name="url" value="{{url}}" />
             </div>
             <div class="controls controls-row">
-                <label for="users" class="control-label">Users</label>
-                <input class="span9 input-xxlarge" type="text" id="users" name="users" value="{{users}}" readonly="readonly"/>
+                <label for="editors" class="control-label">Editors</label>
+                <ul id="editors">
+                    {% for editor in editors %}
+                        <li>{{ editor.email }}</li>
+                    {% endfor %}
+                </ul>
             </div>
             <div class="controls controls-row">
                 <label for="headers" class="control-label">Headers</label>
@@ -27,6 +35,16 @@
             </div>
         </fieldset>
     </form>
+
+     <script type="text/javascript">
+        $(function () {
+            $("#editors").tagit({
+                    fieldName: "editors",
+                    allowSpaces: true
+            });
+        });
+    </script>
+
     <div class="alert alert-info">
         <span class="label label-info">Postgresql</span>
         <br>

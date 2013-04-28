@@ -16,7 +16,7 @@ def list():
 @require_login
 def new():
     url = 'mysql://scott:tiger@localhost/foo'
-    return render_template('connection_string/new.html', url = url, users=[g.user.username])
+    return render_template('connection_string/create_or_edit.html', url = url, users=[g.user.username])
 
 @mod.route('/', methods=['GET', 'POST'])
 @mod.route('/<name>', methods=['GET', 'POST'])
@@ -47,7 +47,7 @@ def edit(name=None):
             ConnectionString.create_or_update(name=name, url=url, headers=headers)
             return redirect(url_for('.edit', name = name))
 
-    return render_template('connection_string/new.html',
+    return render_template('connection_string/create_or_edit.html',
                            name = name,
                            headers = headers,
                            users = users,
