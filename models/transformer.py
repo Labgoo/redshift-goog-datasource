@@ -19,27 +19,44 @@ class Transformer(db.Document):
     name = db.StringField(required=True)
     last_modified_by = db.ReferenceField(User, required=True, dbref=True)
     updated = db.DateTimeField(required=True)
+    editors = db.ListField(db.ReferenceField('User', dbref=True))
 
     @classmethod
     def all(cls):
         if not session.user:
             return None
 
-        return cls.objects.filter(owner=session.user)
+        return cls.objects.filter(db.Q(owner=session.user) | db.Q(editors = session.user))
 
     @classmethod
-    def create_or_update(cls, name, code):
-        owner = session.user
-        query, created = cls.objects.get_or_create(auto_save = False, name = name)
+    def create_or_update(cls, name, code, editors):
+        user = session.user
+        transformer, created = cls.objects.get_or_create(auto_save = False, name = name)
 
-        if not created and query.owner.pk != owner.pk:
+        if not created and transformer.owner.pk != user.pk:
             raise Exception('Query already exists')
 
-        query.last_modified_by = session.user
-        query.owner = owner
-        query.code = code
-        query.updated = datetime.utcnow()
-        query.save()
+        if created:
+            transformer.owner = user
+
+        editors = list(editors)
+
+        for i,editor in enumerate(editors):
+            if editor.pk == user.pk:
+                editors[i] = None
+
+        editors = [editor for editor in editors if editor]
+
+        if not created:
+            modified = [editor.pk for editor in editors] != [editor.pk for editor in transformer.editors] or \
+                       transformer.code != code
+
+        if created or modified:
+            transformer.editors = editors
+            transformer.last_modified_by = session.user
+            transformer.code = code
+            transformer.updated = datetime.utcnow()
+            transformer.save()
 
     @classmethod
     def execute(cls, name, data):
@@ -57,3 +74,24 @@ class Transformer(db.Document):
         exec code_object in code_globals, code_locals
 
         return code_locals['result']
+
+    @classmethod
+    def find(cls, name_or_oid):
+        logging.info('loading transformer %s', name_or_oid)
+
+        user = session.user
+
+        if not user:
+            raise Exception('Missing user')
+
+        if not name_or_oid:
+            return None
+
+        if ObjectId.is_valid(name_or_oid):
+            filter = db.Q(pk = name_or_oid) | db.Q(name = name_or_oid)
+        else:
+            filter = db.Q(name = name_or_oid)
+
+        transformer = cls.objects.get(filter & (db.Q(owner=user) | db.Q(editors = user)))
+
+        return transformer

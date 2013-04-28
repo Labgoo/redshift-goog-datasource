@@ -33,7 +33,7 @@ class ConnectionString(db.Document):
 
         connection, created = cls.objects.get_or_create(auto_save = False, name = name)
 
-        if not created and connection.owner.pk != owner.pk:
+        if not created and connection.owner.pk != user.pk:
             raise Exception('Connection already exists')
 
         if created:

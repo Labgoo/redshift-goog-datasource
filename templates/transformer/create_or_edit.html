@@ -5,6 +5,11 @@
 	<link rel="stylesheet" href="{{ url_for('static', filename='vendor/codemirror/codemirror.css') }}" media="screen"/>
 	<link rel=stylesheet type=text/css href="{{ url_for('static', filename='css/codemirror-custom.css') }}" media="screen">
 	<script src="{{ url_for('static', filename='js/transformer-editor.js') }}"></script>
+
+    <script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.2/jquery-ui.min.js" type="text/javascript" charset="utf-8"></script>
+    <script src="{{ url_for('static', filename='vendor/tag-it/js/tag-it.js') }}" type="text/javascript" charset="utf-8"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='vendor/tag-it/css/jquery.tagit.css') }}" type="text/css">
+    <link rel="stylesheet" type="text/css" href="//ajax.googleapis.com/ajax/libs/jqueryui/1/themes/flick/jquery-ui.css">
 {% endblock%}
 
 {% block body %}
@@ -14,6 +19,16 @@
 			<div class="controls controls-row">
 				<input class="span9 input-xxlarge" type="text" id="title" name="name" value="{{name}}" placeholder="Enter a title for your transformer" maxlength="100" />
 			</div>
+
+            <div class="controls controls-row">
+                <label for="editors" class="control-label">Editors</label>
+                <ul id="editors">
+                    {% for editor in editors %}
+                        <li>{{ editor.email }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+
 			<div class="controls">
 				<textarea id="code" name="code" class="span9">{{code|safe}}</textarea>
 			</div>
@@ -22,5 +37,12 @@
 			</div>
 		</fieldset>
 	</form>
-	<div id="table_div_json"></div>
+    <script type="text/javascript">
+        $(function () {
+            $("#editors").tagit({
+                    fieldName: "editors",
+                    allowSpaces: true
+            });
+        });
+    </script>
 {% endblock %}

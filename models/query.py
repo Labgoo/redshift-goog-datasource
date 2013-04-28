@@ -39,7 +39,7 @@ class Query(db.Document):
 
         query, created = cls.objects.get_or_create(auto_save = False, name = name)
 
-        if not created and query.owner.pk != owner.pk:
+        if not created and query.owner.pk != user.pk:
             raise Exception('Query already exists')
 
         if created:
