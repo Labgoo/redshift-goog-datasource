@@ -53,7 +53,15 @@ def query_db(connection, query,  meta_vars, vars):
 
     data = [dict((column, value) for column, value in row.items()) for row in rows]
 
-    type_convert = {"NoneType": "string", "unicode": "string", "string": "string", "long": "number", "int": "number", "datetime": "datetime", "float": "number"}
+    type_convert = {"NoneType": "string",
+                    "unicode": "string",
+                    "string": "string",
+                    "long": "number",
+                    "int": "number",
+                    "datetime": "datetime",
+                    "bool": "boolean",
+                    "float": "number"}
+        
     if len(data) > 0:
         description = dict([(name, (type_convert[type(value).__name__], name)) for name, value in data[0].iteritems()])
     else:
