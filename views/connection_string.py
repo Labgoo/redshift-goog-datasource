@@ -1,10 +1,9 @@
 # -*- coding: utf-8 -*-
 
 from flask import render_template, request, Blueprint, g, session, redirect, url_for
-import logging, json
-import mongo, os
+import logging
 from user import require_login
-from models import ConnectionString
+from models import ConnectionString, User
 
 mod = Blueprint('connection_string', __name__, url_prefix='/connection')
 
