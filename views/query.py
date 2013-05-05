@@ -12,7 +12,9 @@ mod = Blueprint('query', __name__, url_prefix='/query')
 def query_google_data_source(connection, sql, meta_vars, vars):
     import requests
 
-    url = connection.url[len('google://'):]
+    url = connection.url
+    if url.startswith('google://'):
+        url = connection.url[len('google://'):]
 
     query = build_sql_query(sql, meta_vars, vars)
 
@@ -108,10 +110,11 @@ def data_to_datatable(description, data, columns_order):
     return data_table, columns_order
 
 def datatable_to_data(data_table):
-    description = data_table["cols"]
+    table = data_table.get('table', data_table)
+    description = table["cols"]
 
     def enum_rows():
-        for row in data_table["rows"]:
+        for row in table["rows"]:
             r = []
             for i,v in enumerate(row["c"]):
                 r.append((description[i]["id"], v["v"]))
@@ -254,7 +257,7 @@ def edit(name=None):
         json_data = None
 
         if connection:
-            if connection.url.startswith('google://'):
+            if connection.url.startswith('google://') or connection.url.startswith('http://') or connection.url.startswith('https://'):
                 description, data, columns_order = query_google_data_source(connection, sql, meta_vars, vars)
             else:
                 description, data, columns_order = query_execute_sql(connection, sql, meta_vars, vars)
