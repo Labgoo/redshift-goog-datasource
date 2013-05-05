@@ -12,7 +12,7 @@
         <fieldset>
             <div class="controls controls-row">
                 <label for="name" class="control-label">Name</label>
-                <input class="span9 input-xxlarge" type="text" id="name" name="name" value="{{name}}" placeholder="Name" maxlength="100" />
+                <input class="span9 input-xxlarge" type="text" id="name" name="name" value="{{name}}"  {% if name %}readonly="readonly"{% endif %} placeholder="Name" maxlength="100" />
             </div>
             <div class="controls controls-row">
                 <label for="url" class="control-label">Url</label>

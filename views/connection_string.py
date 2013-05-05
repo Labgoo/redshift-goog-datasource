@@ -35,7 +35,6 @@ def edit(name=None):
         users.append(connection.owner)
         editors = connection.editors
     else:
-
         def get_editors():
             editors = request.form.get('editors', '').split(',')
             return User.get_by_username(editors)
@@ -51,7 +50,7 @@ def edit(name=None):
 
         if name:
             ConnectionString.create_or_update(name=name, url=url, headers=headers, editors=editors)
-            return redirect(url_for('.edit', name = name))
+            return redirect(url_for('.list'))
 
     return render_template('connection_string/create_or_edit.html',
                            name = name,
