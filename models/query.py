@@ -1,11 +1,20 @@
 from app import app
 from bson import ObjectId
 from flask import session
-import logging
+import logging, random, string
 from datetime import datetime
 from models import User, ConnectionString
 
 db = app.extensions['mongoengine']
+
+UNICODE_ASCII_CHARACTERS = (string.ascii_letters.decode('ascii') +
+    string.digits.decode('ascii'))
+
+def random_ascii_string(length):
+    return ''.join([random.choice(UNICODE_ASCII_CHARACTERS) for x in xrange(length)])
+
+def create_query_access_token():
+    return random_ascii_string(16)
 
 class Query(db.Document):
     meta = {'collection': 'queries',
@@ -22,17 +31,19 @@ class Query(db.Document):
     updated = db.DateTimeField(required=True)
     owner = db.ReferenceField(User, required=True, dbref=True)
     editors = db.ListField(db.ReferenceField('User', dbref=True))
+    access_token = db.StringField(required=True)
 
     @classmethod
     def all(cls):
-        if not session.user:
-            return None
+        user = getattr(session, 'user', None)
+        if user:
+            return []
 
-        return cls.objects.filter(db.Q(owner=session.user) | db.Q(editors = session.user))
+        return cls.objects.filter(db.Q(owner=user) | db.Q(editors = user))
 
     @classmethod
     def create_or_update(cls, name, sql, meta_vars, connection, editors):
-        user = session.user
+        user = getattr(session, 'user', None)
 
         if not user:
             raise Exception('Missing user')
@@ -59,9 +70,13 @@ class Query(db.Document):
                        query.meta_vars != meta_vars or \
                        query.connection != connection
 
+        if created or not query.access_token:
+            query.access_token = create_query_access_token()
+            modified = True
+
         if created or modified:
             query.editors = editors
-            query.last_modified_by = session.user
+            query.last_modified_by = user
             query.sql = sql
             query.connection = connection
             query.meta_vars = meta_vars
@@ -69,12 +84,12 @@ class Query(db.Document):
             query.save()
 
     @classmethod
-    def find(cls, name_or_oid):
+    def find(cls, name_or_oid, access_token=None):
         logging.info('loading query %s', name_or_oid)
 
-        user = session.user
+        user = getattr(session, 'user', None)
 
-        if not user:
+        if not user and not access_token:
             raise Exception('Missing user')
 
         if not name_or_oid:
@@ -85,6 +100,12 @@ class Query(db.Document):
         else:
             filter = db.Q(name = name_or_oid)
 
-        query = cls.objects.get(filter & (db.Q(owner=user) | db.Q(editors = user)))
+        if not access_token:
+            filter = filter & (db.Q(owner=user) | db.Q(editors = user))
+
+        query = cls.objects.get(filter)
+
+        if query and access_token and access_token != query.access_token:
+            return None
 
         return query

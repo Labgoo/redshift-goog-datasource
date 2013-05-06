@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from flask import render_template, request, Blueprint, Response, redirect, url_for
+from flask import render_template, request, Blueprint, Response, redirect, url_for, g
 import logging, json
 from models import Query
 from datetime import datetime, timedelta
@@ -172,8 +172,13 @@ def new():
 
 @mod.route('/', methods=['POST', 'GET'])
 @mod.route('/<name>', methods=['POST', 'GET'])
-@require_login
 def edit(name=None):
+
+    user_access_token = request.args.get('access_token', request.form.get('access_token'))
+
+    if not user_access_token and g.user is None:
+        return redirect(url_for('user.login', next=request.path))
+
     if request.method == 'POST':
         def extract_meta_var_fields():
             index = 0
@@ -218,11 +223,18 @@ def edit(name=None):
         if name == 'new':
             name = None
 
-        connection = ConnectionString.find(request.form.get('connection-string'))
+        if not name and g.user is None:
+            return redirect(url_for('user.login', next=request.path))
+
+        connection_string = request.form.get('connection-string')
+        connection = ConnectionString.find(connection_string)
 
         editors = get_editors()
 
         if name and request.form.get('user-action') == 'Save + Execute':
+            if g.user is None:
+                return redirect(url_for('user.login', next=request.path))
+
             save(name, sql, meta_vars, connection, editors)
             full_vars = vars_from_request(meta_vars, False)
             return redirect(url_for('.edit', name = name, **dict(full_vars)))
@@ -239,7 +251,7 @@ def edit(name=None):
 
             vars.append((key, value))
 
-        query = Query.find(name)
+        query = Query.find(name, access_token=user_access_token)
 
         if not query:
             return redirect(url_for('.new'))
@@ -248,6 +260,7 @@ def edit(name=None):
         meta_vars = query.meta_vars
         connection = query.connection
         editors = query.editors
+        access_token = query.access_token
 
     transform = request.args.get('transform', None)
 
@@ -308,7 +321,8 @@ def edit(name=None):
         error = error,
         json = json_data,
         connection = connection,
-        connections = ConnectionString.all(),
+        connections = ConnectionString.all() or [connection],
         meta_vars = meta_vars,
         editors = editors,
+        access_token=access_token,
         vars = full_vars)

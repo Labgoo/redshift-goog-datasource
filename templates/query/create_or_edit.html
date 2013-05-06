@@ -39,6 +39,13 @@
                 </div>
             {% endfor %}
 
+            {% if access_token %}
+                <div class="controls controls-row">
+                    <label for="access-token" class="control-label">Access Token</label>
+                    <input class="span9 input-xxlarge" type="text" id="access-token" readonly="readonly" value="{{access_token}}" />
+                </div>
+            {% endif %}
+
             <div class="controls controls-row">
                 <label for="editors" class="control-label">Editors</label>
                 <ul id="editors">

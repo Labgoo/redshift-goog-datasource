@@ -19,14 +19,16 @@ class ConnectionString(db.Document):
 
     @classmethod
     def all(cls):
-        if not session.user:
-            return None
+        user = getattr(session, 'user', None)
 
-        return cls.objects.filter(db.Q(owner=session.user) | db.Q(editors = session.user))
+        if not user:
+            return []
+
+        return cls.objects.filter(db.Q(owner=user) | db.Q(editors = user))
 
     @classmethod
     def create_or_update(cls, name, url, headers, editors):
-        user = session.user
+        user = getattr(session, 'user', None)
 
         if not user:
             raise Exception('Missing user')
@@ -53,21 +55,22 @@ class ConnectionString(db.Document):
         connection.save()
 
     @classmethod
-    def find(cls, name_or_oid):
-        user = session.user
-
-        if not user:
-            raise Exception('Missing user')
-
+    def find(cls, name_or_oid, allow_global_search=False):
         if not name_or_oid:
             return None
+
+        user = getattr(session, 'user', None)
+
+        if not user and not allow_global_search:
+            raise Exception('Missing user')
 
         if ObjectId.is_valid(name_or_oid):
             filter = db.Q(pk = name_or_oid) | db.Q(name = name_or_oid)
         else:
             filter = db.Q(name = name_or_oid)
 
-        query = cls.objects.get(filter & (db.Q(owner=user) | db.Q(editors = user)))
+        if not allow_global_search:
+            query = cls.objects.get(filter & (db.Q(owner=user) | db.Q(editors = user)))
 
         return query
 
