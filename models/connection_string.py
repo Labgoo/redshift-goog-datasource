@@ -70,7 +70,9 @@ class ConnectionString(db.Document):
             filter = db.Q(name = name_or_oid)
 
         if not allow_global_search:
-            query = cls.objects.get(filter & (db.Q(owner=user) | db.Q(editors = user)))
+            filter = filter & (db.Q(owner=user) | db.Q(editors = user))
 
-        return query
+        connection = cls.objects.get(filter)
+
+        return connection
 

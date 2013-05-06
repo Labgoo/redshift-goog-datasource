@@ -17,12 +17,6 @@ def load(name):
 
     return transformer
 
-def save(name, code, editors):
-    logging.info('save transformer %s: %s', name, code)
-
-    Transformer.create_or_update(name, code, editors)
-
-
 @mod.route('/list', methods=['GET'])
 @require_login
 def list():
@@ -66,8 +60,8 @@ def edit(name=None):
         editors = get_editors()
 
         if name:
-            save(name, code, editors)
-            return redirect(url_for('.edit', name=name))
+            Transformer.create_or_update(name, code, editors)
+            return redirect(url_for('.list'))
 
     return render_template('transformer/create_or_edit.html',
                            name=name,

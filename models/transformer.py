@@ -8,7 +8,7 @@ from bson import ObjectId
 db = app.extensions['mongoengine']
 
 class Transformer(db.Document):
-    meta = {'collection': 'transformerers',
+    meta = {'collection': 'transformers',
             'indexes': [
                 {'fields': ['name'], 'unique': True},
                 ]
@@ -23,10 +23,12 @@ class Transformer(db.Document):
 
     @classmethod
     def all(cls):
-        if not session.user:
-            return None
+        user = getattr(session, 'user', None)
 
-        return cls.objects.filter(db.Q(owner=session.user) | db.Q(editors = session.user))
+        if not user:
+            return []
+
+        return cls.objects.filter(db.Q(owner=user) | db.Q(editors = user))
 
     @classmethod
     def create_or_update(cls, name, code, editors):
@@ -76,22 +78,23 @@ class Transformer(db.Document):
         return code_locals['result']
 
     @classmethod
-    def find(cls, name_or_oid):
-        logging.info('loading transformer %s', name_or_oid)
-
-        user = session.user
-
-        if not user:
-            raise Exception('Missing user')
-
+    def find(cls, name_or_oid, allow_global_search=False):
         if not name_or_oid:
             return None
+
+        user = getattr(session, 'user', None)
+
+        if not user and not allow_global_search:
+            raise Exception('Missing user')
 
         if ObjectId.is_valid(name_or_oid):
             filter = db.Q(pk = name_or_oid) | db.Q(name = name_or_oid)
         else:
             filter = db.Q(name = name_or_oid)
 
-        transformer = cls.objects.get(filter & (db.Q(owner=user) | db.Q(editors = user)))
+        if not allow_global_search:
+            filter = filter & (db.Q(owner=user) | db.Q(editors = user))
+
+        transformer = cls.objects.get(filter)
 
         return transformer
