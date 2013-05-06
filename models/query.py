@@ -50,6 +50,10 @@ class Query(db.Document):
 
         query, created = cls.objects.get_or_create(auto_save = False, name = name)
 
+        modified = True
+        if not query.owner:
+            query.owner = user
+
         if not created and query.owner.pk != user.pk:
             raise Exception('Query already exists')
 
@@ -65,7 +69,7 @@ class Query(db.Document):
         editors = [editor for editor in editors if editor]
 
         if not created:
-            modified = [editor.pk for editor in editors] != [editor.pk for editor in query.editors] or \
+            modified = modified or [editor.pk for editor in editors] != [editor.pk for editor in query.editors] or \
                        query.sql != sql or \
                        query.meta_vars != meta_vars or \
                        query.connection != connection
@@ -100,8 +104,8 @@ class Query(db.Document):
         else:
             filter = db.Q(name = name_or_oid)
 
-        if not access_token:
-            filter = filter & (db.Q(owner=user) | db.Q(editors = user))
+        #if not access_token:
+        #    filter = filter & (db.Q(owner=user) | db.Q(editors = user))
 
         query = cls.objects.get(filter)
 
