@@ -32,11 +32,15 @@ class Transformer(db.Document):
 
     @classmethod
     def create_or_update(cls, name, code, editors):
-        user = session.user
+        user = getattr(session, 'user', None)
+
+        if not user:
+            raise Exception('Missing user')
+
         transformer, created = cls.objects.get_or_create(auto_save = False, name = name)
 
         if not created and transformer.owner.pk != user.pk:
-            raise Exception('Query already exists')
+            raise Exception('Transformer already exists')
 
         if created:
             transformer.owner = user
@@ -55,7 +59,7 @@ class Transformer(db.Document):
 
         if created or modified:
             transformer.editors = editors
-            transformer.last_modified_by = session.user
+            transformer.last_modified_by = user
             transformer.code = code
             transformer.updated = datetime.utcnow()
             transformer.save()

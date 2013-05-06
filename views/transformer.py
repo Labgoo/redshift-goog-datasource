@@ -20,7 +20,7 @@ def load(name):
 @mod.route('/list', methods=['GET'])
 @require_login
 def list():
-    return render_template('transformer/list.html', transformeres=Transformer.all())
+    return render_template('transformer/list.html', transformers=Transformer.all())
 
 
 @mod.route('/new', methods=['GET'])
