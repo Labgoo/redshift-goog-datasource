@@ -36,7 +36,8 @@ class Query(db.Document):
     @classmethod
     def all(cls):
         user = getattr(session, 'user', None)
-        if user:
+
+        if not user:
             return []
 
         return cls.objects.filter(db.Q(owner=user) | db.Q(editors = user))
