@@ -227,7 +227,7 @@ def edit(name=None):
             return redirect(url_for('user.login', next=request.path))
 
         connection_string = request.form.get('connection-string')
-        connection = ConnectionString.find(connection_string)
+        connection = ConnectionString.find(connection_string, True)
 
         editors = get_editors()
 
@@ -276,7 +276,7 @@ def edit(name=None):
                 description, data, columns_order = query_execute_sql(connection, sql, meta_vars, vars)
 
             if transform:
-                data = Transformer.execute(transform, data)
+                data = Transformer.execute(transform, data, True)
 
             if raw_data:
                 json_data = json.dumps(data, default=handle_datetime)

@@ -61,9 +61,9 @@ class Transformer(db.Document):
             transformer.save()
 
     @classmethod
-    def execute(cls, name, data):
+    def execute(cls, name, data, allow_global_search=False):
         logging.info('executing transformer %s', name)
-        transformer = cls.objects.get({"name": name})
+        transformer = cls.find(name, allow_global_search)
 
         if not transformer:
             return None
