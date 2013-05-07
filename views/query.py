@@ -240,6 +240,8 @@ def edit(name=None):
             return redirect(url_for('.edit', name = name, **dict(full_vars)))
 
         vars = vars_from_request(meta_vars, True)
+
+        access_token = None
     else:
         if not name:
             return redirect(url_for('.new'))
