@@ -264,6 +264,9 @@ def edit(name=None):
 
     transform = request.args.get('transform', None)
 
+    if not transform:
+        transform = request.args.get('transformer', None)
+
     raw_data = not request.args.get('json', None) is None
 
     try:
