@@ -30,6 +30,21 @@ class Transformer(db.Document):
 
         return cls.objects.filter(db.Q(owner=user) | db.Q(editors = user))
 
+    def is_user_editor(self, user):
+        return self.owner == user or user in self.editors
+
+    @classmethod
+    def remove_duplicate_editors(cls, transformer):
+        user = getattr(session, 'user', None)
+
+        editors = list(transformer.editors)
+
+        for i,editor in enumerate(editors):
+            if editor == user and user.pk == transformer.owner:
+                editors[i] = None
+
+        return list(set([editor for editor in editors if editor]))
+
     @classmethod
     def create_or_update(cls, name, code, editors):
         user = getattr(session, 'user', None)
@@ -39,19 +54,13 @@ class Transformer(db.Document):
 
         transformer, created = cls.objects.get_or_create(auto_save = False, name = name)
 
-        if not created and transformer.owner.pk != user.pk:
+        if not created and not transformer.is_user_editor(user):
             raise Exception('Transformer already exists')
 
         if created:
             transformer.owner = user
 
-        editors = list(editors)
-
-        for i,editor in enumerate(editors):
-            if editor.pk == user.pk:
-                editors[i] = None
-
-        editors = [editor for editor in editors if editor]
+        editors = cls.remove_duplicate_editors(transformer)
 
         if not created:
             modified = [editor.pk for editor in editors] != [editor.pk for editor in transformer.editors] or \

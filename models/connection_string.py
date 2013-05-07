@@ -26,6 +26,21 @@ class ConnectionString(db.Document):
 
         return cls.objects.filter(db.Q(owner=user) | db.Q(editors = user))
 
+    def is_user_editor(self, user):
+        return self.owner == user or user in self.editors
+
+    @classmethod
+    def remove_duplicate_editors(cls, connection):
+        user = getattr(session, 'user', None)
+
+        editors = list(connection.editors)
+
+        for i,editor in enumerate(editors):
+            if editor == user and user.pk == connection.owner:
+                editors[i] = None
+
+        return list(set([editor for editor in editors if editor]))
+
     @classmethod
     def create_or_update(cls, name, url, headers, editors):
         user = getattr(session, 'user', None)
@@ -35,19 +50,13 @@ class ConnectionString(db.Document):
 
         connection, created = cls.objects.get_or_create(auto_save = False, name = name)
 
-        if not created and connection.owner.pk != user.pk:
+        if not created and not connection.is_user_editor(user):
             raise Exception('Connection already exists')
 
         if created:
             connection.owner = user
 
-        editors = list(editors)
-
-        for i,editor in enumerate(editors):
-            if editor.pk == user.pk:
-                editors[i] = None
-
-        editors = [editor for editor in editors if editor]
+        editors = cls.remove_duplicate_editors(connection)
 
         connection.editors = editors
         connection.url = url
