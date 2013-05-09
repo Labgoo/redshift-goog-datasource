@@ -30,13 +30,11 @@ class ConnectionString(db.Document):
         return self.owner == user or user in self.editors
 
     @classmethod
-    def remove_duplicate_editors(cls, connection):
+    def remove_duplicate_editors(cls, connection, editors):
         user = getattr(session, 'user', None)
 
-        editors = list(connection.editors)
-
         for i,editor in enumerate(editors):
-            if editor == user and user.pk == connection.owner:
+            if editor == user and user == connection.owner:
                 editors[i] = None
 
         return list(set([editor for editor in editors if editor]))
@@ -56,7 +54,7 @@ class ConnectionString(db.Document):
         if created:
             connection.owner = user
 
-        editors = cls.remove_duplicate_editors(connection)
+        editors = cls.remove_duplicate_editors(connection, editors)
 
         connection.editors = editors
         connection.url = url

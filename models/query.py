@@ -46,13 +46,11 @@ class Query(db.Document):
         return self.owner == user or user in self.editors
 
     @classmethod
-    def remove_duplicate_editors(cls, query):
+    def remove_duplicate_editors(cls, query, editors):
         user = getattr(session, 'user', None)
 
-        editors = list(query.editors)
-
         for i,editor in enumerate(editors):
-            if editor == user and user.pk == query.owner:
+            if editor == user and user == query.owner:
                 editors[i] = None
 
         return list(set([editor for editor in editors if editor]))
@@ -72,7 +70,7 @@ class Query(db.Document):
         if created:
             query.owner = user
 
-        editors = cls.remove_duplicate_editors(query)
+        editors = cls.remove_duplicate_editors(query, editors)
 
         if not created:
             modified = [editor.pk for editor in editors] != [editor.pk for editor in query.editors] or \

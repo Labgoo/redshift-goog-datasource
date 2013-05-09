@@ -34,13 +34,11 @@ class Transformer(db.Document):
         return self.owner == user or user in self.editors
 
     @classmethod
-    def remove_duplicate_editors(cls, transformer):
+    def remove_duplicate_editors(cls, transformer, editors):
         user = getattr(session, 'user', None)
 
-        editors = list(transformer.editors)
-
         for i,editor in enumerate(editors):
-            if editor == user and user.pk == transformer.owner:
+            if editor == user and user == transformer.owner:
                 editors[i] = None
 
         return list(set([editor for editor in editors if editor]))
@@ -60,7 +58,7 @@ class Transformer(db.Document):
         if created:
             transformer.owner = user
 
-        editors = cls.remove_duplicate_editors(transformer)
+        editors = cls.remove_duplicate_editors(transformer, editors)
 
         if not created:
             modified = [editor.pk for editor in editors] != [editor.pk for editor in transformer.editors] or \
