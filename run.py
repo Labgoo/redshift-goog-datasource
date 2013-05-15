@@ -30,7 +30,13 @@ def index():
 
 @app.context_processor
 def inject_meta():
-    return dict(favico=os.environ.get('favico'), logo=os.environ.get('logo'))
+    d =  dict(favico=os.environ.get('favico'), logo=os.environ.get('logo'))
+
+    for key,val in os.environ.iteritems():
+        key = "env_" + key
+        d[key] = val
+
+    return d
 
 if __name__ == '__main__':
 	# Bind to PORT if defined, otherwise default to 5000.
