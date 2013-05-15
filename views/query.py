@@ -149,26 +149,12 @@ def handle_datetime(obj):
 @mod.route('/new', methods=['GET'])
 @require_login
 def new():
-    sql = "select * from socialism_online.cdrs_raw \n" + \
-          "where\n\textract(year from dt_timestamp)={Year} and \n" + \
-          "\textract(month from dt_timestamp)={Month} and \n" + \
-          "\textract(day from dt_timestamp)={Day}"
-
-    yesterday = datetime.today() - timedelta(days=1)
-    meta_vars=[
-        ("Year", {"type": "integer", "default": yesterday.year}),
-        ("Month", {"type": "integer", "default": yesterday.month}),
-        ("Day", {"type": "integer", "default": yesterday.day})]
-
-    vars = [('Year', None), ('Month', None), ('Day', None)]
-
     return render_template('query/create_or_edit.html',
-        sql = sql,
+        sql = "",
         vars = vars,
         connection = None,
         connections = ConnectionString.all(),
-        editors = [],
-        meta_vars = meta_vars)
+        editors = [])
 
 @mod.route('/', methods=['POST', 'GET'])
 @mod.route('/<name>', methods=['POST', 'GET'])
