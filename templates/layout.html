@@ -28,8 +28,10 @@
             <li {% if request.blueprint=='home_page'%}class="active"{%endif%}><a href="#">Home</a></li>
             <li {% if request.blueprint=='query'%}class="active"{%endif%}><a href="{{url_for('query.list')}}">Queries</a></li>
             <li {% if request.blueprint=='transformer'%}class="active"{%endif%}><a href="{{url_for('transformer.list')}}">Transformers</a></li>
-            <li {% if request.blueprint=='connection_string'%}class="active"{%endif%}><a href="{{url_for('connection_string.list')}}">Connection Strings</a></li>
-            <li {% if request.blueprint=='oauthclient'%}class="active"{%endif%}><a href="{{url_for('oauthclient.list')}}">OAuth Clients</a></li>
+            <li {% if request.blueprint=='connection_string'%}class="active"{%endif%}><a href="{{url_for('connection_string.list')}}">Connections</a></li>
+            {% if not env_disable_oauth_clients %}
+                <li {% if request.blueprint=='oauthclient'%}class="active"{%endif%}><a href="{{url_for('oauthclient.list')}}">OAuth Clients</a></li>
+            {% endif %}
           </ul>
           <ul class="nav pull-right">
             {% if not g.user %}

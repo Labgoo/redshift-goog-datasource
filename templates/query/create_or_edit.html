@@ -46,14 +46,16 @@
                 </div>
             {% endif %}
 
-            <div class="controls controls-row">
-                <label for="editors" class="control-label">Editors</label>
-                <ul id="editors">
-                    {% for editor in editors %}
-                        <li>{{ editor.email }}</li>
-                    {% endfor %}
-                </ul>
-            </div>
+            {% if not env_disable_editors %}
+                <div class="controls controls-row">
+                    <label for="editors" class="control-label">Editors</label>
+                    <ul id="editors">
+                        {% for editor in editors %}
+                            <li>{{ editor.email }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% endif %}
 
 			<div class="controls">
 				<textarea id="sql" name="sql" class="span9" rows="5">{{sql|safe}}</textarea>
@@ -73,16 +75,18 @@
 				</div>
 			</div> 
 			<br class="clearfix" />
-			<div id="vars">
-				{%for name,value in vars%}
-					<div class="control-group">
-						<label class="control-label" id="dynfield-label{{loop.index0}}" for="dynfield{{loop.index0}}">{{name}}</label>
-						<div class="controls">
-							<input class="input-xlarge" type="text" name="{{name}}" {%if not value is none%}value="{{value}}"{%endif%} id="dynfield{{loop.index0}}">
-						</div>
-					</div>
-				{%endfor%}
-			</div>
+            {% if not env_disable_query_vars %}
+                <div id="vars">
+                    {%for name,value in vars%}
+                        <div class="control-group">
+                            <label class="control-label" id="dynfield-label{{loop.index0}}" for="dynfield{{loop.index0}}">{{name}}</label>
+                            <div class="controls">
+                                <input class="input-xlarge" type="text" name="{{name}}" {%if not value is none%}value="{{value}}"{%endif%} id="dynfield{{loop.index0}}">
+                            </div>
+                        </div>
+                    {%endfor%}
+                </div>
+            {% endif %}
 			{% macro addVariableSection(prefix, index=None, name=None, options=None) -%}
 				<div id="sheepItForm_template{%if not index is none%}{{index}}{%endif%}" class="controls-row controls {%if not index is none%}cloned-input{%endif%}" {%if not index is none%}idtemplate="sheepItForm_template"{%endif%}>
 						<input id="sheepItForm_{{prefix}}_name" data-var-index="{{prefix}}" class="span2 var-name" type="text" name="var-name{{prefix}}" placeholder="Varibale name" maxlength="10" value="{%if name%}{{name}}{%else%}Variable{{prefix}}{%endif%}" {%if not index is none%}idtemplate="sheepItForm_%23index%23_name" nametemplate="var-name%23index%23"{%endif%} />
@@ -99,30 +103,34 @@
 			{%- endmacro %}
 
 			<div class="mine">
-			{{ addVariableSection('#index#') }}
-			</div>
-			<!-- No forms template -->
-			{%for name,options in meta_vars%}
-				{{ addVariableSection(loop.index0, loop.index0, name, options) }}
-			{%endfor%}
+            {% if not env_disable_query_vars %}
+                {{ addVariableSection('#index#') }}
+                </div>
+                <!-- No forms template -->
+                {%for name,options in meta_vars%}
+                    {{ addVariableSection(loop.index0, loop.index0, name, options) }}
+                {%endfor%}
 
-			<div id="sheepItForm_noforms_template" {%if vars %}class="hide"{%endif%}>No variables defined</div>
-			<!-- /No forms template-->
+                <div id="sheepItForm_noforms_template" {%if vars %}class="hide"{%endif%}>No variables defined</div>
+                <!-- /No forms template-->
 
-			<div class="controls controls-row">
-					<input  id="sheepItForm_add" type="button" class="btn pull-left" value="Add Varibale" />
-			</div>
+                <div class="controls controls-row">
+                        <input  id="sheepItForm_add" type="button" class="btn pull-left" value="Add Varibale" />
+                </div>
+            {% endif %}
 		</fieldset>
 	</form>
 
-    <script type="text/javascript">
-        $(function () {
-            $("#editors").tagit({
-                    fieldName: "editors",
-                    allowSpaces: true
+    {% if not env_disable_editors %}
+        <script type="text/javascript">
+            $(function () {
+                $("#editors").tagit({
+                        fieldName: "editors",
+                        allowSpaces: true
+                });
             });
-        });
-    </script>
+        </script>
+    {% endif %}
 	{% if json %}
     <ul id="vistabs" class="nav nav-tabs">
         <li><a href="#table" data-toggle="tab">Table</a></li>

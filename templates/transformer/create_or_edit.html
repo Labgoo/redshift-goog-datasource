@@ -20,14 +20,16 @@
 				<input class="span9 input-xxlarge" type="text" id="title" name="name" value="{{name}}" placeholder="Enter a title for your transformer" maxlength="100" />
 			</div>
 
-            <div class="controls controls-row">
-                <label for="editors" class="control-label">Editors</label>
-                <ul id="editors">
-                    {% for editor in editors %}
-                        <li>{{ editor.email }}</li>
-                    {% endfor %}
-                </ul>
-            </div>
+            {% if not env_disable_editors %}
+                <div class="controls controls-row">
+                    <label for="editors" class="control-label">Editors</label>
+                    <ul id="editors">
+                        {% for editor in editors %}
+                            <li>{{ editor.email }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% endif %}
 
 			<div class="controls">
 				<textarea id="code" name="code" class="span9">{{code|safe}}</textarea>
@@ -37,12 +39,14 @@
 			</div>
 		</fieldset>
 	</form>
-    <script type="text/javascript">
-        $(function () {
-            $("#editors").tagit({
-                    fieldName: "editors",
-                    allowSpaces: true
+    {% if not env_disable_editors %}
+        <script type="text/javascript">
+            $(function () {
+                $("#editors").tagit({
+                        fieldName: "editors",
+                        allowSpaces: true
+                });
             });
-        });
-    </script>
+        </script>
+    {% endif %}
 {% endblock %}
