@@ -3,6 +3,7 @@ from bson import ObjectId
 from flask import session
 import logging, random, string
 from datetime import datetime
+from mongoengine.queryset import DoesNotExist
 from models import User, ConnectionString
 
 db = app.extensions['mongoengine']
@@ -91,6 +92,8 @@ class Query(db.Document):
             query.updated = datetime.utcnow()
             query.save()
 
+        return query, created
+
     @classmethod
     def find(cls, name_or_oid, access_token=None):
         logging.info('loading query %s', name_or_oid)
@@ -111,7 +114,10 @@ class Query(db.Document):
         if not access_token:
             filter = filter & (db.Q(owner=user) | db.Q(editors = user))
 
-        query = cls.objects.get(filter)
+        try:
+            query = cls.objects.get(filter)
+        except DoesNotExist:
+            query = None
 
         if query and access_token and access_token != query.access_token:
             return None

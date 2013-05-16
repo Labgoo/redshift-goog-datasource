@@ -1,22 +1,24 @@
 {% extends "layout.html" %}
 
 {% block head %}
-	<script src="{{ url_for('static', filename='vendor/codemirror/codemirror.js') }}"></script>
 	<link rel="stylesheet" href="{{ url_for('static', filename='vendor/codemirror/codemirror.css') }}" media="screen"/>
-	<script src="{{ url_for('static', filename='vendor/codemirror/sql.js') }}"></script>
 	<link rel=stylesheet type=text/css href="{{ url_for('static', filename='css/codemirror-custom.css') }}" media="screen">
+	<script src="{{ url_for('static', filename='vendor/codemirror/codemirror.js') }}"></script>
+	<script src="{{ url_for('static', filename='vendor/codemirror/sql.js') }}"></script>
 	<script src="{{ url_for('static', filename='vendor/jquery.sheepItPlugin.js') }}"></script>
-	<script src="{{ url_for('static', filename='js/sql-editor.js') }}"></script>
 
     <script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.2/jquery-ui.min.js" type="text/javascript" charset="utf-8"></script>
     <script src="{{ url_for('static', filename='vendor/tag-it/js/tag-it.js') }}" type="text/javascript" charset="utf-8"></script>
     <link rel="stylesheet" href="{{ url_for('static', filename='vendor/tag-it/css/jquery.tagit.css') }}" type="text/css">
     <link rel="stylesheet" type="text/css" href="//ajax.googleapis.com/ajax/libs/jqueryui/1/themes/flick/jquery-ui.css">
+
+	<script src="https://www.google.com/jsapi" type="text/javascript"></script>
+    <script src="{{ url_for('static', filename='js/sql-editor.js') }}"></script>
 {% endblock%}
 
 {% block body %}
 	<h1>{% if name %}Edit{% else %}Create{% endif  %} a Query</h1>
-	<form id="sheepItForm" method="post" action="{% if name %}{{url_for('.edit', name=name) }}{%else%}{{ url_for('.new') }}{%endif%}">
+	<form id="sheepItForm" method="post" {% if not name %}data-new-query="1"{% endif %} action="{% if name %}{{url_for('.edit', name=name, gwiz_json=1) }}{%else%}{{ url_for('.new', gwiz_json=1) }}{%endif%}">
 		<fieldset>
 			<div class="controls controls-row">
 				<input class="span9 input-xxlarge" type="text" id="query-name" name="query-name" value="{{name}}" {% if name %}readonly="readonly"{% else %} placeholder="Enter a title for your query"{% endif %} maxlength="100" />
@@ -39,11 +41,13 @@
                 </div>
             {% endfor %}
 
-            {% if access_token %}
-                <div class="controls controls-row">
-                    <label for="access-token" class="control-label">Access Token</label>
-                    <input class="span9 input-xxlarge" type="text" id="access-token" readonly="readonly" value="{{access_token}}" />
-                </div>
+            {% if not env_disable_access_token %}
+                {% if access_token %}
+                    <div class="controls controls-row">
+                        <label for="access-token" class="control-label">Access Token</label>
+                        <input class="span9 input-xxlarge" type="text" id="access-token" readonly="readonly" value="{{access_token}}" />
+                    </div>
+                {% endif %}
             {% endif %}
 
             {% if not env_disable_editors %}
@@ -68,7 +72,7 @@
 			</div>
 			<div class="controls-row controls" style="float:right">
 				<div class="btn-group">
-					<input id="sql-save-execute" type="submit" name="user-action" class="btn btn-xxlarge pull-right {%if not name %}disabled{%endif%}" value="Save + Execute" />
+					<input id="sql-save-execute" type="submit" name="user-action" class="btn btn-xxlarge pull-right {%if not name %}disabled{%endif%}" value="Save" />
 				</div>
 				<div class="btn-group">
 					<input id="sql-execute" type="submit" name="user-action" class="btn btn-primary btn-xxlarge pull-right" value="Execute" />
@@ -131,8 +135,8 @@
             });
         </script>
     {% endif %}
-	{% if json %}
-    <ul id="vistabs" class="nav nav-tabs">
+
+    <ul id="vistabs" style="display:none" class="nav nav-tabs">
         <li><a href="#table" data-toggle="tab">Table</a></li>
         <li><a href="#piechart" data-toggle="tab">Piechart</a></li>
         <li><a href="#areachart" data-toggle="tab">Area Charts</a></li>
@@ -146,48 +150,4 @@
         <div class="tab-pane" id="barcharts"></div>
     </div>
 
-	<script src="https://www.google.com/jsapi" type="text/javascript"></script>
-	<script type="text/javascript">
-            $(function () {
-                $('#vistabs a:first').tab('show');
-
-                $('#vistabs a').click(function (e) {
-                    e.preventDefault();
-                    $(this).tab('show');
-                });
-            });
-
-			google.load('visualization', '1', {packages:['table', 'corechart']});
-			google.setOnLoadCallback(drawVis);
-
-			function drawTable(data) {
-                var table = new google.visualization.Table(document.getElementById('table'));
-				table.draw(data, {showRowNumber: true});
-			}
-
-            function drawPieChart(data) {
-                var chart = new google.visualization.PieChart(document.getElementById('piechart'));
-                chart.draw(data);
-            }
-
-            function drawAreaChart(data) {
-                var chart = new google.visualization.AreaChart(document.getElementById('areachart'));
-                chart.draw(data);
-            }
-
-            function drawBarCharts(data) {
-                var chart = new google.visualization.BarChart(document.getElementById('barcharts'));
-                chart.draw(data);
-            }
-
-            function drawVis() {
-                var json_data = new google.visualization.DataTable({{json|safe}}, 0.6);
-
-                drawTable(json_data);
-                drawPieChart(json_data);
-                drawAreaChart(json_data);
-                drawBarCharts(json_data);
-            }
-	</script>
-	{% endif %}
 {% endblock %}

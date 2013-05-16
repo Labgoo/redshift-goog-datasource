@@ -1,4 +1,7 @@
-$(document).ready(function () {
+google.load('visualization', '1', {packages:['table', 'corechart']});
+google.setOnLoadCallback(function() {});
+
+jQuery(function () {
 	var mime = 'text/x-mariadb';
 
 	// get mime type
@@ -85,10 +88,71 @@ $(document).ready(function () {
 		recreateVars = false;
 	};
 
+    function drawTable(data) {
+        var table = new google.visualization.Table(document.getElementById('table'));
+        table.draw(data, {showRowNumber: true});
+    }
+
+    function drawPieChart(data) {
+        var chart = new google.visualization.PieChart(document.getElementById('piechart'));
+        chart.draw(data);
+    }
+
+    function drawAreaChart(data) {
+        var chart = new google.visualization.AreaChart(document.getElementById('areachart'));
+        chart.draw(data);
+    }
+
+    function drawBarCharts(data) {
+        var chart = new google.visualization.BarChart(document.getElementById('barcharts'));
+        chart.draw(data);
+    }
+
     $("#sql-execute, #sql-save-execute").click(function() {
     	if (recreateVars) {
 			createVarsFills();
 			return false;
 		}
+
+        var $btn = $(this);
+        $btn.addClass('loading');
+
+        var newQuery = $('form').data('new-query');
+
+        if (!newQuery) {
+            var $form = $('form');
+
+            window.editor.save();
+
+            var data = $form.serializeArray();
+
+            data.push({ name: this.name, value: this.value });
+
+            $.ajax({
+                type: $form.attr('method'),
+                url: $form.attr('action'),
+                data: data
+            }).done(function(data) {
+                var json_data = new google.visualization.DataTable(data, 0.6);
+
+                $('#vistabs a:first').tab('show');
+
+                $('#vistabs a').click(function (e) {
+                    e.preventDefault();
+                    $(this).tab('show');
+                });
+
+                drawTable(json_data );
+                drawPieChart(json_data);
+                drawAreaChart(json_data);
+                drawBarCharts(json_data);
+            }).always(function() {
+                $btn.removeClass('loading');
+            }).fail(function(jqXHR, textStatus) {
+
+            });
+
+            return false;
+        }
     });
 });
