@@ -14,8 +14,7 @@ def list():
 @mod.route('/new', methods=['GET'])
 @require_login
 def new():
-    url = 'mysql://scott:tiger@localhost/foo'
-    return render_template('connection_string/create_or_edit.html', url = url, users=[g.user.username])
+    return render_template('connection_string/create_or_edit.html')
 
 @mod.route('/', methods=['GET', 'POST'])
 @mod.route('/<name>', methods=['GET', 'POST'])

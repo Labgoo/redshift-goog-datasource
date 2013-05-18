@@ -72,7 +72,7 @@ def query_db(connection, query,  meta_vars, vars):
     return description, data, columns_order
 
 def save(name, sql, meta_vars, connection, editors):
-    Query.create_or_update(name = name,
+    return Query.create_or_update(name = name,
                            sql = sql,
                            meta_vars = meta_vars,
                            connection = connection,
@@ -165,6 +165,12 @@ def edit(name=None):
     if not user_access_token and g.user is None:
         return redirect(url_for('user.login', next=request.path))
 
+    execute_sql = request.method == 'POST'
+
+    query = None
+
+    redirect_to = None
+
     if request.method == 'POST':
         def extract_meta_var_fields():
             index = 0
@@ -217,17 +223,18 @@ def edit(name=None):
 
         editors = get_editors()
 
-        if name and request.form.get('user-action') == 'Save + Execute':
+        if name and request.form.get('user-action') == 'Save':
             if g.user is None:
                 return redirect(url_for('user.login', next=request.path))
 
-            save(name, sql, meta_vars, connection, editors)
-            full_vars = vars_from_request(meta_vars, False)
-            return redirect(url_for('.edit', name = name, **dict(full_vars)))
+            query, created = save(name, sql, meta_vars, connection, editors)
+
+            if created:
+                full_vars = vars_from_request(meta_vars, False)
+                return redirect(url_for('.edit', name = name, **dict(full_vars)))
 
         vars = vars_from_request(meta_vars, True)
 
-        access_token = None
     else:
         if not name:
             return redirect(url_for('.new'))
@@ -248,69 +255,89 @@ def edit(name=None):
         meta_vars = query.meta_vars
         connection = query.connection
         editors = query.editors
-        access_token = query.access_token
 
-    transform = request.args.get('transform', None)
+    data_table = None
+    error = None
+    json_data = None
+    access_token = None
+    if execute_sql:
+        transform = request.args.get('transform', None)
 
-    if not transform:
-        transform = request.args.get('transformer', None)
+        if not transform:
+            transform = request.args.get('transformer', None)
 
-    raw_data = not request.args.get('json', None) is None
+        raw_data = not request.args.get('json', None) is None
 
-    try:
-        json_data = None
+        try:
+            json_data = None
 
-        if connection:
-            if connection.url.startswith('google://') or connection.url.startswith('http://') or connection.url.startswith('https://'):
-                description, data, columns_order = query_google_data_source(connection, sql, meta_vars, vars)
+            if connection:
+                if connection.url.startswith('google://') or connection.url.startswith('http://') or connection.url.startswith('https://'):
+                    description, data, columns_order = query_google_data_source(connection, sql, meta_vars, vars)
+                else:
+                    description, data, columns_order = query_execute_sql(connection, sql, meta_vars, vars)
+
+                if transform:
+                    data = Transformer.execute(transform, data, True)
+
+                if raw_data:
+                    json_data = json.dumps(data, default=handle_datetime)
+                elif len(data) > 0:
+                    data_table, columns_order = data_to_datatable(description, data, columns_order)
+                    json_data = data_table.ToJSon(columns_order=columns_order)
+
+            if not json_data:
+                json_data = json.dumps([])
+                data_table = None
+
+        except Exception, ex:
+            logging.error("Failed to execute query %s", ex)
+            error = str(ex)
+
+        if not request.args.get('gwiz', None) is None:
+            if error:
+                return Response(error, status=400)
+
+            return Response(data_table.ToJSonResponse(columns_order=columns_order),  mimetype='application/json')
+        if not request.args.get('gwiz_json', None) is None:
+            if error:
+                return Response(error, status=400)
+
+            if data_table:
+                return Response(data_table.ToJSon(columns_order=columns_order),  mimetype='application/json')
             else:
-                description, data, columns_order = query_execute_sql(connection, sql, meta_vars, vars)
+                return Response('',  mimetype='application/json')
 
-            if transform:
-                data = Transformer.execute(transform, data, True)
+        if not request.args.get('json', None) is None:
+            if error:
+                return Response(error, status=400)
 
-            if raw_data:
-                json_data = json.dumps(data, default=handle_datetime)
-            elif len(data) > 0:
-                data_table, columns_order = data_to_datatable(description, data, columns_order)
-                json_data = data_table.ToJSon(columns_order=columns_order)
+            return Response(json_data,  mimetype='application/json')
+        elif not request.args.get('html', None) is None:
+            return Response(data_table.ToHtml(columns_order=columns_order))
+        elif not request.args.get('csv', None) is None:
+            return Response(data_table.ToCsv(columns_order=columns_order), mimetype='text/csv')
 
-        if not json_data:
-            json_data = json.dumps([])
-            data_table = None
+    full_vars = []
+    vars = dict(vars)
+    for key, options in meta_vars:
+        val = vars.get(key)
+        if val:
+            full_vars.append((key, val))
+        else:
+            full_vars.append((key, None))
 
-        error = ''
-    except Exception, ex:
-        logging.error("Failed to execute query %s", ex)
-        error = str(ex)
-        data_table = None
+    if name:
+        if query is None:
+            query = Query.find(name, access_token=user_access_token)
 
-    if not request.args.get('gwiz', None) is None:
-        return Response(data_table.ToJSonResponse(columns_order=columns_order),  mimetype='application/json')
-    if not request.args.get('json', None) is None:
-        if error:
-            return Response(error)
-
-        return Response(json_data,  mimetype='application/json')
-    elif not request.args.get('html', None) is None:
-        return Response(data_table.ToHtml(columns_order=columns_order))
-    elif not request.args.get('csv', None) is None:
-        return Response(data_table.ToCsv(columns_order=columns_order), mimetype='text/csv')
-    else:
-        full_vars = []
-        vars = dict(vars)
-        for key, options in meta_vars:
-            val = vars.get(key)
-            if val:
-                full_vars.append((key, val))
-            else:
-                full_vars.append((key, None))
+        if query:
+            access_token = query.access_token
 
     return render_template('query/create_or_edit.html',
         name = name,
         sql = sql,
         error = error,
-        json = json_data,
         connection = connection,
         connections = ConnectionString.all() or [connection],
         meta_vars = meta_vars,
