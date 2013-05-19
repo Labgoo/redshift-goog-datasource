@@ -2,6 +2,8 @@
     padding-right:10px;float:left;width:40px;height:40px
  }
 
+.hide {display: none;}
+
 .btn.loading {
     background-image: -webkit-gradient(linear, 0 0, 100% 100%,
         color-stop(.25, rgba(0, 0, 0, .10)),

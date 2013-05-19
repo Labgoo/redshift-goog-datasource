@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from flask import render_template, request, Blueprint, g, session, redirect, url_for
+from flask import render_template, request, Blueprint, g, session, redirect, url_for, Response
 import logging
 from user import require_login
 from models import ConnectionString, User
@@ -15,6 +15,15 @@ def list():
 @require_login
 def new():
     return render_template('connection_string/create_or_edit.html')
+
+@mod.route('/<name>', methods=['DELETE'])
+def delete(name):
+    query = ConnectionString.find(name)
+    if query:
+        query.delete()
+
+    json_data = ConnectionString.dumps({'status': 'ok'})
+    return Response(json_data,  mimetype='application/json')
 
 @mod.route('/', methods=['GET', 'POST'])
 @mod.route('/<name>', methods=['GET', 'POST'])

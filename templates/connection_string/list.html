@@ -8,14 +8,29 @@
     <div id="content">
         <h1>Queries</h1>
 
+        <div id="modal-from-dom" class="hide modal fade">
+            <div class="modal-header">
+              <a href="#" class="close">&times;</a>
+              <h3>Delete Query</h3>
+            </div>
+            <div class="modal-body">
+              <p>You are about to delete a connection, this procedure is irreversible.</p>
+              <p>Do you want to proceed?</p>
+            </div>
+            <div class="modal-footer">
+              <a href="{{url_for('.delete', name='item') }}" class="btn btn-danger">Yes</a>
+              <a href="javascript:$('#modal-from-dom').modal('hide')" class="btn secondary">No</a>
+            </div>
+        </div>
+
         <ul class="admin">
             {%for connection in connections%}
                 <li>
-                    <a class="name" href="/connection/{{connection.name}}">{{connection.name}}</a>
-                    <a href="/connection/{{connection.name}}/delete" class="btn btn-danger btn-small">
+                    <a class="name" href="{{url_for('.edit', name=connection.name) }}">{{connection.name}}</a>
+                    <a href="{{url_for('.delete', name=connection.name) }}" class="btn btn-danger btn-small confirm-delete">
                         <i class="icon-white icon-trash"></i>Delete
                     </a>
-                    <a href="/connection/{{connection.name}}" class="btn btn-small">
+                    <a href="{{url_for('.edit', name=connection.name) }}" class="btn btn-small">
                         <i class="icon-edit"></i>Edit
                     </a>
                 </li>
@@ -26,4 +41,34 @@
             Create a Connection String
         </a>
     </div>
+
+    <script>
+        $('#modal-from-dom').bind('show', function() {
+            var href = $(this).data('href'),
+                li = $(this).data('li'),
+                removeBtn = $(this).find('.btn-danger');
+
+            removeBtn.click(function() {
+                $.ajax({
+                    type: "DELETE",
+                    url: href
+                });
+
+                $('#modal-from-dom').modal('hide');
+
+                li.fadeOut(function() {
+                    $(this).remove();
+                });
+
+                return false;
+            });
+        }).modal({ backdrop: false });
+
+        $('.confirm-delete').click(function(e) {
+            e.preventDefault();
+
+            var href = $(this).attr('href');
+            $('#modal-from-dom').data({'href': href, 'li': $(this).parent()}).modal('show');
+        });
+    </script>
 {% endblock %}

@@ -32,6 +32,15 @@ def new():
                            code=code)
 
 
+@mod.route('/<name>', methods=['DELETE'])
+def delete(name):
+    query = Transformer.find(name)
+    if query:
+        query.delete()
+
+    json_data = Transformer.dumps({'status': 'ok'})
+    return Response(json_data,  mimetype='application/json')
+
 @mod.route('/', methods=['GET', 'POST'])
 @mod.route('/<name>', methods=['GET', 'POST'])
 @require_login
