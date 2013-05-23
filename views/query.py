@@ -153,7 +153,7 @@ def handle_datetime(obj):
 def new():
     return render_template('query/create_or_edit.html',
         sql = "",
-        vars = [],
+        vars = vars,
         connection = None,
         connections = ConnectionString.all(),
         editors = [])
