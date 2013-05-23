@@ -42,8 +42,7 @@ jQuery(function () {
     });
 
 	$('#query-name').change(function() {
-		var hasName = $.trim($(this).val()).length > 0;
-		$('#sql-save-execute').prop('disabled', !hasName).toggleClass('disabled', !hasName);
+		$('#sql-save-execute').prop('disabled', !hasQueryName()).toggleClass('disabled', !hasName);
 	});
 
 	$(document).on('change', '.var-name', function() {
@@ -117,6 +116,16 @@ jQuery(function () {
         return queryName.length > 0;
     }
 
+    function showError(error) {
+        drawTable(null);
+        drawPieChart(null);
+        drawAreaChart(null);
+        drawBarCharts(null);
+
+        $('#error-message').text(error);
+        $('#error-dialog').fadeIn();
+    }
+
     $("#sql-execute, #sql-save-execute").click(function() {
     	if (recreateVars) {
 			createVarsFills();
@@ -142,31 +151,29 @@ jQuery(function () {
                 url: $form.attr('action') + '?gwiz_json',
                 data: data
             }).done(function(data) {
-                var json_data = new google.visualization.DataTable(data, 0.6);
+                if (data.error) {
+                    showError(data.error);
+                } else {
+                    var json_data = new google.visualization.DataTable(data, 0.6);
 
-                $('#vistabs a:first').tab('show');
+                    $('#vistabs a:first').tab('show');
 
-                $('#vistabs a').click(function (e) {
-                    e.preventDefault();
-                    $(this).tab('show');
-                });
+                    $('#vistabs a').click(function (e) {
+                        e.preventDefault();
+                        $(this).tab('show');
+                    });
 
-                $('#error-dialog').fadeOut();
+                    $('#error-dialog').fadeOut();
 
-                drawTable(json_data);
-                drawPieChart(json_data);
-                drawAreaChart(json_data);
-                drawBarCharts(json_data);
+                    drawTable(json_data);
+                    drawPieChart(json_data);
+                    drawAreaChart(json_data);
+                    drawBarCharts(json_data);
+                }
             }).always(function() {
                 $btn.removeClass('loading');
             }).fail(function(jqXHR, textStatus, errorThrown) {
-                drawTable(null);
-                drawPieChart(null);
-                drawAreaChart(null);
-                drawBarCharts(null);
-
-                $('#error-message').text(errorThrown);
-                $('#error-dialog').fadeIn();
+                showError(errorThrown);
             });
 
             return false;

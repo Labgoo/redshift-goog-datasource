@@ -23,9 +23,18 @@ def query_google_data_source(connection, sql, meta_vars, vars):
     headers = json.loads(connection.headers)
 
     r = requests.get(url, headers=headers)
+    result = r.json()
+
+    if result.get("status") == "error":
+        http_error_msgs = []
+        for error in result.get("errors", []):
+            http_error_msgs.append(error.get("detailed_message"))
+
+        raise requests.HTTPError("\n".join(http_error_msgs), response=r)
+
     r.raise_for_status()
 
-    return datatable_to_data(r.json())
+    return datatable_to_data(result)
 
 def build_sql_query(query, meta_vars, vars):
     meta_vars = dict(meta_vars)
@@ -307,21 +316,21 @@ def edit(name=None):
 
         if not request.args.get('gwiz', None) is None:
             if error:
-                return Response(error, status=400)
+                return Response(json.dumps({"error": error}), mimetype='application/json')
 
             return Response(data_table.ToJSonResponse(columns_order=columns_order),  mimetype='application/json')
         if not request.args.get('gwiz_json', None) is None:
             if error:
-                return Response(error, status=400)
+                return Response(json.dumps({"error": error}), mimetype='application/json')
 
             if data_table:
-                return Response(data_table.ToJSon(columns_order=columns_order),  mimetype='application/json')
+                return Response(data_table.ToJSon(columns_order=columns_order), mimetype='application/json')
             else:
                 return Response('',  mimetype='application/json')
 
         if not request.args.get('json', None) is None:
             if error:
-                return Response(error, status=400)
+                return Response(json.dumps({"error": error}), mimetype='application/json')
 
             return Response(json_data,  mimetype='application/json')
         elif not request.args.get('html', None) is None:

@@ -37,7 +37,7 @@
                 {% endif %}
             {% else %}
                 <div class="alert">
-                    You need to define a connection to the database.
+                    You need to <a href="{{url_for('connection_string.new')}}">create a connection</a> to the database.
                 </div>
             {% endfor %}
 
