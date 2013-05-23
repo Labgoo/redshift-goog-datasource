@@ -1,0 +1,18 @@
+{% extends "layout.html" %}
+
+{% block body %}
+<div class="hero-unit">
+    <h1>{% if env_app_title %}{{ env_app_title }}{% else %}Welcome to Data Explorer{% endif %}</h1>
+    <p></p>
+  <p>
+      Data Explorer allow you to query you data online using SQL.<br>
+      You start by creating a <a href="{{url_for('connection_string.new')}}">connection</a> to your data.<br>
+      After the connection is ready you can use it to create a <a href="{{url_for('query.new')}}">query</a>.
+  </p>
+   <p>
+      {% if not g.user %}
+      But <b>first</b> you need to <a href="{{url_for('user.login')}}">login</a> using your Google account.
+      {% endif %}
+</p>
+</div>
+{% endblock %}

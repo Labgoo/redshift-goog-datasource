@@ -41,13 +41,19 @@ def create_profile():
 @oid.loginhandler
 def login():
     if g.user is not None:
-        return redirect(url_for('query.new'))
+        return redirect(url_for('homepage.index'))
 
     if request.method == 'POST':
         openid = request.form.get('openid')
         if openid:
             return oid.try_login(openid, ask_for=['email', 'fullname',
                                                   'nickname'])
+    else:
+        return oid.try_login("https://www.google.com/accounts/o8/id", ask_for=['email', 'fullname',
+                                                  'nickname'])
+
+        return redirect()
+
     return render_template(
         'users/login.html',
         next = oid.get_next_url(),

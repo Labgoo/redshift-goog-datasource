@@ -16,6 +16,7 @@ from views import user
 from views import connection_string
 from views import oauth2
 from views import oauthclient
+from views import homepage
 
 app.register_blueprint(query.mod)
 app.register_blueprint(transformer.mod)
@@ -23,10 +24,7 @@ app.register_blueprint(user.mod)
 app.register_blueprint(connection_string.mod)
 app.register_blueprint(oauth2.mod)
 app.register_blueprint(oauthclient.mod)
-
-@app.route('/')
-def index():
-    return redirect('/query/list')
+app.register_blueprint(homepage.mod)
 
 @app.context_processor
 def inject_meta():
