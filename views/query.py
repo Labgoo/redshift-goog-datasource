@@ -101,13 +101,13 @@ def vars_with_default_value(meta_vars, vars):
 
     return result
 
-def data_to_datatable(description, data, columns_order):
+def data_to_datatable(description, data):
     import gviz_api
 
     data_table = gviz_api.DataTable(description)
     data_table.LoadData(data)
 
-    return data_table, columns_order
+    return data_table
 
 def datatable_to_data(data_table):
     table = data_table.get('table', data_table)
@@ -127,9 +127,11 @@ def datatable_to_data(data_table):
         for col in description:
             yield col["id"], (col["type"], col["label"])
 
+    columns_order = [col["id"] for col in description]
+
     description = [item for item in convert_description()]
 
-    return dict(description), data, None
+    return dict(description), data, columns_order
 
 def query_execute_sql(connection, sql, meta_vars, vars):
     description, data, columns_order = query_db(connection, sql, meta_vars, vars)
@@ -151,10 +153,19 @@ def handle_datetime(obj):
 def new():
     return render_template('query/create_or_edit.html',
         sql = "",
-        vars = vars,
+        vars = [],
         connection = None,
         connections = ConnectionString.all(),
         editors = [])
+
+@mod.route('/<name>', methods=['DELETE'])
+def delete(name):
+    query = Query.find(name)
+    if query:
+        query.delete()
+
+    json_data = json.dumps({'status': 'ok'})
+    return Response(json_data,  mimetype='application/json')
 
 @mod.route('/', methods=['POST', 'GET'])
 @mod.route('/<name>', methods=['POST', 'GET'])
@@ -283,7 +294,7 @@ def edit(name=None):
                 if raw_data:
                     json_data = json.dumps(data, default=handle_datetime)
                 elif len(data) > 0:
-                    data_table, columns_order = data_to_datatable(description, data, columns_order)
+                    data_table = data_to_datatable(description, data)
                     json_data = data_table.ToJSon(columns_order=columns_order)
 
             if not json_data:

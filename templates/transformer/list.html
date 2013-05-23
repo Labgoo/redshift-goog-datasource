@@ -8,14 +8,29 @@
 	<div id="content">        
 		<h1>Transformers</h1>
 
+        <div id="modal-from-dom" class="hide modal fade">
+            <div class="modal-header">
+              <a href="#" class="close">&times;</a>
+              <h3>Delete Query</h3>
+            </div>
+            <div class="modal-body">
+              <p>You are about to delete a transformer, this procedure is irreversible.</p>
+              <p>Do you want to proceed?</p>
+            </div>
+            <div class="modal-footer">
+              <a href="{{url_for('.delete', name='item') }}" class="btn btn-danger">Yes</a>
+              <a href="javascript:$('#modal-from-dom').modal('hide')" class="btn secondary">No</a>
+            </div>
+        </div>
+
 		<ul class="admin">
 		    {%for transformer in transformers%}
 		    <li>
-				<a class="name" href="/transformer/{{transformer.name}}">{{transformer.name}}</a>
-				<a href="/transformer/{{transformer.name}}/delete"class="delete-variable btn btn-danger btn-small">
+				<a class="name" href="{{url_for('.edit', name=transformer.name) }}">{{transformer.name}}</a>
+				<a href="{{url_for('.delete', name=transformer.name) }}"class="delete-variable btn btn-danger btn-small confirm-delete">
 					<i class="icon-white icon-trash"></i>Delete
 				</a>
-				<a href="{{url_for('.edit', name=transformer.name)}}" class="btn btn-small">
+				<a href="{{url_for('.edit', name=transformer.name) }}" class="btn btn-small">
 					<i class="icon-edit"></i>Edit
 				</a>				
 		    </li>
@@ -26,4 +41,34 @@
 		  Create a Transformer
 		</a>
       </div>
+
+    <script>
+        $('#modal-from-dom').bind('show', function() {
+            var href = $(this).data('href'),
+                li = $(this).data('li'),
+                removeBtn = $(this).find('.btn-danger');
+
+            removeBtn.click(function() {
+                $.ajax({
+                    type: "DELETE",
+                    url: href
+                });
+
+                $('#modal-from-dom').modal('hide');
+
+                li.fadeOut(function() {
+                    $(this).remove();
+                });
+
+                return false;
+            });
+        }).modal({ backdrop: false });
+
+        $('.confirm-delete').click(function(e) {
+            e.preventDefault();
+
+            var href = $(this).attr('href');
+            $('#modal-from-dom').data({'href': href, 'li': $(this).parent()}).modal('show');
+        });
+    </script>
 {% endblock %}
