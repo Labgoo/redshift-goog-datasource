@@ -126,7 +126,8 @@ def datatable_to_data(data_table):
         for row in table["rows"]:
             r = []
             for i,v in enumerate(row["c"]):
-                r.append((description[i]["id"], v["v"]))
+                val = v["v"] if v else None
+                r.append((description[i]["id"], val))
 
             yield dict(r)
 
@@ -311,7 +312,7 @@ def edit(name=None):
                 data_table = None
 
         except Exception, ex:
-            logging.error("Failed to execute query %s", ex)
+            logging.exception("Failed to execute query %s", ex)
             error = str(ex)
 
         if not request.args.get('gwiz', None) is None:

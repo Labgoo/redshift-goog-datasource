@@ -17,7 +17,9 @@
 {% endblock%}
 
 {% block body %}
-	<h1>{% if name %}Edit{% else %}Create{% endif  %} a Query</h1>
+
+    <div class="span9">
+    <h1>{% if name %}Edit{% else %}Create{% endif  %} a Query</h1>
 	<form id="sheepItForm" method="post" {% if not name %}data-new-query="1"{% endif %} action="{% if name %}{{url_for('.edit', name=name) }}{%else%}{{ url_for('.new') }}{%endif%}">
 		<fieldset>
 			<div class="controls controls-row">
@@ -62,7 +64,7 @@
             {% endif %}
 
 			<div class="controls">
-				<textarea id="sql" name="sql" class="span9" rows="5">{{sql|safe}}</textarea>
+				<textarea id="sql" name="sql" class="span9" rows="2">{{sql|safe}}</textarea>
 
 				<div id="error-dialog" class="alert alert-error" {%if not error %}style="display:none"{%endif%}>
 					<button type="button" class="close" data-dismiss="alert">&times;</button>
@@ -74,7 +76,9 @@
 					<input id="sql-save-execute" type="submit" name="user-action" class="btn btn-xxlarge pull-right {%if not name %}disabled{%endif%}" value="Save" />
 				</div>
 				<div class="btn-group">
-					<input id="sql-execute" type="submit" name="user-action" class="btn btn-primary btn-xxlarge pull-right" value="Execute" />
+					<button id="sql-execute" type="submit" name="user-action" class="btn btn-primary btn-xxlarge pull-right">
+                        <i id="execute-spinner"></i> Execute
+					</button>
 				</div>
 			</div> 
 			<br class="clearfix" />
@@ -123,30 +127,31 @@
             {% endif %}
 		</fieldset>
 	</form>
-
-    {% if not env_disable_editors %}
-        <script type="text/javascript">
-            $(function () {
-                $("#editors").tagit({
-                        fieldName: "editors",
-                        allowSpaces: true
-                });
-            });
-        </script>
-    {% endif %}
-
-    <ul id="vistabs" style="display:none" class="nav nav-tabs">
-        <li><a href="#table" data-toggle="tab">Table</a></li>
-        <li><a href="#piechart" data-toggle="tab">Piechart</a></li>
-        <li><a href="#areachart" data-toggle="tab">Area Charts</a></li>
-        <li><a href="#barcharts" data-toggle="tab">Bar Charts</a></li>
-    </ul>
-
-    <div class="tab-content">
-        <div class="tab-pane active" id="table"></div>
-        <div class="tab-pane" id="piechart"></div>
-        <div class="tab-pane" id="areachart"></div>
-        <div class="tab-pane" id="barcharts"></div>
     </div>
+    <div class="span12">
+        {% if not env_disable_editors %}
+            <script type="text/javascript">
+                $(function () {
+                    $("#editors").tagit({
+                            fieldName: "editors",
+                            allowSpaces: true
+                    });
+                });
+            </script>
+        {% endif %}
 
+        <ul id="vistabs" style="display:none" class="nav nav-tabs">
+            <li><a href="#table" data-toggle="tab">Table</a></li>
+            <li><a href="#piechart" data-toggle="tab">Piechart</a></li>
+            <li><a href="#areachart" data-toggle="tab">Area Charts</a></li>
+            <li><a href="#barcharts" data-toggle="tab">Bar Charts</a></li>
+        </ul>
+
+        <div class="tab-content">
+            <div class="tab-pane active" id="table"></div>
+            <div class="tab-pane" id="piechart"></div>
+            <div class="tab-pane" id="areachart"></div>
+            <div class="tab-pane" id="barcharts"></div>
+        </div>
+    </div>
 {% endblock %}

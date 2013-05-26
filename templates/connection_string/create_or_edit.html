@@ -8,6 +8,7 @@
 {% endblock%}
 
 {% block body %}
+    <div class="span9">
     <form method="post" action="{% if name %}{{url_for('.edit', name=name) }}{%else%}{{ url_for('.new') }}{%endif%}">
         <fieldset>
             <div class="controls controls-row">
@@ -86,4 +87,5 @@
             mssql+pyodbc://mydsn<br>
         </div>
     {% endif %}
+    </div>
 {% endblock %}
