@@ -13,6 +13,7 @@
 {% endblock%}
 
 {% block body %}
+    <div class="span9">
 	<h1>Create a Transformer</h1>
 	<form method="post" action="{% if name %}{{url_for('.edit', name=name) }}{%else%}{{ url_for('.new') }}{%endif%}">
 		<fieldset>
@@ -49,4 +50,5 @@
             });
         </script>
     {% endif %}
+    </div>
 {% endblock %}

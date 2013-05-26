@@ -2,8 +2,8 @@
 <html>
   <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel=stylesheet type=text/css href="{{ url_for('static', filename='css/bootstrap.css') }}" media="screen">
-    <link rel=stylesheet type=text/css href="{{ url_for('static', filename='css/bootstrap-responsive.css') }}" media="screen">
+    <link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/css/bootstrap-combined.min.css" rel="stylesheet">
+    <link href="//netdna.bootstrapcdn.com/font-awesome/3.1.1/css/font-awesome.min.css" rel="stylesheet">
     <link rel=stylesheet type=text/css href="{{ url_for('static', filename='css/bootstrap-custom.css') }}" media="screen">
 
     {% if env_favico %}
@@ -12,6 +12,7 @@
 
 	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
     <script src="//code.jquery.com/jquery-migrate-1.2.0.js"></script>
+    <script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js"></script>
 
     <script src="{{ url_for('static', filename='js/bootstrap.js') }}"></script>
     <script src="{{ url_for('static', filename='js/bootstrap-modal.js') }}"></script>
@@ -23,11 +24,12 @@
       <div class="navbar-inner">
          <div class="container">
             {% if env_logo %}
+                <a href="http://www.cooladata.com/">
                 <img id="logo" src="{{ env_logo }}">
+                </a>
             {% endif %}
 
-        <a class="brand" href="#">
-            Data Explorer</a>
+        <a class="brand" href="#">Cooladata SQL Query Tool</a>
           <ul class="nav">
             <li {% if request.blueprint=='homepage'%}class="active"{%endif%}><a href="{{url_for('homepage.index')}}">Home</a></li>
             <li {% if request.blueprint=='query'%}class="active"{%endif%}><a href="{{url_for('query.list')}}">Queries</a></li>
@@ -48,7 +50,7 @@
         </div>
       </div>
     </div>
-    <div class="span9 offset2">
+    <div class="span12 offset1">
         {% block body %}{% endblock %}
     </div>
   </body>
