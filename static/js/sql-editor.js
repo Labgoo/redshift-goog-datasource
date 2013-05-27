@@ -98,7 +98,7 @@ jQuery(function () {
     function drawTable(data) {
         if (data) {
             var table = new google.visualization.Table($('#table')[0]);
-            table.draw(data, {showRowNumber: true});
+            table.draw(data, {showRowNumber: true, page: 'enable', pageSize: 20});
         } else {
             $('#table').empty();
         }
