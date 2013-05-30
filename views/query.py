@@ -199,12 +199,9 @@ def edit(name=None):
     def is_data_request():
         return is_format_request(['gwiz', 'json', 'csv', 'html', 'gwiz_json'])
 
-    raw_data = is_data_request()
-    execute_sql = request.method == 'POST' or raw_data
+    execute_sql = request.method == 'POST' or is_data_request()
 
     query = None
-
-    redirect_to = None
 
     if request.method == 'POST':
         def extract_meta_var_fields():
@@ -313,7 +310,7 @@ def edit(name=None):
                 if transform:
                     data = Transformer.execute(transform, data, True)
 
-                if raw_data:
+                if is_format_request('json'):
                     json_data = json.dumps(data, default=handle_datetime)
                 elif len(data) > 0:
                     data_table = data_to_datatable(description, data)
