@@ -186,7 +186,21 @@ def edit(name=None):
     if not user_access_token and g.user is None:
         return redirect(url_for('user.login', next=request.path))
 
-    execute_sql = request.method == 'POST'
+    def is_format_request(formats):
+        if isinstance(formats, basestring):
+            return request.args.get(formats, None) is not None
+
+        for format in formats:
+            if is_format_request(format):
+                return True
+
+        return False
+
+    def is_data_request():
+        return is_format_request(['gwiz', 'json', 'csv', 'html', 'gwiz_json'])
+
+    raw_data = is_data_request()
+    execute_sql = request.method == 'POST' or raw_data
 
     query = None
 
@@ -287,8 +301,6 @@ def edit(name=None):
         if not transform:
             transform = request.args.get('transformer', None)
 
-        raw_data = not request.args.get('json', None) is None
-
         try:
             json_data = None
 
@@ -315,12 +327,12 @@ def edit(name=None):
             logging.exception("Failed to execute query %s", ex)
             error = str(ex)
 
-        if not request.args.get('gwiz', None) is None:
+        if is_format_request('gwiz'):
             if error:
                 return Response(json.dumps({"error": error}), mimetype='application/json')
 
             return Response(data_table.ToJSonResponse(columns_order=columns_order),  mimetype='application/json')
-        if not request.args.get('gwiz_json', None) is None:
+        if is_format_request('gwiz_json'):
             if error:
                 return Response(json.dumps({"error": error}), mimetype='application/json')
 
@@ -329,14 +341,14 @@ def edit(name=None):
             else:
                 return Response('',  mimetype='application/json')
 
-        if not request.args.get('json', None) is None:
+        if is_format_request('json'):
             if error:
                 return Response(json.dumps({"error": error}), mimetype='application/json')
 
             return Response(json_data,  mimetype='application/json')
-        elif not request.args.get('html', None) is None:
+        elif is_format_request('html'):
             return Response(data_table.ToHtml(columns_order=columns_order))
-        elif not request.args.get('csv', None) is None:
+        elif is_format_request('csv'):
             return Response(data_table.ToCsv(columns_order=columns_order), mimetype='text/csv')
 
     full_vars = []
