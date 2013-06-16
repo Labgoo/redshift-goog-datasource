@@ -49,7 +49,7 @@ class ConnectionString(db.Document):
         connection, created = cls.objects.get_or_create(auto_save = False, name = name)
 
         if not created and not connection.is_user_editor(user):
-            raise Exception('Connection already exists')
+            raise ValueError('Connection already exists')
 
         if created:
             connection.owner = user

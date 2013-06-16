@@ -32,7 +32,7 @@ def create_profile():
             flash(u'Error: you have to enter a valid email address')
         else:
             flash(u'Profile successfully created')
-            User.create(name, email, session['openid'])
+            User.create(name, email, session['openid'], session.get('oauth_token'))
             return redirect(oid.get_next_url())
 
     return render_template('users/create_profile.html', next_url=oid.get_next_url())
@@ -49,30 +49,42 @@ def login():
             return oid.try_login(openid, ask_for=['email', 'fullname',
                                                   'nickname'])
     else:
-        return oid.try_login("https://www.google.com/accounts/o8/id", ask_for=['email', 'fullname',
-                                                  'nickname'])
-
-        return redirect()
+        oid_url = os.environ.get('oid_url')
+        if oid_url:
+            return oid.try_login(oid_url,
+                                 ask_for=['email', 'fullname', 'nickname'])
 
     return render_template(
         'users/login.html',
-        next = oid.get_next_url(),
-        error = oid.fetch_error())
+        next=oid.get_next_url(),
+        error=oid.fetch_error())
 
 @oid.after_login
 def create_or_login(resp):
     session['openid'] = resp.identity_url
+
+    args = request.args.to_dict()
+    oauth_token = args.get('openid.oauth-token')
+
+    if oauth_token:
+        session['oauth_token'] = oauth_token
+
     user = User.get_by_openid(resp.identity_url)
     if user is not None:
         flash(u'Successfully signed in')
+
+        if user.oauth_token != oauth_token:
+            user.oauth_token = oauth_token
+            user.save()
+
         g.user = user
         return redirect(oid.get_next_url())
 
     return redirect(url_for(
         '.create_profile',
-        next = oid.get_next_url(),
-        name = resp.fullname or resp.nickname,
-        email = resp.email))
+        next=oid.get_next_url(),
+        name=resp.fullname or resp.nickname,
+        email=resp.email))
 
 @app.before_request
 def lookup_current_user():
@@ -83,6 +95,7 @@ def lookup_current_user():
 
 
 from functools import wraps
+
 
 def require_login(f):
     @wraps(f)

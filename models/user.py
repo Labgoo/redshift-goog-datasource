@@ -9,13 +9,15 @@ class User(db.Document):
     openid = db.StringField(required=False)
     username = db.StringField(required=False)
     email = db.StringField(required=False)
+    oauth_token = db.StringField(required=False)
 
     @classmethod
-    def create(cls, username, email, openid):
+    def create(cls, username, email, openid, oauth_token):
         user = User()
         user.username = username
         user.email = email
         user.openid = openid
+        user.oauth_token = oauth_token
         user.save()
 
     @classmethod
@@ -28,6 +30,6 @@ class User(db.Document):
     @classmethod
     def get_by_openid(cls, openid):
         try:
-            return cls.objects.get(openid = openid)
+            return cls.objects.get(openid=openid)
         except:  # TODO: better catch
             return None

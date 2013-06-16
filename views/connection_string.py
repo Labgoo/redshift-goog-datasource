@@ -30,6 +30,8 @@ def delete(name):
 @require_login
 def edit(name=None):
     users = []
+    error_message = None
+
     if request.method == 'GET':
         logging.info('loading connection string %s', name)
         if not name:
@@ -57,13 +59,21 @@ def edit(name=None):
             name = None
 
         if name:
-            ConnectionString.create_or_update(name=name, url=url, headers=headers, editors=editors)
-            return redirect(url_for('.list'))
+            try:
+                ConnectionString.create_or_update(
+                    name=name,
+                    url=url,
+                    headers=headers,
+                    editors=editors)
+                return redirect(url_for('.list'))
+            except ValueError, ex:
+                error_message = ex.message
 
     return render_template('connection_string/create_or_edit.html',
-                           name = name,
-                           headers = headers,
-                           users = users,
-                           url = url,
-                           editors = editors)
+                           name=name,
+                           headers=headers,
+                           users=users,
+                           url=url,
+                           editors=editors,
+                           error=error_message)
 

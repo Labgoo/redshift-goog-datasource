@@ -1,13 +1,15 @@
 # -*- coding: utf-8 -*-
 
 from flask import render_template, request, Blueprint, Response, redirect, url_for, g
-import logging, json
+import logging
+import json
 from models import Query
-from datetime import datetime, timedelta
+from datetime import datetime
 from models import Transformer, ConnectionString, User
 from user import require_login
 
 mod = Blueprint('query', __name__, url_prefix='/query')
+
 
 def query_google_data_source(connection, sql, meta_vars, vars):
     import requests
@@ -20,7 +22,13 @@ def query_google_data_source(connection, sql, meta_vars, vars):
 
     url = url.replace('{query}', query)
 
-    headers = json.loads(connection.headers)
+    headers = {}
+
+    if connection.headers:
+        headers.update(json.loads(connection.headers))
+
+    if g.user and g.user.oauth_token:
+        headers['Authorization'] = 'Token %s' % g.user.oauth_token
 
     r = requests.get(url, headers=headers)
     result = r.json()
@@ -97,6 +105,7 @@ def convert_value(val, type):
         return int(val)
     elif type == 'float':
         return float(val)
+
 
 def vars_with_default_value(meta_vars, vars):
     result = {}
