@@ -3,10 +3,11 @@
 from flask import render_template, request, Blueprint, g, redirect, url_for, flash, session
 import logging, json
 import os
-from flask_openid import OpenID
+from flask_openid import OpenID, AX_MAPPING, ALL_KEYS
 from app import app
 
 from models import User
+from openid.extensions.sreg import data_fields
 
 mod = Blueprint('user', __name__, url_prefix='/user')
 
@@ -40,19 +41,23 @@ def create_profile():
 @mod.route('/login', methods=['GET', 'POST'])
 @oid.loginhandler
 def login():
+    AX_MAPPING['oauth-token'] = ['http://axschema.org/oauth-token']
+    ALL_KEYS.add('oauth-token')
+    data_fields['oauth-token'] = 'OAuth Token'
+
     if g.user is not None:
         return redirect(url_for('homepage.index'))
 
     if request.method == 'POST':
         openid = request.form.get('openid')
         if openid:
-            return oid.try_login(openid, ask_for=['email', 'fullname',
-                                                  'nickname'])
+            return oid.try_login(openid,
+                                 ask_for=['email', 'fullname', 'nickname'], nice_to_have=['oauth-token'])
     else:
         oid_url = os.environ.get('oid_url')
         if oid_url:
             return oid.try_login(oid_url,
-                                 ask_for=['email', 'fullname', 'nickname'])
+                                 ask_for=['email', 'fullname', 'nickname'], nice_to_have=['oauth-token'])
 
     return render_template(
         'users/login.html',
@@ -64,7 +69,7 @@ def create_or_login(resp):
     session['openid'] = resp.identity_url
 
     args = request.args.to_dict()
-    oauth_token = args.get('openid.oauth-token')
+    oauth_token = args.get('openid.sreg.oauth-token')
 
     if oauth_token:
         session['oauth_token'] = oauth_token
