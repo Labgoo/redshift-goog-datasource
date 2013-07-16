@@ -21,7 +21,7 @@ jQuery(function () {
 
     $('.CodeMirror').resizable({
         handles: 's, n',
-        minHeight: 100,
+        minHeight: 200,
         resize: function() {
             editor.setSize($(this).width(), $(this).height());
         }

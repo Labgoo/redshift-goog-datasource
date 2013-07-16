@@ -1,13 +1,15 @@
 # -*- coding: utf-8 -*-
 
 from flask import render_template, request, Blueprint, Response, redirect, url_for, g
-import logging, json
+import logging
+import json
 from models import Query
-from datetime import datetime, timedelta
+from datetime import datetime
 from models import Transformer, ConnectionString, User
 from user import require_login
 
 mod = Blueprint('query', __name__, url_prefix='/query')
+
 
 def query_google_data_source(connection, sql, meta_vars, vars):
     import requests
@@ -20,7 +22,13 @@ def query_google_data_source(connection, sql, meta_vars, vars):
 
     url = url.replace('{query}', query)
 
-    headers = json.loads(connection.headers)
+    headers = {}
+
+    if connection.headers:
+        headers.update(json.loads(connection.headers))
+
+    if g.user and g.user.oauth_token and headers.get('Authorization', None) is None:
+        headers['Authorization'] = 'Token %s' % g.user.oauth_token
 
     r = requests.get(url, headers=headers)
     result = r.json()
@@ -28,7 +36,12 @@ def query_google_data_source(connection, sql, meta_vars, vars):
     if result.get("status") == "error":
         http_error_msgs = []
         for error in result.get("errors", []):
-            http_error_msgs.append(error.get("detailed_message"))
+            msg = error.get("detailed_message")
+
+            if len(msg) == 0:
+                msg = error.get("message")
+
+            http_error_msgs.append(msg)
 
         raise requests.HTTPError("\n".join(http_error_msgs), response=r)
 
@@ -98,6 +111,7 @@ def convert_value(val, type):
     elif type == 'float':
         return float(val)
 
+
 def vars_with_default_value(meta_vars, vars):
     result = {}
     for key, options in meta_vars.iteritems():
@@ -118,6 +132,23 @@ def data_to_datatable(description, data):
 
     return data_table
 
+
+def parse_date_string(val):
+    parts = [int(v) for v in val[len("Date("):-1].split(',')]
+
+    if len(parts) == 3:
+        return datetime(parts[0], parts[1], parts[2])
+
+    if len(parts) == 6:
+        return datetime(parts[0], parts[1], parts[2],
+                        parts[3], parts[4], parts[5])
+
+    if len(parts) == 7:
+        return datetime(parts[0], parts[1], parts[2],
+                        parts[3], parts[4], parts[5],
+                        parts[6])
+
+
 def datatable_to_data(data_table):
     table = data_table.get('table', data_table)
     description = table["cols"]
@@ -127,6 +158,10 @@ def datatable_to_data(data_table):
             r = []
             for i,v in enumerate(row["c"]):
                 val = v["v"] if v else None
+
+                if val.startswith('Date('):
+                    val = parse_date_string(val)
+
                 r.append((description[i]["id"], val))
 
             yield dict(r)
