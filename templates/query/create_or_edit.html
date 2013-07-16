@@ -3,8 +3,8 @@
 {% block head %}
 	<link rel="stylesheet" href="{{ url_for('static', filename='vendor/codemirror/codemirror.css') }}" media="screen"/>
 	<link rel=stylesheet type=text/css href="{{ url_for('static', filename='css/codemirror-custom.css') }}" media="screen">
-	<script src="{{ url_for('static', filename='vendor/codemirror/codemirror.js') }}"></script>
-	<script src="{{ url_for('static', filename='vendor/codemirror/sql.js') }}"></script>
+	<script src="{{ url_for('static', filename='vendor/codemirror/codemirror.js', version='3.14.0') }}"></script>
+	<script src="{{ url_for('static', filename='vendor/codemirror/sql.js', version='3.14.0') }}"></script>
 	<script src="{{ url_for('static', filename='vendor/jquery.sheepItPlugin.js') }}"></script>
 
     <script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.2/jquery-ui.min.js" type="text/javascript" charset="utf-8"></script>
@@ -64,7 +64,7 @@
             {% endif %}
 
 			<div class="controls">
-				<textarea id="sql" name="sql" class="span9" rows="2">{{sql|safe}}</textarea>
+				<textarea id="sql" name="sql" class="span9" rows="10">{{sql|safe}}</textarea>
 
 				<div id="error-dialog" class="alert alert-error" {%if not error %}style="display:none"{%endif%}>
 					<button type="button" class="close" data-dismiss="alert">&times;</button>
