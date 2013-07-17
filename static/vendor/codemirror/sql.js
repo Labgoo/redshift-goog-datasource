@@ -7,6 +7,7 @@ CodeMirror.defineMode("sql", function(config, parserConfig) {
       keywords       = parserConfig.keywords || {},
       operatorChars  = parserConfig.operatorChars || /^[*+\-%<>!=&|~^]/,
       support        = parserConfig.support || {},
+      functions      = parserConfig.functions || {},
       hooks          = parserConfig.hooks || {},
       dateSQL        = parserConfig.dateSQL || {"date" : true, "time" : true, "timestamp" : true};
 
@@ -98,6 +99,7 @@ CodeMirror.defineMode("sql", function(config, parserConfig) {
       if (atoms.hasOwnProperty(word)) return "atom";
       if (builtin.hasOwnProperty(word)) return "builtin";
       if (keywords.hasOwnProperty(word)) return "keyword";
+      if (functions.hasOwnProperty(word)) return "function";
       if (client.hasOwnProperty(word)) return "string-2";
       return null;
     }

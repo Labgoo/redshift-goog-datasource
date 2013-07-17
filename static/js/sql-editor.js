@@ -2,12 +2,7 @@ google.load('visualization', '1', {packages:['table', 'corechart']});
 google.setOnLoadCallback(function() {});
 
 jQuery(function () {
-	var mime = 'text/x-mariadb';
-
-	// get mime type
-	if (window.location.href.indexOf('mime=') > -1) {
-			mime = window.location.href.substr(window.location.href.indexOf('mime=') + 5);
-	}
+	var mime = 'text/x-cooladatasql';
 
 	window.editor = CodeMirror.fromTextArea(document.getElementById('sql'), {
 			mode: mime,
