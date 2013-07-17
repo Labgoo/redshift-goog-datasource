@@ -371,7 +371,7 @@ def edit(name=None):
             if data_table:
                 return Response(data_table.ToJSon(columns_order=columns_order), mimetype='application/json')
             else:
-                return Response('',  mimetype='application/json')
+                return Response(json.dumps({"info": 'No results returned'}), mimetype='application/json')
 
         if is_format_request('json'):
             if error:
