@@ -159,7 +159,7 @@ def datatable_to_data(data_table):
             for i,v in enumerate(row["c"]):
                 val = v["v"] if v else None
 
-                if val.startswith('Date('):
+                if isinstance(val, basestring) and val.startswith('Date('):
                     val = parse_date_string(val)
 
                 r.append((description[i]["id"], val))
