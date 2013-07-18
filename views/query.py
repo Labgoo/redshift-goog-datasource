@@ -270,8 +270,13 @@ def edit(name=None):
             return vars
 
         def get_editors():
-            editors = request.form.get('editors', '').split(',')
-            return User.get_by_username(editors)
+            editors = request.form.getlist('editors')
+            if editors:
+                users = User.get_by_username(editors)
+                return users
+
+            return []
+
 
         meta_vars = extract_meta_var_fields()
 

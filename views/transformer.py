@@ -56,8 +56,13 @@ def edit(name=None):
         editors = transformer.editors
     else:
         def get_editors():
-            editors = request.form.get('editors', '').split(',')
-            return User.get_by_username(editors)
+            editors = request.form.getlist('editors')
+            if editors:
+                users = User.get_by_username(editors)
+                return users
+
+            return []
+
 
         code = request.form['code']
 
