@@ -5,6 +5,7 @@
 	<link rel=stylesheet type=text/css href="{{ url_for('static', filename='css/codemirror-custom.css') }}" media="screen">
 	<script src="{{ url_for('static', filename='vendor/codemirror/codemirror.js', version='3.14.0') }}"></script>
 	<script src="{{ url_for('static', filename='vendor/codemirror/sql.js', version='3.14.0') }}"></script>
+	<script src="{{ url_for('static', filename='vendor/cooladata/sql.js', version='3.14.0') }}"></script>
 	<script src="{{ url_for('static', filename='vendor/jquery.sheepItPlugin.js') }}"></script>
 
     <script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.2/jquery-ui.min.js" type="text/javascript" charset="utf-8"></script>
@@ -13,7 +14,7 @@
     <link rel="stylesheet" type="text/css" href="//ajax.googleapis.com/ajax/libs/jqueryui/1/themes/flick/jquery-ui.css">
 
 	<script src="https://www.google.com/jsapi" type="text/javascript"></script>
-    <script src="{{ url_for('static', filename='js/sql-editor.js', ver=1) }}"></script>
+    <script src="{{ url_for('static', filename='js/sql-editor.js', ver=2) }}"></script>
 {% endblock%}
 
 {% block body %}
@@ -67,8 +68,11 @@
 				<textarea id="sql" name="sql" class="span9" rows="10">{{sql|safe}}</textarea>
 
 				<div id="error-dialog" class="alert alert-error" {%if not error %}style="display:none"{%endif%}>
-					<button type="button" class="close" data-dismiss="alert">&times;</button>
 	  				<span id="error-message">{{error}}</span>
+				</div>
+
+				<div id="info-dialog" class="alert alert-info" {%if not info %}style="display:none"{%endif%}>
+	  				<span id="info-message">{{info}}</span>
 				</div>
 			</div>
 			<div class="controls-row controls" style="float:right">

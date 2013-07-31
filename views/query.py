@@ -137,14 +137,14 @@ def parse_date_string(val):
     parts = [int(v) for v in val[len("Date("):-1].split(',')]
 
     if len(parts) == 3:
-        return datetime(parts[0], parts[1], parts[2])
+        return datetime(parts[0], parts[1]+1, parts[2])
 
     if len(parts) == 6:
-        return datetime(parts[0], parts[1], parts[2],
+        return datetime(parts[0], parts[1]+1, parts[2],
                         parts[3], parts[4], parts[5])
 
     if len(parts) == 7:
-        return datetime(parts[0], parts[1], parts[2],
+        return datetime(parts[0], parts[1]+1, parts[2],
                         parts[3], parts[4], parts[5],
                         parts[6])
 
@@ -159,7 +159,7 @@ def datatable_to_data(data_table):
             for i,v in enumerate(row["c"]):
                 val = v["v"] if v else None
 
-                if val.startswith('Date('):
+                if isinstance(val, basestring) and val.startswith('Date('):
                     val = parse_date_string(val)
 
                 r.append((description[i]["id"], val))
@@ -177,6 +177,7 @@ def datatable_to_data(data_table):
     description = [item for item in convert_description()]
 
     return dict(description), data, columns_order
+
 
 def query_execute_sql(connection, sql, meta_vars, vars):
     description, data, columns_order = query_db(connection, sql, meta_vars, vars)
@@ -270,8 +271,13 @@ def edit(name=None):
             return vars
 
         def get_editors():
-            editors = request.form.get('editors', '').split(',')
-            return User.get_by_username(editors)
+            editors = request.form.getlist('editors')
+            if editors:
+                users = User.get_by_username(editors)
+                return users
+
+            return []
+
 
         meta_vars = extract_meta_var_fields()
 
@@ -371,7 +377,7 @@ def edit(name=None):
             if data_table:
                 return Response(data_table.ToJSon(columns_order=columns_order), mimetype='application/json')
             else:
-                return Response('',  mimetype='application/json')
+                return Response(json.dumps({"info": 'No results returned'}), mimetype='application/json')
 
         if is_format_request('json'):
             if error:

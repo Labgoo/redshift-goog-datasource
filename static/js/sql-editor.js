@@ -2,12 +2,7 @@ google.load('visualization', '1', {packages:['table', 'corechart']});
 google.setOnLoadCallback(function() {});
 
 jQuery(function () {
-	var mime = 'text/x-mariadb';
-
-	// get mime type
-	if (window.location.href.indexOf('mime=') > -1) {
-			mime = window.location.href.substr(window.location.href.indexOf('mime=') + 5);
-	}
+	var mime = 'text/x-cooladatasql';
 
 	window.editor = CodeMirror.fromTextArea(document.getElementById('sql'), {
 			mode: mime,
@@ -134,6 +129,16 @@ jQuery(function () {
         $('#error-dialog').fadeIn();
     }
 
+    function showInfo(info) {
+        drawTable(null);
+        drawPieChart(null);
+        drawAreaChart(null);
+        drawBarCharts(null);
+
+        $('#info-message').text(info);
+        $('#info-dialog').fadeIn();
+    }
+
     $("#sql-execute, #sql-save-execute").click(function() {
     	if (recreateVars) {
 			createVarsFills();
@@ -156,13 +161,18 @@ jQuery(function () {
 
             data.push({ name: this.name, value: this.value });
 
+            $('.alert').fadeOut();
+
             $.ajax({
                 type: $form.attr('method'),
                 url: $form.attr('action') + '?gwiz_json',
                 data: data
             }).done(function(data) {
+
                 if (data && data.error) {
                     showError(data.error);
+                } else if (data && data.info) {
+                    showInfo(data.info);
                 } else {
                     $('#vistabs a:first').tab('show');
 
@@ -170,8 +180,6 @@ jQuery(function () {
                         e.preventDefault();
                         $(this).tab('show');
                     });
-
-                    $('#error-dialog').fadeOut();
 
                     if (data) {
                         var json_data = new google.visualization.DataTable(data, 0.6);
