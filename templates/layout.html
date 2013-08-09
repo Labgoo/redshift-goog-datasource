@@ -37,8 +37,7 @@
                 {% if not g.user %}
                   <li><a href="{{url_for('user.login')}}">Login</a></li>
                 {%else%}
-                  <li><a>Hello {{g.user.username}} ({{g.user.email}})</a></li>
-                  <li><a href="{{url_for('user.logout')}}">Logout</a></li>
+                  <li><a href="{{url_for('user.logout')}}">Logout ({{g.user.email}})</a></li>
                 {%endif%}
               </ul>
       </div>
