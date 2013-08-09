@@ -2,8 +2,8 @@
 <html>
   <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/css/bootstrap-combined.min.css" rel="stylesheet">
-    <link href="//netdna.bootstrapcdn.com/font-awesome/3.1.1/css/font-awesome.min.css" rel="stylesheet">
+    <link href="//netdna.bootstrapcdn.com/bootstrap/3.0.0-rc1/css/bootstrap.min.css" rel="stylesheet">
+    <link href="//netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.min.css" rel="stylesheet">
     <link rel=stylesheet type=text/css href="{{ url_for('static', filename='css/bootstrap-custom.css') }}" media="screen">
 
     {% if env_favico %}
@@ -12,48 +12,47 @@
     <link rel="icon" type="image/png" href="{{ url_for('static', filename='img/generic_favico.png') }}">
     {% endif %}
 
-	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
-    <script src="//code.jquery.com/jquery-migrate-1.2.0.js"></script>
-    <script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js"></script>
-
-    <script src="{{ url_for('static', filename='js/bootstrap.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/bootstrap-modal.js') }}"></script>
-
     {% block head %}{% endblock %}
   </head>
   <body>
     <div class="navbar">
       <div class="navbar-inner">
-         <div class="container">
             {% if env_logo %}
                 <a href="http://www.cooladata.com/">
                 <img id="logo" src="{{ env_logo }}">
                 </a>
             {% endif %}
 
-        <a class="brand" href="#">Cooladata SQL Query Tool</a>
-          <ul class="nav">
-            <li {% if request.blueprint=='homepage'%}class="active"{%endif%}><a href="{{url_for('homepage.index')}}">Home</a></li>
-            <li {% if request.blueprint=='query'%}class="active"{%endif%}><a href="{{url_for('query.list')}}">Queries</a></li>
-            <li {% if request.blueprint=='transformer'%}class="active"{%endif%}><a href="{{url_for('transformer.list')}}">Transformers</a></li>
-            <li {% if request.blueprint=='connection_string'%}class="active"{%endif%}><a href="{{url_for('connection_string.list')}}">Connections</a></li>
-            {% if not env_disable_oauth_clients %}
-                <li {% if request.blueprint=='oauthclient'%}class="active"{%endif%}><a href="{{url_for('oauthclient.list')}}">OAuth Clients</a></li>
-            {% endif %}
-          </ul>
-          <ul class="nav pull-right">
-            {% if not g.user %}
-              <li><a href="{{url_for('user.login')}}">Login</a></li>
-            {%else%}
-              <li><a>Hello {{g.user.username}} ({{g.user.email}})</a></li>
-              <li><a href="{{url_for('user.logout')}}">Logout</a></li>
-            {%endif%}
-          </ul>
-        </div>
+            <a class="navbar-brand" href="#">SQL Query Tool</a>
+            <ul class="nav navbar-nav">
+                <li {% if request.blueprint=='homepage'%}class="active"{%endif%}><a href="{{url_for('homepage.index')}}">Home</a></li>
+                <li {% if request.blueprint=='query'%}class="active"{%endif%}><a href="{{url_for('query.list_items')}}">Queries</a></li>
+                <li {% if request.blueprint=='transformer'%}class="active"{%endif%}><a href="{{url_for('transformer.list')}}">Transformers</a></li>
+                <li {% if request.blueprint=='connection_string'%}class="active"{%endif%}><a href="{{url_for('connection_string.list')}}">Connections</a></li>
+                {% if not env_disable_oauth_clients %}
+                    <li {% if request.blueprint=='oauthclient'%}class="active"{%endif%}><a href="{{url_for('oauthclient.list')}}">OAuth Clients</a></li>
+                {% endif %}
+              </ul>
+              <ul class="nav navbar-nav pull-right">
+                {% if not g.user %}
+                  <li><a href="{{url_for('user.login')}}">Login</a></li>
+                {%else%}
+                  <li><a>Hello {{g.user.username}} ({{g.user.email}})</a></li>
+                  <li><a href="{{url_for('user.logout')}}">Logout</a></li>
+                {%endif%}
+              </ul>
       </div>
     </div>
-    <div class="span12 offset1">
+    <div class="col-lg-10 col-offset-1">
         {% block body %}{% endblock %}
     </div>
+
+	<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+    <script src="//code.jquery.com/jquery-migrate-1.2.0.js"></script>
+    <script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js"></script>
+
+    <script src="//netdna.bootstrapcdn.com/bootstrap/3.0.0-rc1/js/bootstrap.js"></script>
+
+    {% block postbody %}{% endblock %}
   </body>
 </html>

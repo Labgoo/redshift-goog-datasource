@@ -7,10 +7,10 @@
     <form method="post" action="{% if name %}{{url_for('.user_home', name=name) }}{%else%}{{ url_for('.create_user') }}{%endif%}">
         <fieldset>
             <div class="controls controls-row">
-                <input class="span9 input-xxlarge" type="text" id="name" name="name" value="{{name}}" placeholder="User Name" maxlength="100" />
+                <input class="col-lg-9 input-xxlarge" type="text" id="name" name="name" value="{{name}}" placeholder="User Name" maxlength="100" />
             </div>
             <div class="controls">
-                <input id="code" name="code" class="span9" rows="5">{{code|safe}}</textarea>
+                <input id="code" name="code" class="col-lg-9" rows="5">{{code|safe}}</textarea>
             </div>
             <div class="controls controls-row">
                 <input type="submit" class="btn btn-primary btn-xxlarge pull-right" value="Save"/>

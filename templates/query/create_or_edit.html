@@ -1,161 +1,223 @@
 {% extends "layout.html" %}
 
 {% block head %}
-	<link rel="stylesheet" href="{{ url_for('static', filename='vendor/codemirror/codemirror.css') }}" media="screen"/>
-	<link rel=stylesheet type=text/css href="{{ url_for('static', filename='css/codemirror-custom.css') }}" media="screen">
-	<script src="{{ url_for('static', filename='vendor/codemirror/codemirror.js', version='3.14.0') }}"></script>
-	<script src="{{ url_for('static', filename='vendor/codemirror/sql.js', version='3.14.0') }}"></script>
-	<script src="{{ url_for('static', filename='vendor/cooladata/sql.js', version='3.14.0') }}"></script>
-	<script src="{{ url_for('static', filename='vendor/jquery.sheepItPlugin.js') }}"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='vendor/codemirror/codemirror.css') }}" media="screen"/>
+    <link rel=stylesheet type=text/css href="{{ url_for('static', filename='css/codemirror-custom.css') }}"
+          media="screen">
+    <link rel=stylesheet type=text/css href="{{ url_for('static', filename='css/tables.css', ver=3) }}"
+          media="screen">
 
-    <script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.2/jquery-ui.min.js" type="text/javascript" charset="utf-8"></script>
-    <script src="{{ url_for('static', filename='vendor/tag-it/js/tag-it.js') }}" type="text/javascript" charset="utf-8"></script>
-    <link rel="stylesheet" href="{{ url_for('static', filename='vendor/tag-it/css/jquery.tagit.css') }}" type="text/css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='vendor/tag-it/css/jquery.tagit.css') }}"
+          type="text/css">
     <link rel="stylesheet" type="text/css" href="//ajax.googleapis.com/ajax/libs/jqueryui/1/themes/flick/jquery-ui.css">
 
-	<script src="https://www.google.com/jsapi" type="text/javascript"></script>
-    <script src="{{ url_for('static', filename='js/sql-editor.js', ver=2) }}"></script>
-{% endblock%}
+{% endblock %}
 
 {% block body %}
+    <div class="container">
+        <div class="row">
+            <form id="sheepItForm" method="post" {% if not name %}data-new-query="1"{% endif %}
+                  action="{% if name %}{{ url_for('.edit', name=name) }}{% else %}{{ url_for('.new') }}{% endif %}">
+                <fieldset>
+                    <legend>{% if name %}Edit{% else %}Create{% endif %} a Query</legend>
+                    <div class="col-lg-9">
+                        <div class="form-group">
+                            <input class="form-control" type="text" id="query-name" name="query-name" value="{{ name }}"
+                                   {% if name %}readonly="readonly"{% else %}
+                                   placeholder="Enter a title for your query"{% endif %} maxlength="100"/>
+                        </div>
 
-    <div class="span9">
-    <h1>{% if name %}Edit{% else %}Create{% endif  %} a Query</h1>
-	<form id="sheepItForm" method="post" {% if not name %}data-new-query="1"{% endif %} action="{% if name %}{{url_for('.edit', name=name) }}{%else%}{{ url_for('.new') }}{%endif%}">
-		<fieldset>
-			<div class="controls controls-row">
-				<input class="span9 input-xxlarge" type="text" id="query-name" name="query-name" value="{{name}}" {% if name %}readonly="readonly"{% else %} placeholder="Enter a title for your query"{% endif %} maxlength="100" />
-			</div>
-
-            {% for current_connection in connections %}
-                {% if loop.first %}
-                    <div class="controls controls-row">
-					    <select id="connection_strings" class="span9 input-xxlarge" type="select" name="connection-string">
-                            <option></option>
-                {% endif %}
-                            <option {% if connection.pk == current_connection.pk %}selected="selected"{% endif %}>{{ current_connection.name }}</option>
-                {% if loop.last %}
-				        </select>
-                    </div>
-                {% endif %}
-            {% else %}
-                <div class="alert">
-                    You need to <a href="{{url_for('connection_string.new')}}">create a connection</a> to the database.
-                </div>
-            {% endfor %}
-
-            {% if not env_disable_access_token %}
-                {% if access_token %}
-                    <div class="controls controls-row">
-                        <label for="access-token" class="control-label">Access Token</label>
-                        <input class="span9 input-xxlarge" type="text" id="access-token" readonly="readonly" value="{{access_token}}" />
-                    </div>
-                {% endif %}
-            {% endif %}
-
-            {% if not env_disable_editors %}
-                <div class="controls controls-row">
-                    <label for="editors" class="control-label">Editors</label>
-                    <ul id="editors">
-                        {% for editor in editors %}
-                            <li>{{ editor.email }}</li>
+                        {% for current_connection in connections %}
+                            {% if loop.first %}
+                                <div class="form-group">
+                                <select id="connection_strings" class="form-control" type="select"
+                                        name="connection-string">
+                                <option></option>
+                            {% endif %}
+                        <option {% if connection.pk == current_connection.pk %}selected="selected"{% endif %}>{{ current_connection.name }}</option>
+                        {% if loop.last %}
+                            </select>
+                            </div>
+                        {% endif %}
+                        {% else %}
+                            <div class="alert">
+                                You need to <a href="{{ url_for('connection_string.new') }}">create a connection</a> to
+                                the
+                                database.
+                            </div>
                         {% endfor %}
-                    </ul>
-                </div>
-            {% endif %}
 
-			<div class="controls">
-				<textarea id="sql" name="sql" class="span9" rows="10">{{sql|safe}}</textarea>
+                        {% if not env_disable_access_token %}
+                            {% if access_token %}
+                                <div class="form-group">
+                                    <label for="access-token">Access Token</label>
+                                    <input class="form-control" type="text" id="access-token" readonly="readonly"
+                                           value="{{ access_token }}"/>
+                                </div>
+                            {% endif %}
+                        {% endif %}
 
-				<div id="error-dialog" class="alert alert-error" {%if not error %}style="display:none"{%endif%}>
-	  				<span id="error-message">{{error}}</span>
-				</div>
+                        {% if not env_disable_editors %}
+                            <div class="form-group">
+                                <label for="editors">Editors</label>
+                                <ul id="editors">
+                                    {% for editor in editors %}
+                                        <li>{{ editor.email }}</li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        {% endif %}
 
-				<div id="info-dialog" class="alert alert-info" {%if not info %}style="display:none"{%endif%}>
-	  				<span id="info-message">{{info}}</span>
-				</div>
-			</div>
-			<div class="controls-row controls" style="float:right">
-				<div class="btn-group">
-					<input id="sql-save-execute" type="submit" name="user-action" class="btn btn-xxlarge pull-right {%if not name %}disabled{%endif%}" value="Save" />
-				</div>
-				<div class="btn-group">
-					<button id="sql-execute" type="submit" name="user-action" class="btn btn-primary btn-xxlarge pull-right">
-                        <i id="execute-spinner"></i> Execute
-					</button>
-				</div>
-			</div> 
-			<br class="clearfix" />
-            {% if not env_disable_query_vars %}
-                <div id="vars">
-                    {%for name,value in vars%}
-                        <div class="control-group">
-                            <label class="control-label" id="dynfield-label{{loop.index0}}" for="dynfield{{loop.index0}}">{{name}}</label>
-                            <div class="controls">
-                                <input class="input-xlarge" type="text" name="{{name}}" {%if not value is none%}value="{{value}}"{%endif%} id="dynfield{{loop.index0}}">
+                        <div class="form-group">
+                            <textarea id="sql" name="sql" class="form-control" rows="10">{{ sql|safe }}</textarea>
+
+                            <div id="error-dialog" class="alert alert-error"
+                                 {% if not error %}style="display:none"{% endif %}>
+                                <span id="error-message">{{ error }}</span>
+                            </div>
+
+                            <div id="info-dialog" class="alert alert-info"
+                                 {% if not info %}style="display:none"{% endif %}>
+                                <span id="info-message">{{ info }}</span>
                             </div>
                         </div>
-                    {%endfor%}
-                </div>
-            {% endif %}
-			{% macro addVariableSection(prefix, index=None, name=None, options=None) -%}
-				<div id="sheepItForm_template{%if not index is none%}{{index}}{%endif%}" class="controls-row controls {%if not index is none%}cloned-input{%endif%}" {%if not index is none%}idtemplate="sheepItForm_template"{%endif%}>
-						<input id="sheepItForm_{{prefix}}_name" data-var-index="{{prefix}}" class="span2 var-name" type="text" name="var-name{{prefix}}" placeholder="Varibale name" maxlength="10" value="{%if name%}{{name}}{%else%}Variable{{prefix}}{%endif%}" {%if not index is none%}idtemplate="sheepItForm_%23index%23_name" nametemplate="var-name%23index%23"{%endif%} />
-						<select id="sheepItForm_{{prefix}}_type" class="span2" type="select" name="var-type{{prefix}}" {%if not index is none%}idtemplate="sheepItForm_%23index%23_type" nametemplate="var-type%23index%23"{%endif%}>
-								<option {% if options.type == "string" %}selected="selected"{% endif %}>string</option>
-								<option {% if options.type == "integer" %}selected="selected"{% endif %}>integer</option>
-								<option {% if options.type == "float" %}selected="selected"{% endif %}>float</option>
-						</select>
-						<input id="sheepItForm_{{prefix}}_default" class="span2" type="text" name="var-default{{prefix}}" placeholder="Default value" value="{{options.default}}" {%if not index is none%}idtemplate="sheepItForm_%23index%23_default" nametemplate="var-default%23index%23"{%endif%} />
-						<div class="span2">
-							<a href="#" style="float:left" class="sheepItForm_remove_current delete-variable btn btn-danger btn-small"><i class="icon-white icon-trash"></i> 	Delete</a>
-						</div>
-				</div>
-			{%- endmacro %}
+                        <div class="pull-right">
+                            <input id="sql-save-execute" type="submit" name="user-action"
+                                   class="btn btn-lg  {% if not name %}disabled{% endif %}" value="Save"/>
+                            <button id="sql-execute" type="submit" name="user-action"
+                                    class="btn btn-default btn-primary btn-lg">
+                                <i id="execute-spinner"></i> Execute
+                            </button>
+                        </div>
 
-			<div class="mine">
-            {% if not env_disable_query_vars %}
-                {{ addVariableSection('#index#') }}
-                </div>
-                <!-- No forms template -->
-                {%for name,options in meta_vars%}
-                    {{ addVariableSection(loop.index0, loop.index0, name, options) }}
-                {%endfor%}
+                        <div class="form-group pull-left">
+                            <button id="sheepItForm_add" class="btn">Add Variable</button>
+                        </div>
+                        <div class="clearfix"></div>
+                        <div id="sheepItForm_noforms_template" {% if vars %}class="hide"{% endif %}>No variables
+                            defined
+                        </div>
+                        <!-- /No forms template-->
 
-                <div id="sheepItForm_noforms_template" {%if vars %}class="hide"{%endif%}>No variables defined</div>
-                <!-- /No forms template-->
 
-                <div class="controls controls-row">
-                        <input  id="sheepItForm_add" type="button" class="btn pull-left" value="Add Varibale" />
-                </div>
-            {% endif %}
-		</fieldset>
-	</form>
+                        {% if not env_disable_query_vars %}
+                            <div id="vars">
+                                {% for name,value in vars %}
+                                    <div class="form-group">
+                                        <label id="dynfield-label{{ loop.index0 }}"
+                                               for="dynfield{{ loop.index0 }}">{{ name }}</label>
+                                        <input class="form-control" type="text" name="{{ name }}"
+                                               {% if not value is none %}value="{{ value }}"{% endif %}
+                                               id="dynfield{{ loop.index0 }}">
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                        {% macro addVariableSection(prefix, index=None, name=None, options=None) -%}
+
+                            <div id="sheepItForm_template{% if not index is none %}{{ index }}{% endif %}"
+                                 class="{% if not index is none %}cloned-input{% endif %} row form-inline form-group"
+                                 {% if not index is none %}idtemplate="sheepItForm_template"{% endif %}>
+                                <div class="col-lg-2">
+                                    <input id="sheepItForm_{{ prefix }}_name" data-var-index="{{ prefix }}"
+                                           class="col-lg-2 form-control var-name" type="text"
+                                           name="var-name{{ prefix }}"
+                                           placeholder="Varibale name" maxlength="10"
+                                           value="{% if name %}{{ name }}{% else %}Variable{{ prefix }}{% endif %}"
+                                           {% if not index is none %}idtemplate="sheepItForm_%23index%23_name"
+                                           nametemplate="var-name%23index%23"{% endif %}/>
+                                </div>
+                                <div class="col-lg-2">
+                                    <select id="sheepItForm_{{ prefix }}_type" class="col-lg-2 form-control"
+                                            type="select"
+                                            name="var-type{{ prefix }}"
+                                            {% if not index is none %}idtemplate="sheepItForm_%23index%23_type"
+                                            nametemplate="var-type%23index%23"{% endif %}>
+                                        <option {% if options.type == "string" %}selected="selected"{% endif %}>string
+                                        </option>
+                                        <option {% if options.type == "integer" %}selected="selected"{% endif %}>integer
+                                        </option>
+                                        <option {% if options.type == "float" %}selected="selected"{% endif %}>float
+                                        </option>
+                                    </select>
+                                </div>
+                                <div class="col-lg-2">
+                                    <input id="sheepItForm_{{ prefix }}_default" class="form-control" type="text"
+                                           name="var-default{{ prefix }}" placeholder="Default value"
+                                           value="{{ options.default }}"
+                                           {% if not index is none %}idtemplate="sheepItForm_%23index%23_default"
+                                           nametemplate="var-default%23index%23"{% endif %}/>
+                                </div>
+                                <div class="span2">
+                                    <a href="#" style="float:left"
+                                       class="sheepItForm_remove_current delete-variable btn btn-danger btn-small"><i
+                                            class="icon-white icon-trash"></i> Delete</a>
+                                </div>
+                            </div>
+                            <div class="clearfix"></div>
+
+                        {%- endmacro %}
+
+                        <div class="mine">
+                            {% if not env_disable_query_vars %}
+                                {{ addVariableSection('#index#') }}
+                                </div>
+                                <!-- No forms template -->
+                                {% for name,options in meta_vars %}
+                                    {{ addVariableSection(loop.index0, loop.index0, name, options) }}
+                                {% endfor %}
+
+                            {% endif %}
+                        <div>
+                </fieldset>
+            </form>
+        </div>
+        <div class="clearfix"></div>
     </div>
-    <div class="span12">
-        {% if not env_disable_editors %}
-            <script type="text/javascript">
-                $(function () {
-                    $("#editors").tagit({
-                            fieldName: "editors",
-                            allowSpaces: true
-                    });
-                });
-            </script>
-        {% endif %}
+        <div class="row" style="margin-top:20px">
+            <div style="overflow: scroll">
+                <ul id="vistabs" style="display:none" class="nav nav-tabs">
+                    <li><a href="#table" data-toggle="tab">Table</a></li>
+                    <li><a href="#piechart" data-toggle="tab">Piechart</a></li>
+                    <li><a href="#areachart" data-toggle="tab">Area Charts</a></li>
+                    <li><a href="#barcharts" data-toggle="tab">Bar Charts</a></li>
+                </ul>
 
-        <ul id="vistabs" style="display:none" class="nav nav-tabs">
-            <li><a href="#table" data-toggle="tab">Table</a></li>
-            <li><a href="#piechart" data-toggle="tab">Piechart</a></li>
-            <li><a href="#areachart" data-toggle="tab">Area Charts</a></li>
-            <li><a href="#barcharts" data-toggle="tab">Bar Charts</a></li>
-        </ul>
-
-        <div class="tab-content">
-            <div class="tab-pane active" id="table"></div>
-            <div class="tab-pane" id="piechart"></div>
-            <div class="tab-pane" id="areachart"></div>
-            <div class="tab-pane" id="barcharts"></div>
+                <div class="tab-content">
+                    <div class="tab-pane active" id="table"></div>
+                    <div class="tab-pane" id="piechart"></div>
+                    <div class="tab-pane" id="areachart"></div>
+                    <div class="tab-pane" id="barcharts"></div>
+                </div>
+            </div>
         </div>
     </div>
+{% endblock %}
+
+{% block postbody %}
+    {% if not env_disable_editors %}
+        <script type="text/javascript">
+            $(function () {
+                $("#editors").tagit({
+                    fieldName: "editors",
+                    allowSpaces: true
+                });
+            });
+        </script>
+    {% endif %}
+
+    <script src="{{ url_for('static', filename='vendor/codemirror/codemirror.js', version='3.14.0') }}"></script>
+    <script src="{{ url_for('static', filename='vendor/codemirror/sql.js', version='3.14.0') }}"></script>
+    <script src="{{ url_for('static', filename='vendor/cooladata/sql.js', version='3.14.0') }}"></script>
+
+    <script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.2/jquery-ui.min.js"></script>
+    <script src="//ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.4/jquery.dataTables.min.js"></script>
+    <script src="{{ url_for('static', filename='vendor/tag-it/js/tag-it.js') }}" type="text/javascript"
+            charset="utf-8"></script>
+
+    <script src="https://www.google.com/jsapi" type="text/javascript"></script>
+
+    <script src="{{ url_for('static', filename='vendor/jquery.sheepItPlugin.js') }}"></script>
+
+    <script src="{{ url_for('static', filename='js/sql-editor.js', ver=14) }}"></script>
 {% endblock %}

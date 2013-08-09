@@ -8,31 +8,31 @@
         <fieldset>
             {% if client.pk %}
                 <label class="control-label" for="client-id">Client Id</label>
-                <input class="span9 input-xxlarge" type="text" id="client-id" name="client-id" value="{{client.pk}}" readonly="readonly" maxlength="100" />
+                <input class="col-lg-9 input-xxlarge" type="text" id="client-id" name="client-id" value="{{client.pk}}" readonly="readonly" maxlength="100" />
             {% endif %}
             {% if client.client_secret %}
                 <label class="control-label" for="client-secret">Client Secret</label>
-                <input class="span9 input-xxlarge" type="text" id="client-secret" name="client-secret" value="{{client.client_secret}}" readonly="readonly" maxlength="100" />
+                <input class="col-lg-9 input-xxlarge" type="text" id="client-secret" name="client-secret" value="{{client.client_secret}}" readonly="readonly" maxlength="100" />
             {% endif %}
             <div class="controls controls-row">
                 <label class="control-label" for="name">Name</label>
-                <input class="span9 input-xxlarge" type="text" id="name" name="name" value="{{client.name}}" placeholder="Name" maxlength="100" />
+                <input class="col-lg-9 input-xxlarge" type="text" id="name" name="name" value="{{client.name}}" placeholder="Name" maxlength="100" />
             </div>
             <div class="controls controls-row">
                 <label class="control-label" for="description">Description</label>
-                <textarea class="span9 input-xxlarge" rows="5" id="description" name="description">{{ client.description }}</textarea>
+                <textarea class="col-lg-9 input-xxlarge" rows="5" id="description" name="description">{{ client.description }}</textarea>
             </div>
             <div class="controls controls-row">
                 <label class="control-label" for="domain">OAuth Domain</label>
-                <input class="span9 input-xxlarge" type="text" id="domain" name="domain" value="{{client.domain}}" />
+                <input class="col-lg-9 input-xxlarge" type="text" id="domain" name="domain" value="{{client.domain}}" />
             </div>
             <div class="controls controls-row">
                 <label class="control-label"for="website">Application Website</label>
-                <input class="span9 input-xxlarge" type="text" id="website" name="website" value="{{client.website}}" />
+                <input class="col-lg-9 input-xxlarge" type="text" id="website" name="website" value="{{client.website}}" />
             </div>
             <div class="controls controls-row">
                 <label class="control-label" for="icon">Application Icon</label>
-                <input class="span9 input-xxlarge" type="text" id="icon" name="icon" value="{{client.icon}}" />
+                <input class="col-lg-9 input-xxlarge" type="text" id="icon" name="icon" value="{{client.icon}}" />
             </div>
             <div class="controls controls-row">
                 <input type="submit" class="btn btn-primary btn-xxlarge pull-right" value="{% if client.name %}Update Your Application{% else %}Register Your Application{% endif %}"/>
