@@ -37,9 +37,6 @@
                     <button data-href="{{url_for('.delete', name=query.name) }}" type="button" data-toggle="modal" data-target="#modal-from-dom" class="confirm-delete btn btn-danger btn-small">
                         <i class="icon-white icon-trash"></i>&nbsp;Delete
                     </button>
-                    <button type="button" data-href="{{url_for('.edit', name=query.name) }}" class="btn btn-small">
-                        <i class="icon-edit"></i>&nbsp;Edit
-                    </button>
                 </li>
             {% else%}
                 No query created.

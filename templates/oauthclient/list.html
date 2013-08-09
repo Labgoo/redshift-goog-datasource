@@ -15,9 +15,6 @@
                     <a href="{{url_for('.delete', name=client.name) }}" class="btn btn-danger btn-small">
                         <i class="icon-white icon-trash"></i>Delete
                     </a>
-                    <a href="{{url_for('.edit', name=client.name) }}" class="btn btn-small">
-                        <i class="icon-edit"></i>Edit
-                    </a>
                 </li>
             {%endfor%}
         </ul>
