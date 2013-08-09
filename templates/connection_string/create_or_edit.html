@@ -1,60 +1,52 @@
 {% extends "layout.html" %}
 
 {% block head %}
-    <script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.2/jquery-ui.min.js" type="text/javascript" charset="utf-8"></script>
-    <script src="{{ url_for('static', filename='vendor/tag-it/js/tag-it.js') }}" type="text/javascript" charset="utf-8"></script>
-    <link rel="stylesheet" href="{{ url_for('static', filename='vendor/tag-it/css/jquery.tagit.css') }}" type="text/css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='vendor/tag-it/css/jquery.tagit.css') }}"
+          type="text/css">
     <link rel="stylesheet" type="text/css" href="//ajax.googleapis.com/ajax/libs/jqueryui/1/themes/flick/jquery-ui.css">
-{% endblock%}
+{% endblock %}
 
 {% block body %}
-    <div class="span9">
-    <form method="post" action="{% if name %}{{url_for('.edit', name=name) }}{%else%}{{ url_for('.new') }}{%endif%}">
+    <form method="post"
+          action="{% if name %}{{ url_for('.edit', name=name) }}{% else %}{{ url_for('.new') }}{% endif %}">
         {% if error %}
             <div id="error-dialog" class="alert alert-error">
-			    <button type="button" class="close" data-dismiss="alert">&times;</button>
-	  			<span id="error-message">{{ error }}</span>
-			</div>
+                <button type="button" class="close" data-dismiss="alert">&times;</button>
+                <span id="error-message">{{ error }}</span>
+            </div>
         {% endif %}
         <fieldset>
-            <div class="controls controls-row">
-                <label for="name" class="control-label">Name</label>
-                <input class="span9 input-xxlarge" type="text" id="name" name="name" value="{{name}}"  {% if name %}readonly="readonly"{% endif %} placeholder="Name" maxlength="100" />
-            </div>
-            <div class="controls controls-row">
-                <label for="url" class="control-label">Url</label>
-                <input class="span9 input-xxlarge" type="text" id="url" name="url" value="{{url}}" />
-            </div>
-            {% if not env_disable_editors %}
-                <div class="controls controls-row">
-                    <label for="editors" class="control-label">Editors</label>
-                    <ul id="editors">
-                        {% for editor in editors %}
-                            <li>{{ editor.email }}</li>
-                        {% endfor %}
-                    </ul>
+            <legend>Create a Connection</legend>
+            <div class="col-lg-9">
+                <div class="form-group">
+                    <label for="name" class="control-label">Name</label>
+                    <input class="form-control" type="text" id="name" name="name" value="{{ name }}"
+                           {% if name %}readonly="readonly"{% endif %} placeholder="Name" maxlength="100"/>
                 </div>
-            {% endif %}
-            <div class="controls controls-row">
-                <label for="headers" class="control-label">Headers</label>
-                <textarea class="span9 input-xxlarge" id="headers" name="headers">{{ headers }}</textarea>
-            </div>
-            <div class="controls controls-row">
-                <input type="submit" class="btn btn-primary btn-xxlarge pull-right" value="Save"/>
+                <div class="form-group">
+                    <label for="url" class="control-label">Url</label>
+                    <input class="form-control" type="text" id="url" name="url" value="{{ url }}"/>
+                </div>
+                {% if not env_disable_editors %}
+                    <div class="form-group">
+                        <label for="editors" class="control-label">Editors</label>
+                        <ul id="editors">
+                            {% for editor in editors %}
+                                <li>{{ editor.email }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                {% endif %}
+                <div class="form-group">
+                    <label for="headers" class="control-label">Headers</label>
+                    <textarea class="form-control" id="headers" name="headers">{{ headers }}</textarea>
+                </div>
+                <div class="form-group">
+                    <input type="submit" class="btn btn-primary btn-xxlarge pull-right" value="Save"/>
+                </div>
             </div>
         </fieldset>
     </form>
-
-    {% if not env_disable_editors %}
-         <script type="text/javascript">
-            $(function () {
-                $("#editors").tagit({
-                        fieldName: "editors",
-                        allowSpaces: true
-                });
-            });
-        </script>
-    {% endif %}
 
     {% if not env_disable_connections_help %}
         <div class="alert alert-info">
@@ -93,5 +85,22 @@
             mssql+pyodbc://mydsn<br>
         </div>
     {% endif %}
-    </div>
+{% endblock %}
+
+{% block postbody %}
+    <script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.2/jquery-ui.min.js" type="text/javascript"
+        charset="utf-8"></script>
+    <script src="{{ url_for('static', filename='vendor/tag-it/js/tag-it.js') }}" type="text/javascript"
+        charset="utf-8"></script>
+
+    {% if not env_disable_editors %}
+        <script type="text/javascript">
+            $(function () {
+                $("#editors").tagit({
+                    fieldName: "editors",
+                    allowSpaces: true
+                });
+            });
+        </script>
+    {% endif %}
 {% endblock %}

@@ -1,54 +1,65 @@
 {% extends "layout.html" %}
 
 {% block head %}
-	<script src="{{ url_for('static', filename='vendor/codemirror/codemirror.js') }}"></script>
-	<link rel="stylesheet" href="{{ url_for('static', filename='vendor/codemirror/codemirror.css') }}" media="screen"/>
-	<link rel=stylesheet type=text/css href="{{ url_for('static', filename='css/codemirror-custom.css') }}" media="screen">
-	<script src="{{ url_for('static', filename='js/transformer-editor.js') }}"></script>
-
-    <script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.2/jquery-ui.min.js" type="text/javascript" charset="utf-8"></script>
-    <script src="{{ url_for('static', filename='vendor/tag-it/js/tag-it.js') }}" type="text/javascript" charset="utf-8"></script>
-    <link rel="stylesheet" href="{{ url_for('static', filename='vendor/tag-it/css/jquery.tagit.css') }}" type="text/css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='vendor/codemirror/codemirror.css') }}" media="screen"/>
+    <link rel=stylesheet type=text/css href="{{ url_for('static', filename='css/codemirror-custom.css') }}"
+          media="screen">
+    <link rel="stylesheet" href="{{ url_for('static', filename='vendor/tag-it/css/jquery.tagit.css') }}"
+          type="text/css">
     <link rel="stylesheet" type="text/css" href="//ajax.googleapis.com/ajax/libs/jqueryui/1/themes/flick/jquery-ui.css">
-{% endblock%}
+{% endblock %}
 
 {% block body %}
-    <div class="span9">
-	<h1>Create a Transformer</h1>
-	<form method="post" action="{% if name %}{{url_for('.edit', name=name) }}{%else%}{{ url_for('.new') }}{%endif%}">
-		<fieldset>
-			<div class="controls controls-row">
-				<input class="span9 input-xxlarge" type="text" id="title" name="name" value="{{name}}" placeholder="Enter a title for your transformer" maxlength="100" />
-			</div>
-
-            {% if not env_disable_editors %}
-                <div class="controls controls-row">
-                    <label for="editors" class="control-label">Editors</label>
-                    <ul id="editors">
-                        {% for editor in editors %}
-                            <li>{{ editor.email }}</li>
-                        {% endfor %}
-                    </ul>
+    <form method="post" class="horizontal-form"
+          action="{% if name %}{{ url_for('.edit', name=name) }}{% else %}{{ url_for('.new') }}{% endif %}">
+        <fieldset>
+            <legend>Create a Transformer</legend>
+            <div class="col-lg-9">
+                <div class="form-group">
+                    <input class="form-control" type="text" id="title" name="name" value="{{ name }}"
+                           placeholder="Enter a title for your transformer" maxlength="100"/>
                 </div>
-            {% endif %}
 
-			<div class="controls">
-				<textarea id="code" name="code" class="span9">{{code|safe}}</textarea>
-			</div>
-			<div class="controls controls-row">
-				<input type="submit" class="btn btn-primary btn-xxlarge pull-right" value="Save"/>
-			</div>
-		</fieldset>
-	</form>
+                {% if not env_disable_editors %}
+                    <div class="form-group">
+                        <label for="editors">Editors</label>
+                        <ul id="editors">
+                            {% for editor in editors %}
+                                <li>{{ editor.email }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                {% endif %}
+
+                <div class="form-group">
+                    <textarea id="code" name="code" class="form-control" >{{ code|safe }}</textarea>
+                </div>
+                <div class="form-group">
+                    <input type="submit" class="btn btn-primary btn-xxlarge pull-right" value="Save" class="form-control" />
+                </div>
+            </div>
+        </fieldset>
+    </form>
+{% endblock %}
+
+{% block postbody %}
+    <script src="{{ url_for('static', filename='vendor/codemirror/codemirror.js') }}"></script>
+
+    <script src="{{ url_for('static', filename='js/transformer-editor.js') }}"></script>
+
+    <script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.2/jquery-ui.min.js" type="text/javascript"
+            charset="utf-8"></script>
+    <script src="{{ url_for('static', filename='vendor/tag-it/js/tag-it.js') }}" type="text/javascript"
+            charset="utf-8"></script>
+
     {% if not env_disable_editors %}
         <script type="text/javascript">
             $(function () {
                 $("#editors").tagit({
-                        fieldName: "editors",
-                        allowSpaces: true
+                    fieldName: "editors",
+                    allowSpaces: true
                 });
             });
         </script>
     {% endif %}
-    </div>
 {% endblock %}

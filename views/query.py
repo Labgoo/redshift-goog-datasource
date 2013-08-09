@@ -11,14 +11,14 @@ from user import require_login
 mod = Blueprint('query', __name__, url_prefix='/query')
 
 
-def query_google_data_source(connection, sql, meta_vars, vars):
+def query_google_data_source(connection, sql, meta_vars, query_vars):
     import requests
 
     url = connection.url
     if url.startswith('google://'):
         url = connection.url[len('google://'):]
 
-    query = build_sql_query(sql, meta_vars, vars)
+    query = build_sql_query(sql, meta_vars, query_vars)
 
     url = url.replace('{query}', query)
 
@@ -49,24 +49,26 @@ def query_google_data_source(connection, sql, meta_vars, vars):
 
     return datatable_to_data(result)
 
-def build_sql_query(query, meta_vars, vars):
+
+def build_sql_query(query, meta_vars, query_vars):
     meta_vars = dict(meta_vars)
-    vars = dict(vars)
+    query_vars = dict(query_vars)
 
-    vars = vars_with_default_value(meta_vars, vars)
+    query_vars = vars_with_default_value(meta_vars, query_vars)
 
-    logging.info('execute query %s %s %s', query, vars, meta_vars)
+    logging.info('execute query %s %s %s', query, query_vars, meta_vars)
 
-    return query.format(**vars)
+    return query.format(**query_vars)
 
-def query_db(connection, query,  meta_vars, vars):
+
+def query_db(connection, query,  meta_vars, query_vars):
     if not connection:
         raise ValueError('Missing Connection String')
 
     from sqlalchemy import create_engine
 
     db = create_engine(connection.url)
-    sql = build_sql_query(query, meta_vars, vars)
+    sql = build_sql_query(query, meta_vars, query_vars)
     cur = db.execute(sql)
     rows = cur.fetchall()
 
@@ -93,29 +95,32 @@ def query_db(connection, query,  meta_vars, vars):
 
     return description, data, columns_order
 
-def save(name, sql, meta_vars, connection, editors):
-    return Query.create_or_update(name = name,
-                           sql = sql,
-                           meta_vars = meta_vars,
-                           connection = connection,
-                           editors = editors)
 
-def convert_value(val, type):
+def save(name, sql, meta_vars, connection, editors):
+    return Query.create_or_update(
+        name=name,
+        sql=sql,
+        meta_vars=meta_vars,
+        connection=connection,
+        editors=editors)
+
+
+def convert_value(val, val_type):
     if not val:
         return None
 
-    if type == 'string':
+    if val_type == 'string':
         return val
-    elif type == 'integer':
+    elif val_type == 'integer':
         return int(val)
-    elif type == 'float':
+    elif val_type == 'float':
         return float(val)
 
 
-def vars_with_default_value(meta_vars, vars):
+def vars_with_default_value(meta_vars, query_vars):
     result = {}
     for key, options in meta_vars.iteritems():
-        val = vars.get(key)
+        val = query_vars.get(key)
 
         if not val:
             val = options.get('default')
@@ -123,6 +128,7 @@ def vars_with_default_value(meta_vars, vars):
         result[key] = convert_value(val, options['type'])
 
     return result
+
 
 def data_to_datatable(description, data):
     import gviz_api
@@ -156,7 +162,7 @@ def datatable_to_data(data_table):
     def enum_rows():
         for row in table["rows"]:
             r = []
-            for i,v in enumerate(row["c"]):
+            for i, v in enumerate(row["c"]):
                 val = v["v"] if v else None
 
                 if isinstance(val, basestring) and val.startswith('Date('):
@@ -179,30 +185,35 @@ def datatable_to_data(data_table):
     return dict(description), data, columns_order
 
 
-def query_execute_sql(connection, sql, meta_vars, vars):
-    description, data, columns_order = query_db(connection, sql, meta_vars, vars)
+def query_execute_sql(connection, sql, meta_vars, query_vars):
+    description, data, columns_order = query_db(connection, sql, meta_vars, query_vars)
 
     return description, data, columns_order
 
+
 @mod.route('/list', methods=['GET'])
 @require_login
-def list():
+def list_items():
     queries = Query.all()
 
     return render_template('query/list.html', queries=queries)
 
+
 def handle_datetime(obj):
     return obj.isoformat() if isinstance(obj, datetime) else None
+
 
 @mod.route('/new', methods=['GET'])
 @require_login
 def new():
-    return render_template('query/create_or_edit.html',
-        sql = "",
-        vars = [],
-        connection = None,
-        connections = ConnectionString.all(),
-        editors = [])
+    return render_template(
+        'query/create_or_edit.html',
+        sql="",
+        vars=[],
+        connection=None,
+        connections=ConnectionString.all(),
+        editors=[])
+
 
 @mod.route('/<name>', methods=['DELETE'])
 def delete(name):
@@ -213,10 +224,10 @@ def delete(name):
     json_data = json.dumps({'status': 'ok'})
     return Response(json_data,  mimetype='application/json')
 
+
 @mod.route('/', methods=['POST', 'GET'])
 @mod.route('/<name>', methods=['POST', 'GET'])
 def edit(name=None):
-
     user_access_token = request.args.get('access_token', request.form.get('access_token'))
 
     if not user_access_token and g.user is None:
@@ -226,8 +237,8 @@ def edit(name=None):
         if isinstance(formats, basestring):
             return request.args.get(formats, None) is not None
 
-        for format in formats:
-            if is_format_request(format):
+        for fmt in formats:
+            if is_format_request(fmt):
                 return True
 
         return False
@@ -249,15 +260,15 @@ def edit(name=None):
                 if not name:
                     return meta
 
-                type = request.form.get('var-type%d' % index, 'string')
+                var_type = request.form.get('var-type%d' % index, 'string')
                 default = request.form.get('var-default%d' % index, 'string')
 
-                meta.append((name, {'default': default, 'type': type}))
+                meta.append((name, {'default': default, 'type': var_type}))
 
                 index += 1
 
         def vars_from_request(meta_vars, empty_vars):
-            vars = []
+            query_vars = []
             for name, options in meta_vars:
                 value = request.form.get(name)
 
@@ -266,9 +277,9 @@ def edit(name=None):
                 elif not empty_vars:
                     continue
 
-                vars.append((name, value))
+                query_vars.append((name, value))
 
-            return vars
+            return query_vars
 
         def get_editors():
             editors = request.form.getlist('editors')
@@ -277,7 +288,6 @@ def edit(name=None):
                 return users
 
             return []
-
 
         meta_vars = extract_meta_var_fields()
 
@@ -304,20 +314,20 @@ def edit(name=None):
 
             if created:
                 full_vars = vars_from_request(meta_vars, False)
-                return redirect(url_for('.edit', name = name, **dict(full_vars)))
+                return redirect(url_for('.edit', name=name, **dict(full_vars)))
 
-        vars = vars_from_request(meta_vars, True)
+        query_vars = vars_from_request(meta_vars, True)
 
     else:
         if not name:
             return redirect(url_for('.new'))
 
-        vars = []
+        query_vars = []
         for key, value in request.args.iteritems():
             if not value:
                 continue
 
-            vars.append((key, value))
+            query_vars.append((key, value))
 
         query = Query.find(name, access_token=user_access_token)
 
@@ -331,6 +341,7 @@ def edit(name=None):
 
     data_table = None
     error = None
+    columns_order = None
     json_data = None
     access_token = None
     if execute_sql:
@@ -343,10 +354,12 @@ def edit(name=None):
             json_data = None
 
             if connection:
-                if connection.url.startswith('google://') or connection.url.startswith('http://') or connection.url.startswith('https://'):
-                    description, data, columns_order = query_google_data_source(connection, sql, meta_vars, vars)
+                if connection.url.startswith('google://') or \
+                        connection.url.startswith('http://') or \
+                        connection.url.startswith('https://'):
+                    description, data, columns_order = query_google_data_source(connection, sql, meta_vars, query_vars)
                 else:
-                    description, data, columns_order = query_execute_sql(connection, sql, meta_vars, vars)
+                    description, data, columns_order = query_execute_sql(connection, sql, meta_vars, query_vars)
 
                 if transform:
                     data = Transformer.execute(transform, data, True)
@@ -390,9 +403,9 @@ def edit(name=None):
             return Response(data_table.ToCsv(columns_order=columns_order), mimetype='text/csv')
 
     full_vars = []
-    vars = dict(vars)
+    query_vars = dict(query_vars)
     for key, options in meta_vars:
-        val = vars.get(key)
+        val = query_vars.get(key)
         if val:
             full_vars.append((key, val))
         else:

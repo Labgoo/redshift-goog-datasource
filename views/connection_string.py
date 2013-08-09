@@ -18,9 +18,9 @@ def new():
 
 @mod.route('/<name>', methods=['DELETE'])
 def delete(name):
-    query = ConnectionString.find(name)
-    if query:
-        query.delete()
+    connection = ConnectionString.find(name)
+    if connection:
+        connection.delete()
 
     json_data = ConnectionString.dumps({'status': 'ok'})
     return Response(json_data,  mimetype='application/json')

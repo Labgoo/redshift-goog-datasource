@@ -1,49 +1,60 @@
 {% extends "layout.html" %}
 
 {% block head %}
-<link rel=stylesheet type=text/css href="{{ url_for('static', filename='css/admin.css') }}" media="screen">
+    <link rel=stylesheet type=text/css href="{{ url_for('static', filename='css/admin.css') }}" media="screen">
 {% endblock %}
 
 {% block body %}
-	<div id="content">        
-		<h1>Transformers</h1>
+    <div id="content">
+        <fieldset>
+            <legend>Transformers</legend>
+        </fieldset>
+        <div id="modal-from-dom" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                        <h4>Delete Transformer</h4>
+                    </div>
 
-        <div id="modal-from-dom" class="hide modal fade">
-            <div class="modal-header">
-              <a href="#" class="close">&times;</a>
-              <h3>Delete Query</h3>
-            </div>
-            <div class="modal-body">
-              <p>You are about to delete a transformer, this procedure is irreversible.</p>
-              <p>Do you want to proceed?</p>
-            </div>
-            <div class="modal-footer">
-              <a href="{{url_for('.delete', name='item') }}" class="btn btn-danger">Yes</a>
-              <a href="javascript:$('#modal-from-dom').modal('hide')" class="btn secondary">No</a>
+                    <div class="modal-body">
+                        <p>You are about to delete a transformer, this procedure is irreversible.</p>
+
+                        <p>Do you want to proceed?</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="buton" data-dismiss="modal" class="btn btn-danger">Yes</button>
+                        <button type="button" class="btn secondary" data-dismiss="modal">No</button>
+                    </div>
+                </div>
             </div>
         </div>
 
-		<ul class="admin">
-		    {%for transformer in transformers%}
-		    <li>
-				<a class="name" href="{{url_for('.edit', name=transformer.name) }}">{{transformer.name}}</a>
-				<a href="{{url_for('.delete', name=transformer.name) }}"class="delete-variable btn btn-danger btn-small confirm-delete">
-					<i class="icon-white icon-trash"></i>Delete
-				</a>
-				<a href="{{url_for('.edit', name=transformer.name) }}" class="btn btn-small">
-					<i class="icon-edit"></i>Edit
-				</a>				
-		    </li>
-			{%endfor%}    
-		</ul>
+        <ul class="admin">
+            {%for transformer in transformers%}
+                <li>
+                    <a class="name" href="{{url_for('.edit', name=transformer.name) }}">{{transformer.name}}</a>
+                    <button data-href="{{url_for('.delete', name=transformer.name) }}" type="button" data-toggle="modal" data-target="#modal-from-dom" class="confirm-delete btn btn-danger btn-small">
+                        <i class="icon-white icon-trash"></i>&nbsp;Delete
+                    </button>
+                    <button type="button" data-href="{{url_for('.edit', name=transformer.name) }}" class="btn btn-small">
+                        <i class="icon-edit"></i>&nbsp;Edit
+                    </button>
+                </li>
+            {% else%}
+                No transformer created.
+            {%endfor%}
+        </ul>
 
-		<a id="create" href="{{url_for('.new') }}" class="button pill big primary">
-		  Create a Transformer
-		</a>
-      </div>
+        <a id="create" href="{{url_for('.new')}}" class="button pill big primary">
+            Create a Transformer
+        </a>
+    </div>
+{% endblock %}
 
-    <script>
-        $('#modal-from-dom').bind('show', function() {
+{% block postbody %}
+    <script type="text/javascript">
+        $('#modal-from-dom').on('shown.bs.modal', function () {
             var href = $(this).data('href'),
                 li = $(this).data('li'),
                 removeBtn = $(this).find('.btn-danger');
@@ -62,12 +73,10 @@
 
                 return false;
             });
-        }).modal({ backdrop: false });
+        });
 
-        $('.confirm-delete').click(function(e) {
-            e.preventDefault();
-
-            var href = $(this).attr('href');
+        $('.confirm-delete').click(function() {
+            var href = $(this).data('href');
             $('#modal-from-dom').data({'href': href, 'li': $(this).parent()}).modal('show');
         });
     </script>
