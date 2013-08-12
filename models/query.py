@@ -8,20 +8,27 @@ from models import User, ConnectionString
 
 db = app.extensions['mongoengine']
 
-UNICODE_ASCII_CHARACTERS = (string.ascii_letters.decode('ascii') +
+UNICODE_ASCII_CHARACTERS = (
+    string.ascii_letters.decode('ascii') +
     string.digits.decode('ascii'))
+
 
 def random_ascii_string(length):
     return ''.join([random.choice(UNICODE_ASCII_CHARACTERS) for x in xrange(length)])
 
+
 def create_query_access_token():
     return random_ascii_string(16)
 
+
 class Query(db.Document):
-    meta = {'collection': 'queries',
-            'indexes': [
-                {'fields': ['name'], 'unique': True},
-            ]
+    meta = {
+        'collection': 'queries',
+        'indexes': [
+            {
+                'fields': ['name'], 'unique': True
+            }
+        ]
     }
 
     meta_vars = db.ListField(required=False)

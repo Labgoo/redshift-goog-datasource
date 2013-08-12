@@ -18,17 +18,20 @@
     <div class="navbar">
       <div class="navbar-inner">
             {% if env_logo %}
-                <a href="http://www.cooladata.com/">
+                <a href="{{url_for('homepage.index')}}">
                 <img id="logo" src="{{ env_logo }}">
                 </a>
             {% endif %}
 
-            <a class="navbar-brand" href="#">SQL Query Tool</a>
+            <a class="navbar-brand" href="{{url_for('homepage.index')}}">SQL Query Tool</a>
             <ul class="nav navbar-nav">
-                <li {% if request.blueprint=='homepage'%}class="active"{%endif%}><a href="{{url_for('homepage.index')}}">Home</a></li>
                 <li {% if request.blueprint=='query'%}class="active"{%endif%}><a href="{{url_for('query.list_items')}}">Queries</a></li>
                 <li {% if request.blueprint=='transformer'%}class="active"{%endif%}><a href="{{url_for('transformer.list')}}">Transformers</a></li>
-                <li {% if request.blueprint=='connection_string'%}class="active"{%endif%}><a href="{{url_for('connection_string.list')}}">Connections</a></li>
+
+                {% if not env_disable_connections %}
+                    <li {% if request.blueprint=='connection_string'%}class="active"{%endif%}><a href="{{url_for('connection_string.list')}}">Connections</a></li>
+                {% endif %}
+
                 {% if not env_disable_oauth_clients %}
                     <li {% if request.blueprint=='oauthclient'%}class="active"{%endif%}><a href="{{url_for('oauthclient.list')}}">OAuth Clients</a></li>
                 {% endif %}

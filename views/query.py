@@ -3,9 +3,10 @@
 from flask import render_template, request, Blueprint, Response, redirect, url_for, g
 import logging
 import json
+import os
 from models import Query
 from datetime import datetime
-from models import Transformer, ConnectionString, User
+from models import Transformer, User
 from user import require_login
 
 mod = Blueprint('query', __name__, url_prefix='/query')
@@ -36,12 +37,21 @@ def query_google_data_source(connection, sql, meta_vars, query_vars):
     if result.get("status") == "error":
         http_error_msgs = []
         for error in result.get("errors", []):
-            msg = error.get("detailed_message")
+            reason = error.get('reason')
+            detailed_message = error.get("detailed_message")
+            message = error.get("message")
 
-            if len(msg) == 0:
-                msg = error.get("message")
+            msg = []
+            if reason:
+                msg.append('%s:' % reason)
 
-            http_error_msgs.append(msg)
+            if message:
+                msg.append(message)
+
+            if detailed_message:
+                msg.append(detailed_message)
+
+            http_error_msgs.append("\n".join(msg))
 
         raise requests.HTTPError("\n".join(http_error_msgs), response=r)
 
@@ -203,6 +213,19 @@ def handle_datetime(obj):
     return obj.isoformat() if isinstance(obj, datetime) else None
 
 
+def get_connections_factory():
+    factory_class_name = os.environ.get('connections_class', 'models.ConnectionString')
+    import importlib
+
+    parts = factory_class_name.split(".")
+
+    module_name = ".".join(parts[0:-1])
+    class_name = parts[-1]
+    module = importlib.import_module(module_name)
+
+    return getattr(module, class_name)
+
+
 @mod.route('/new', methods=['GET'])
 @require_login
 def new():
@@ -211,7 +234,7 @@ def new():
         sql="",
         vars=[],
         connection=None,
-        connections=ConnectionString.all(),
+        connections=get_connections_factory().all(),
         editors=[])
 
 
@@ -302,7 +325,7 @@ def edit(name=None):
             return redirect(url_for('user.login', next=request.path))
 
         connection_string = request.form.get('connection-string')
-        connection = ConnectionString.find(connection_string, True)
+        connection = get_connections_factory().find(connection_string, True)
 
         editors = get_editors()
 
@@ -423,7 +446,7 @@ def edit(name=None):
         sql = sql,
         error = error,
         connection = connection,
-        connections = ConnectionString.all() or [connection],
+        connections = get_connections_factory().all() or [connection],
         meta_vars = meta_vars,
         editors = editors,
         access_token=access_token,

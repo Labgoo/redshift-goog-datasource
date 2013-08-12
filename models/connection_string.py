@@ -2,7 +2,7 @@ from app import app
 db = app.extensions['mongoengine']
 from flask import session
 from models import User
-from bson import ObjectId
+
 
 class ConnectionString(db.Document):
     meta = {'collection': 'connection_strings',
