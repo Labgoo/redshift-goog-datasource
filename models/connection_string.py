@@ -1,14 +1,15 @@
 from app import app
+
 db = app.extensions['mongoengine']
 from flask import session
 from models import User
+from bson import ObjectId
 
 
 class ConnectionString(db.Document):
-    meta = {'collection': 'connection_strings',
-            'indexes': [
-                {'fields': ['name'], 'unique': True},
-            ]
+    meta = {
+        'collection': 'connection_strings',
+        'indexes': [{'fields': ['name'], 'unique': True}]
     }
 
     owner = db.ReferenceField(User, required=True, dbref=True)
@@ -24,7 +25,7 @@ class ConnectionString(db.Document):
         if not user:
             return []
 
-        return cls.objects.filter(db.Q(owner=user) | db.Q(editors = user))
+        return cls.objects.filter(db.Q(owner=user) | db.Q(editors=user))
 
     def is_user_editor(self, user):
         return self.owner == user or user in self.editors
@@ -33,7 +34,7 @@ class ConnectionString(db.Document):
     def remove_duplicate_editors(cls, connection, editors):
         user = getattr(session, 'user', None)
 
-        for i,editor in enumerate(editors):
+        for i, editor in enumerate(editors):
             if editor == user and user == connection.owner:
                 editors[i] = None
 
@@ -46,7 +47,7 @@ class ConnectionString(db.Document):
         if not user:
             raise Exception('Missing user')
 
-        connection, created = cls.objects.get_or_create(auto_save = False, name = name)
+        connection, created = cls.objects.get_or_create(auto_save=False, name=name)
 
         if not created and not connection.is_user_editor(user):
             raise ValueError('Connection already exists')
@@ -72,14 +73,13 @@ class ConnectionString(db.Document):
             raise Exception('Missing user')
 
         if ObjectId.is_valid(name_or_oid):
-            filter = db.Q(pk = name_or_oid) | db.Q(name = name_or_oid)
+            query_filter = db.Q(pk=name_or_oid) | db.Q(name=name_or_oid)
         else:
-            filter = db.Q(name = name_or_oid)
+            query_filter = db.Q(name=name_or_oid)
 
         if not allow_global_search:
-            filter = filter & (db.Q(owner=user) | db.Q(editors = user))
+            query_filter = query_filter & (db.Q(owner=user) | db.Q(editors=user))
 
-        connection = cls.objects.get(filter)
+        connection = cls.objects.get(query_filter)
 
         return connection
-
