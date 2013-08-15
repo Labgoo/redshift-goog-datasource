@@ -3,6 +3,7 @@ db = app.extensions['mongoengine']
 from flask import session
 import requests
 import os
+import logging
 
 
 class ProjectConnection(db.Document):
@@ -19,7 +20,10 @@ class ProjectConnection(db.Document):
         user = getattr(session, 'user', None)
 
         if not user:
+            logging.info('connections.all() no user')
             return []
+
+        logging.info('connections.all() user token: %s', user.oauth_token)
 
         r = requests.get('%sprojects/' % cls.api_root(),
                          headers={'Authorization': 'Token %s' % user.oauth_token})
