@@ -102,9 +102,10 @@ jQuery(function () {
             }
 
             var aaData = [];
-            if (data.K) {
-                for  (var i=0;i<data.K.length;i++) {
-                    var row = $.map(data.K[i].c, function(val) {
+            var rows = data.K || data.J;
+            if (rows) {
+                for  (var i=0;i<rows.length;i++) {
+                    var row = $.map(rows[i].c, function(val) {
                        return val.v;
                     });
 
