@@ -104,7 +104,7 @@ jQuery(function () {
             var aaData = [];
             var rows = data.K || data.J;
             if (rows) {
-                for  (var i=rows.length-1;i>=0;i--) {
+                for  (var i=0;i<rows.length;i++) {
                     var row = $.map(rows[i].c, function(val) {
                        return val.v;
                     });
