@@ -45,7 +45,7 @@ jQuery(function () {
     });
 
 	$('#query-name').change(function() {
-		$('#sql-save-execute').prop('disabled', !hasQueryName()).toggleClass('disabled', !hasName);
+		$('#sql-save-execute').prop('disabled', !hasQueryName()).toggleClass('disabled', !hasQueryName());
 	});
 
 	$(document).on('change', '.var-name', function() {
