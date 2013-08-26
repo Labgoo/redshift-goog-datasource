@@ -226,6 +226,20 @@ def get_connections_factory():
     return getattr(module, class_name)
 
 
+def is_format_request(formats):
+    if isinstance(formats, basestring):
+        return request.args.get(formats, None) is not None
+
+    for fmt in formats:
+        if is_format_request(fmt):
+            return True
+
+    return False
+
+
+def is_data_request():
+    return is_format_request(['gwiz', 'json', 'csv', 'html', 'gwiz_json'])
+
 @mod.route('/new', methods=['GET'])
 @require_login
 def new():
@@ -248,6 +262,20 @@ def delete(name):
     return Response(json_data,  mimetype='application/json')
 
 
+def ajax_redirect(url):
+    json_data = json.dumps({'redirect': url})
+    return Response(json_data,  mimetype='application/json')
+
+
+def ajax_redirect_on_post(url):
+    is_post = request.method == 'POST'
+
+    if is_post:
+        return ajax_redirect(url)
+
+    return redirect(url)
+
+
 @mod.route('/', methods=['POST', 'GET'])
 @mod.route('/<name>', methods=['POST', 'GET'])
 def edit(name=None):
@@ -255,19 +283,6 @@ def edit(name=None):
 
     if not user_access_token and g.user is None:
         return redirect(url_for('user.login', next=request.path))
-
-    def is_format_request(formats):
-        if isinstance(formats, basestring):
-            return request.args.get(formats, None) is not None
-
-        for fmt in formats:
-            if is_format_request(fmt):
-                return True
-
-        return False
-
-    def is_data_request():
-        return is_format_request(['gwiz', 'json', 'csv', 'html', 'gwiz_json'])
 
     execute_sql = request.method == 'POST' or is_data_request()
 
@@ -331,13 +346,13 @@ def edit(name=None):
 
         if name and request.form.get('user-action') == 'Save':
             if g.user is None:
-                return redirect(url_for('user.login', next=request.path))
+                return ajax_redirect_on_post(url_for('user.login', next=request.path))
 
             query, created = save(name, sql, meta_vars, connection, editors)
 
             if created:
                 full_vars = vars_from_request(meta_vars, False)
-                return redirect(url_for('.edit', name=name, **dict(full_vars)))
+                return ajax_redirect(url_for('.edit', name=name, **dict(full_vars)))
 
         query_vars = vars_from_request(meta_vars, True)
 

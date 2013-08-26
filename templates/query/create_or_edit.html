@@ -16,7 +16,7 @@
 {% block body %}
     <div class="container">
         <div class="row">
-            <form id="sheepItForm" method="post" {% if not name %}data-new-query="1"{% endif %}
+            <form id="sheepItForm" method="POST" {% if not name %}data-new-query="1"{% endif %}
                   action="{% if name %}{{ url_for('.edit', name=name) }}{% else %}{{ url_for('.new') }}{% endif %}">
                 <fieldset>
                     <legend>{% if name %}Edit{% else %}Create{% endif %} a Query</legend>
@@ -219,5 +219,5 @@
 
     <script src="{{ url_for('static', filename='vendor/jquery.sheepItPlugin.js') }}"></script>
 
-    <script src="{{ url_for('static', filename='js/sql-editor.js', version=19) }}"></script>
+    <script src="{{ url_for('static', filename='js/sql-editor.js', version=21) }}"></script>
 {% endblock %}

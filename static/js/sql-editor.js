@@ -210,11 +210,15 @@ jQuery(function () {
 
         $('.alert').fadeOut();
 
-        $.ajax({
+        var url = $form.attr('action') + '?gwiz_json';
+        $.ajax(url, {
             type: $form.attr('method'),
-            url: $form.attr('action') + '?gwiz_json',
             data: data
         }).done(function(data) {
+            if (data.redirect) {
+                window.location.href = data.redirect;
+                return;
+            }
 
             if (data && data.error) {
                 showError(data.error);
