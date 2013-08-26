@@ -189,62 +189,62 @@ jQuery(function () {
 			return false;
 		}
 
+        var newQuery = $('form').data('new-query');
+
+        if (newQuery && !hasQueryName()) {
+            return;
+        }
+
         var $btn = $(this);
         $btn.addClass('loading');
 
         $('i', $btn).addClass('icon-spinner icon-spin');
 
-        var newQuery = $('form').data('new-query');
+        var $form = $('form');
 
-        if (!newQuery || !hasQueryName()) {
-            var $form = $('form');
+        window.editor.save();
 
-            window.editor.save();
+        var data = $form.serializeArray();
 
-            var data = $form.serializeArray();
+        data.push({ name: this.name, value: this.value });
 
-            data.push({ name: this.name, value: this.value });
+        $('.alert').fadeOut();
 
-            $('.alert').fadeOut();
+        $.ajax({
+            type: $form.attr('method'),
+            url: $form.attr('action') + '?gwiz_json',
+            data: data
+        }).done(function(data) {
 
-            $.ajax({
-                type: $form.attr('method'),
-                url: $form.attr('action') + '?gwiz_json',
-                data: data
-            }).done(function(data) {
+            if (data && data.error) {
+                showError(data.error);
+            } else if (data && data.info) {
+                showInfo(data.info);
+            } else {
+                var vistabs = $('#vistabs');
 
-                if (data && data.error) {
-                    showError(data.error);
-                } else if (data && data.info) {
-                    showInfo(data.info);
-                } else {
-                    var vistabs = $('#vistabs');
+                vistabs.find('a:first').tab('show');
 
-                    vistabs.find('a:first').tab('show');
+                vistabs.find('a').click(function (e) {
+                    e.preventDefault();
+                    $(this).tab('show');
+                });
 
-                    vistabs.find('a').click(function (e) {
-                        e.preventDefault();
-                        $(this).tab('show');
-                    });
+                if (data) {
+                    var json_data = new google.visualization.DataTable(data, 0.6);
 
-                    if (data) {
-                        var json_data = new google.visualization.DataTable(data, 0.6);
-
-                        drawTable(json_data);
-                        drawPieChart(json_data);
-                        drawAreaChart(json_data);
-                        drawBarCharts(json_data);
-                    }
+                    drawTable(json_data);
+                    drawPieChart(json_data);
+                    drawAreaChart(json_data);
+                    drawBarCharts(json_data);
                 }
-            }).always(function() {
-                $btn.removeClass('loading');
-                $('i', $btn).removeClass('icon-spinner icon-spin');
-            }).fail(function(jqXHR, textStatus, errorThrown) {
-                showError(errorThrown);
-            });
-
-            return false;
-        }
+            }
+        }).always(function() {
+            $btn.removeClass('loading');
+            $('i', $btn).removeClass('icon-spinner icon-spin');
+        }).fail(function(jqXHR, textStatus, errorThrown) {
+            showError(errorThrown);
+        });
 
         return false;
     });
