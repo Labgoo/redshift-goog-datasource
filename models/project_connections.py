@@ -13,7 +13,14 @@ class ProjectConnection(db.Document):
 
     @classmethod
     def api_root(cls):
-        return os.environ.get('cooladata_api_root')
+        from urlparse import urlparse
+        oid_url = os.environ.get('oid_url')
+        o = urlparse(oid_url)
+        return "%s://%s/api" % (o.scheme, o.netloc)
+
+    @classmethod
+    def projects_root(cls):
+        return os.path.join(cls.api_root(), 'projects')
 
     @classmethod
     def all(cls):
@@ -23,9 +30,9 @@ class ProjectConnection(db.Document):
             logging.info('connections.all() no user')
             return []
 
-        logging.info('connections.all() user token: %s', user.oauth_token)
+        logging.info('connections.all() user token (four first chars): %s', user.oauth_token[1:4])
 
-        r = requests.get('%sprojects/' % cls.api_root(),
+        r = requests.get(cls.projects_root(),
                          headers={'Authorization': 'Token %s' % user.oauth_token})
 
         r.raise_for_status()
@@ -35,7 +42,7 @@ class ProjectConnection(db.Document):
 
         for project in projects:
             connection = ProjectConnection()
-            connection.url = '%sprojects/%s/cql?tq={query}' % (cls.api_root(), project["id"])
+            connection.url = os.path.join(cls.projects_root(), str(project["id"]), 'cql?tq={query}')
             connection.headers = '{"Authorization": "Token %s"}' % user.oauth_token
             connection.name = project["name"]
             connections.append(connection)

@@ -112,3 +112,47 @@ def require_login(f):
 
     return decorated
 
+
+from openid.fetchers import HTTPFetcher, setDefaultFetcher, HTTPResponse
+from requests.adapters import HTTPAdapter, DEFAULT_POOLBLOCK
+from requests.packages.urllib3.poolmanager import PoolManager
+import requests
+import ssl
+
+
+class MyAdapter(HTTPAdapter):
+    def init_poolmanager(self, connections, maxsize, block=DEFAULT_POOLBLOCK):
+        super(MyAdapter, self).init_poolmanager(connections, maxsize, block)
+
+        self.poolmanager = PoolManager(
+            num_pools=connections,
+            maxsize=maxsize,
+            block=block,
+            ssl_version=ssl.PROTOCOL_TLSv1)
+
+
+class Urllib3Fetcher(HTTPFetcher):
+    def fetch(self, url, body=None, headers=None):
+        if headers is None:
+            headers = {}
+
+        s = requests.Session()
+        s.mount('https://', MyAdapter())
+
+        if body:
+            r = s.request('post', url, data=body, headers=headers, verify=False)
+        else:
+            r = s.request('get', url, headers=headers, verify=False)
+
+        return self._makeResponse(r)
+
+    def _makeResponse(self, requests_response):
+        resp = HTTPResponse()
+        resp.body = requests_response.text
+        resp.final_url = requests_response.url
+        resp.headers = requests_response.headers
+        resp.status = requests_response.status_code
+
+        return resp
+
+setDefaultFetcher(Urllib3Fetcher(), False)

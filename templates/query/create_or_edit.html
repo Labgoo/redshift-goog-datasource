@@ -6,11 +6,11 @@
           media="screen">
     <link rel=stylesheet type=text/css href="{{ url_for('static', filename='css/tables.css', ver=3) }}"
           media="screen">
+    <link rel="stylesheet" href="{{ url_for('static', filename='vendor/tables/TableTools/media/css/TableTools.css') }}" media="screen"/>
 
     <link rel="stylesheet" href="{{ url_for('static', filename='vendor/tag-it/css/jquery.tagit.css') }}"
           type="text/css">
     <link rel="stylesheet" type="text/css" href="//ajax.googleapis.com/ajax/libs/jqueryui/1/themes/flick/jquery-ui.css">
-
 {% endblock %}
 
 {% block body %}
@@ -215,9 +215,14 @@
     <script src="{{ url_for('static', filename='vendor/tag-it/js/tag-it.js') }}" type="text/javascript"
             charset="utf-8"></script>
 
+    <script src="{{ url_for('static', filename='vendor/tables/TableTools/TableTools.js') }}" type="text/javascript"
+            charset="utf-8"></script>
+    <script src="{{ url_for('static', filename='vendor/tables/TableTools/ZeroClipboard.js') }}" type="text/javascript"
+            charset="utf-8"></script>
+
     <script src="https://www.google.com/jsapi" type="text/javascript"></script>
 
     <script src="{{ url_for('static', filename='vendor/jquery.sheepItPlugin.js') }}"></script>
 
-    <script src="{{ url_for('static', filename='js/sql-editor.js', version=21) }}"></script>
+    <script src="{{ url_for('static', filename='js/sql-editor.js', version=20) }}"></script>
 {% endblock %}

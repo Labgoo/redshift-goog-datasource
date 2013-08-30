@@ -106,7 +106,7 @@ jQuery(function () {
             if (rows) {
                 for  (var i=0;i<rows.length;i++) {
                     var row = $.map(rows[i].c, function(val) {
-                       return val.v;
+                       return val ? val.v : '';
                     });
 
                     aaData.push(row);
@@ -115,29 +115,42 @@ jQuery(function () {
 
             var datatable =  $('#datatableView').dataTable( {
                 aaData: aaData,
-                aoColumns: aoColumns
+                aoColumns: aoColumns,
             });
 
-            var datatable = $(this);
+            var oTableTools = new TableTools(datatable, {
+                sSwfPath: "/static/vendor/tables/TableTools/media/swf/copy_csv_xls_pdf.swf",
+                aButtons: [
+                    "copy",
+                    "csv",
+                    "xls",
+                    "pdf",
+                    "print"
+                ]
+		    } );
+
+            //var datatable = $(this);
             // SEARCH - Add the placeholder for Search and Turn this into in-line formcontrol
             var search_input = datatable.closest('.dataTables_wrapper').find('div[id$=_filter] input');
-            search_input.attr('placeholder', 'Search')
-            search_input.addClass('form-control input-small')
-            search_input.css('width', '250px')
+            search_input.attr('placeholder', 'Search');
+            search_input.addClass('form-control input-small');
+            search_input.css('width', '250px');
 
             // SEARCH CLEAR - Use an Icon
             var clear_input = datatable.closest('.dataTables_wrapper').find('div[id$=_filter] a');
-            clear_input.html('<i class="icon-remove-circle icon-large"></i>')
-            clear_input.css('margin-left', '5px')
+            clear_input.html('<i class="icon-remove-circle icon-large"></i>');
+            clear_input.css('margin-left', '5px');
 
             // LENGTH - Inline-Form control
             var length_sel1 = datatable.closest('.dataTables_wrapper').find('div[id$=_length] select');
-            length_sel1.addClass('form-control input-small')
-            length_sel1.css('width', '75px')
+            length_sel1.addClass('form-control input-small');
+            length_sel1.css('width', '75px');
 
             // LENGTH - Info adjust location
             var length_sel2 = datatable.closest('.dataTables_wrapper').find('div[id$=_info]');
-            length_sel2.css('margin-top', '18px')
+            length_sel2.css('margin-top', '18px');
+
+            $('#table').after( oTableTools.dom.container );
         } else {
             $('#table').empty();
         }
@@ -189,11 +202,11 @@ jQuery(function () {
 			return false;
 		}
 
-        var newQuery = $('form').data('new-query');
+        /*var newQuery = $('form').data('new-query');
 
         if (newQuery && !hasQueryName()) {
             return;
-        }
+        }*/
 
         var $btn = $(this);
         $btn.addClass('loading');
