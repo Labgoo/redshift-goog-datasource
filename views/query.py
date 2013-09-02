@@ -21,7 +21,9 @@ def query_google_data_source(connection, sql, meta_vars, query_vars):
 
     query = build_sql_query(sql, meta_vars, query_vars)
 
+    logging.info('url before replace: %s', url)
     url = url.replace('{query}', query)
+    logging.info('url after replace: %s', url)
 
     headers = {}
 
@@ -239,6 +241,7 @@ def is_format_request(formats):
 
 def is_data_request():
     return is_format_request(['gwiz', 'json', 'csv', 'html', 'gwiz_json'])
+
 
 @mod.route('/new', methods=['GET'])
 @require_login
