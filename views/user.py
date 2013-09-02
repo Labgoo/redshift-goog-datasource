@@ -17,7 +17,7 @@ oid = OpenID(app)
 def logout():
     session.pop('openid', None)
     flash(u'You were signed out')
-    return redirect(oid.get_next_url())
+    return redirect('/')
 
 @mod.route('/create-profile', methods=['GET', 'POST'])
 def create_profile():
@@ -52,12 +52,12 @@ def login():
         openid = request.form.get('openid')
         if openid:
             return oid.try_login(openid,
-                                 ask_for=['email', 'fullname', 'nickname'], nice_to_have=['oauth-token'])
+                                 ask_for=['email', 'fullname'], nice_to_have=['oauth-token'])
     else:
         oid_url = os.environ.get('oid_url')
         if oid_url:
             return oid.try_login(oid_url,
-                                 ask_for=['email', 'fullname', 'nickname'], nice_to_have=['oauth-token'])
+                                 ask_for=['email', 'fullname'], nice_to_have=['oauth-token'])
 
     return render_template(
         'users/login.html',

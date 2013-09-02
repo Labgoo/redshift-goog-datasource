@@ -4,11 +4,14 @@ from flask import redirect, url_for
 import os
 
 from sqlalchemy.dialects import registry
+
 registry.register('postgresql.redshift', 'redshift' '', 'PGDialect_RedShift')
+
 
 @app.before_request
 def before_request():
-	logging.getLogger().setLevel(logging.INFO)
+    logging.getLogger().setLevel(logging.INFO)
+
 
 from views import query
 from views import transformer
@@ -26,17 +29,19 @@ app.register_blueprint(oauth2.mod)
 app.register_blueprint(oauthclient.mod)
 app.register_blueprint(homepage.mod)
 
+
 @app.context_processor
 def inject_meta():
-    d =  dict(favico=os.environ.get('favico'), logo=os.environ.get('logo'))
+    d = dict(favico=os.environ.get('favico'), logo=os.environ.get('logo'))
 
-    for key,val in os.environ.iteritems():
+    for key, val in os.environ.iteritems():
         key = "env_" + key
         d[key] = val
 
     return d
 
+
 if __name__ == '__main__':
-	# Bind to PORT if defined, otherwise default to 5000.
-	port = int(os.environ.get('PORT', 5000))
-	app.run(host='0.0.0.0', port=port)
+    # Bind to PORT if defined, otherwise default to 5000.
+    port = int(os.environ.get('PORT', 5000))
+    app.run(host='0.0.0.0', port=port)
