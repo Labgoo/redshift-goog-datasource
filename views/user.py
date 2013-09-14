@@ -74,6 +74,9 @@ def create_or_login(resp):
     if oauth_token:
         session['oauth_token'] = oauth_token
 
+    name = resp.fullname or resp.nickname
+    email = resp.email
+
     user = User.get_by_openid(resp.identity_url)
     if user is not None:
         flash(u'Successfully signed in')
@@ -84,12 +87,18 @@ def create_or_login(resp):
 
         g.user = user
         return redirect(oid.get_next_url())
+    else:
+        auto_profile_create = os.environ.get('auto_profile_create', None)
+
+        if auto_profile_create:
+            User.create(name, email, session['openid'], oauth_token)
+            return redirect(oid.get_next_url())
 
     return redirect(url_for(
         '.create_profile',
         next=oid.get_next_url(),
-        name=resp.fullname or resp.nickname,
-        email=resp.email))
+        name=name,
+        email=email))
 
 @app.before_request
 def lookup_current_user():
