@@ -187,8 +187,8 @@ def datatable_to_data(data_table):
     data = [item for item in enum_rows()]
 
     def convert_description():
-        for col in description:
-            yield col["id"], (col["type"], col["label"])
+        for col_name in description:
+            yield col_name["id"], (col_name["type"], col_name["label"])
 
     columns_order = [col["id"] for col in description]
 
@@ -297,40 +297,40 @@ def edit(name=None):
 
             meta = []
             while True:
-                name = request.form.get('var-name%d' % index)
-                if not name:
+                var_name = request.form.get('var-name%d' % index)
+                if not var_name:
                     return meta
 
                 var_type = request.form.get('var-type%d' % index, 'string')
                 default = request.form.get('var-default%d' % index, 'string')
 
-                meta.append((name, {'default': default, 'type': var_type}))
+                meta.append((var_name, {'default': default, 'type': var_type}))
 
                 index += 1
 
         def vars_from_request(meta_vars, empty_vars):
-            query_vars = []
-            for name, options in meta_vars:
-                value = request.form.get(name)
+            current_query_vars = []
+            for meta_name, meta_options in meta_vars:
+                var_value = request.form.get(meta_name)
 
-                if value:
-                    value = convert_value(value, options.get('type'))
+                if var_value:
+                    var_value = convert_value(value, meta_options.get('type'))
                 elif not empty_vars:
                     continue
 
-                query_vars.append((name, value))
+                current_query_vars.append((meta_name, var_value))
 
-            return query_vars
+            return current_query_vars
 
         def get_editors():
-            editors = request.form.getlist('editors')
-            if editors:
-                users = User.get_by_username(editors)
+            current_editors = request.form.getlist('editors')
+            if current_editors:
+                users = User.get_by_username(current_editors)
                 return users
 
             return []
 
-        meta_vars = extract_meta_var_fields()
+        fields_meta_vars = extract_meta_var_fields()
 
         sql = request.form['sql']
 
@@ -351,13 +351,17 @@ def edit(name=None):
             if g.user is None:
                 return ajax_redirect_on_post(url_for('user.login', next=request.path))
 
-            query, created = save(name, sql, meta_vars, connection, editors)
+            try:
+                query, created = save(name, sql, fields_meta_vars, connection, editors)
 
-            if created:
-                full_vars = vars_from_request(meta_vars, False)
-                return ajax_redirect(url_for('.edit', name=name, **dict(full_vars)))
+                if created:
+                    full_vars = vars_from_request(fields_meta_vars, False)
+                    return ajax_redirect(url_for('.edit', name=name, **dict(full_vars)))
 
-        query_vars = vars_from_request(meta_vars, True)
+            except Exception, ex:
+                return Response(json.dumps({"error": ex.message.encode('utf8')}), mimetype='application/json')
+
+        query_vars = vars_from_request(fields_meta_vars, True)
 
     else:
         if not name:
@@ -376,7 +380,7 @@ def edit(name=None):
             return redirect(url_for('.new'))
 
         sql = query.sql
-        meta_vars = query.meta_vars
+        fields_meta_vars = query.meta_vars
         connection = query.connection
         editors = query.editors
 
@@ -398,9 +402,17 @@ def edit(name=None):
                 if connection.url.startswith('google://') or \
                         connection.url.startswith('http://') or \
                         connection.url.startswith('https://'):
-                    description, data, columns_order = query_google_data_source(connection, sql, meta_vars, query_vars)
+                    description, data, columns_order = query_google_data_source(
+                        connection,
+                        sql,
+                        fields_meta_vars,
+                        query_vars)
                 else:
-                    description, data, columns_order = query_execute_sql(connection, sql, meta_vars, query_vars)
+                    description, data, columns_order = query_execute_sql(
+                        connection,
+                        sql,
+                        fields_meta_vars,
+                        query_vars)
 
                 if transform:
                     data = Transformer.execute(transform, data, True)
@@ -445,7 +457,7 @@ def edit(name=None):
 
     full_vars = []
     query_vars = dict(query_vars)
-    for key, options in meta_vars:
+    for key, options in fields_meta_vars:
         val = query_vars.get(key)
         if val:
             full_vars.append((key, val))
@@ -465,7 +477,7 @@ def edit(name=None):
         error = error,
         connection = connection,
         connections = get_connections_factory().all() or [connection],
-        meta_vars = meta_vars,
+        meta_vars = fields_meta_vars,
         editors = editors,
         access_token=access_token,
         vars = full_vars)

@@ -30,7 +30,8 @@ class ProjectConnection(db.Document):
             logging.info('connections.all() no user')
             return []
 
-        logging.info('connections.all() user token (four first chars): %s', user.oauth_token[1:4])
+        logging.info('connections.all() user token (four first chars): %s',
+                     user.oauth_token[1:4] if user.oauth_token else None)
 
         r = requests.get(cls.projects_root(),
                          headers={'Authorization': 'Token %s' % user.oauth_token})

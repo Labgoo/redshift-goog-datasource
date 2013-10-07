@@ -56,8 +56,9 @@ def login():
     else:
         oid_url = os.environ.get('oid_url')
         if oid_url:
-            return oid.try_login(oid_url,
-                                 ask_for=['email'], nice_to_have=['oauth-token'])
+            return oid.try_login(
+                oid_url,
+                ask_for=['email'], nice_to_have=['oauth-token'])
 
     return render_template(
         'users/login.html',

@@ -34,7 +34,7 @@ class Query(db.Document):
     meta_vars = db.ListField(required=False)
     sql = db.StringField(required=True)
     name = db.StringField(required=True)
-    connection = db.ReferenceField(ConnectionString, required=False, dbref=True)
+    connection = db.GenericReferenceField(required=False)
     last_modified_by = db.ReferenceField(User, required=True, dbref=True)
     updated = db.DateTimeField(required=True)
     owner = db.ReferenceField(User, required=True, dbref=True)
