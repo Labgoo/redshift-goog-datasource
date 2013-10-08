@@ -34,7 +34,7 @@ class Query(db.Document):
     meta_vars = db.ListField(required=False)
     sql = db.StringField(required=True)
     name = db.StringField(required=True)
-    connection = db.GenericReferenceField(required=False)
+    connection_name = db.StringField(required=False)
     last_modified_by = db.ReferenceField(User, required=True, dbref=True)
     updated = db.DateTimeField(required=True)
     owner = db.ReferenceField(User, required=True, dbref=True)
@@ -80,11 +80,13 @@ class Query(db.Document):
 
         editors = cls.remove_duplicate_editors(query, editors)
 
+        connection_name = connection.name if connection is not None else None
+
         if not created:
             modified = [editor.pk for editor in editors] != [editor.pk for editor in query.editors] or \
                        query.sql != sql or \
                        query.meta_vars != meta_vars or \
-                       query.connection != connection
+                       query.connection_name != connection_name
 
         if created or not query.access_token:
             query.access_token = create_query_access_token()
@@ -94,7 +96,7 @@ class Query(db.Document):
             query.editors = editors
             query.last_modified_by = user
             query.sql = sql
-            query.connection = connection
+            query.connection_name = connection_name
             query.meta_vars = meta_vars
             query.updated = datetime.utcnow()
             query.save()

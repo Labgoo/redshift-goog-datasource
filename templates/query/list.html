@@ -33,7 +33,7 @@
         <ul class="admin">
             {%for query in queries%}
                 <li>
-                    <a class="name" href="{{url_for('.edit', name=query.name) }}">{{query.name}} <small class="label label-info">{{query.connection.name}}</small></a>
+                    <a class="name" href="{{url_for('.edit', name=query.name) }}">{{query.name}} {% if query.connection_name %} <small class="label label-info">{{query.connection_name}}</small>{% else %} <small class="label label-warning">Missing connection</small>{% endif %}</a>
 
                     <button data-href="{{url_for('.delete', name=query.name) }}" type="button" data-toggle="modal" data-target="#modal-from-dom" class="confirm-delete btn btn-danger btn-small">
                         <i class="icon-white icon-trash"></i>&nbsp;Delete
