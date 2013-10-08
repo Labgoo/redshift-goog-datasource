@@ -314,7 +314,7 @@ def edit(name=None):
                 var_value = request.form.get(meta_name)
 
                 if var_value:
-                    var_value = convert_value(value, meta_options.get('type'))
+                    var_value = convert_value(var_value, meta_options.get('type'))
                 elif not empty_vars:
                     continue
 
