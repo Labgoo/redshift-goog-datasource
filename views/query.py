@@ -381,7 +381,7 @@ def edit(name=None):
 
         sql = query.sql
         fields_meta_vars = query.meta_vars
-        connection = get_connections_factory().find(query.connection_name)
+        connection = get_connections_factory().find(query.connection_name, allow_global_search=True)
         editors = query.editors
 
     data_table = None
