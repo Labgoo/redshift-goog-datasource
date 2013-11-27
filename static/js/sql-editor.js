@@ -102,7 +102,7 @@ jQuery(function () {
             }
 
             var aaData = [];
-            if (rows) {
+            if (data.rows) {
                 for  (var i=0;i<data.rows.length;i++) {
                     var row = $.map(data.rows[i].c, function(val) {
                        return val ? val.v : '';
