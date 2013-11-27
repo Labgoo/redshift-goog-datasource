@@ -94,7 +94,7 @@ jQuery(function () {
         if (data) {
             $('#table').html( '<table cellpadding="0" cellspacing="0" class="table table-striped table-bordered table-hover" border="0" class="display" id="datatableView"></table>' );
 
-            var typeMapper = {number: 'numeric', string: 'string', date: 'date'};
+            var typeMapper = {'numeric': 'numeric', 'string': 'string', 'datetime': 'date'};
             var aoColumns = [];
             for  (var i=0;i<data.cols.length;i++) {
                 var col = data.cols[i];
@@ -104,8 +104,15 @@ jQuery(function () {
             var aaData = [];
             if (data.rows) {
                 for  (var i=0;i<data.rows.length;i++) {
-                    var row = $.map(data.rows[i].c, function(val) {
-                       return val ? val.v : '';
+                    var row = $.map(data.rows[i].c, function(val, index) {
+                        val = val ? val.v : '';
+                        val = val ? val : '';
+
+                        if (val && val.length > 0 && data.cols[index].type === 'datetime') {
+                            val = eval(val);
+                        }
+
+                        return val;
                     });
 
                     aaData.push(row);
