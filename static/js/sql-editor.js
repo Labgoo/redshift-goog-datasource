@@ -96,16 +96,15 @@ jQuery(function () {
 
             var typeMapper = {number: 'numeric', string: 'string', date: 'date'};
             var aoColumns = [];
-            for  (var i=0;i<data.H.length;i++) {
-                var col = data.H[i];
+            for  (var i=0;i<data.cols.length;i++) {
+                var col = data.cols[i];
                 aoColumns.push({sTitle: col.label || col.id, sType: typeMapper[col.type] || 'string'});
             }
 
             var aaData = [];
-            var rows = data.K || data.J;
             if (rows) {
-                for  (var i=0;i<rows.length;i++) {
-                    var row = $.map(rows[i].c, function(val) {
+                for  (var i=0;i<data.rows.length;i++) {
+                    var row = $.map(data.rows[i].c, function(val) {
                        return val ? val.v : '';
                     });
 
@@ -248,9 +247,10 @@ jQuery(function () {
                 });
 
                 if (data) {
+                    drawTable(data);
+
                     var json_data = new google.visualization.DataTable(data, 0.6);
 
-                    drawTable(json_data);
                     drawPieChart(json_data);
                     drawAreaChart(json_data);
                     drawBarCharts(json_data);

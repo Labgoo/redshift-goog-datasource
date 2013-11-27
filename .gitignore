@@ -33,3 +33,8 @@ nosetests.xml
 .mr.developer.cfg
 .project
 .pydevproject
+.env
+.idea
+redis-2.6.12
+.DS_Store
+venv
