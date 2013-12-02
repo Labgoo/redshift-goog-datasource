@@ -105,14 +105,16 @@ jQuery(function () {
             if (data.rows) {
                 for  (var i=0;i<data.rows.length;i++) {
                     var row = $.map(data.rows[i].c, function(val, index) {
-                        val = val ? val.v : '';
-                        val = val ? val : '';
+                        var v = val ? val.v : '';
+                        v = v ? v : '';
 
-                        if (val && val.length > 0 && data.cols[index].type === 'datetime') {
-                            val = eval(val);
+                        if (v.length > 0 && data.cols[index].type === 'datetime') {
+                            var dateObj = new Date(eval(v));
+                            var clonedDate = new Date(dateObj.getTime());
+                            v = clonedDate;
                         }
 
-                        return val;
+                        return v;
                     });
 
                     aaData.push(row);
@@ -133,7 +135,7 @@ jQuery(function () {
                     "pdf",
                     "print"
                 ]
-		    } );
+		    });
 
             //var datatable = $(this);
             // SEARCH - Add the placeholder for Search and Turn this into in-line formcontrol
